@@ -1,0 +1,695 @@
+.loadingGate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: #000;
+}
+
+.pageBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #FCF4F0;
+  pointer-events: none;
+}
+
+.loadLabel {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.loadPct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 12vw, 9rem);
+  color: #6D0101;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #FCF4F0;
+  overflow: visible;
+  z-index: 10;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.siteHeader {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.siteHeaderMenuOpen {
+  z-index: 400;
+}
+
+.siteHeader > .nav,
+.siteHeader > .mobileMenu {
+  pointer-events: auto;
+}
+
+.nav {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 1.5rem 2.5rem;
+  background: transparent;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.navOnDark {
+  background: rgba(26, 26, 26, 0.92);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.navOnDark .navLinks a,
+.navOnDark .navSocials a {
+  color: rgba(252, 244, 240, 0.88);
+}
+
+.navOnDark .navLinks a:hover {
+  color: #ffd5fb;
+}
+
+.navOnDark .navCta {
+  background: #ffd5fb;
+  color: #6d0101;
+}
+
+.navOnDark .navCta:hover {
+  background: #fcf4f0;
+}
+
+.navOnDark .navSocials a:hover {
+  color: #ffd5fb;
+  opacity: 1;
+}
+
+.navLogo img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.navLinks {
+  display: flex;
+  gap: 2.25rem;
+  justify-self: center;
+}
+
+.navLinks a {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #6d0101;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.92;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.navLinks a:hover {
+  opacity: 1;
+  color: #4a0000;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-self: end;
+}
+
+.navCta {
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  background: #ffd5fb;
+  color: #6d0101;
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.navCta:hover {
+  transform: translateY(-2px);
+  background: #fcf4f0;
+}
+
+.navSocials {
+  display: flex;
+  gap: 1rem;
+}
+
+.navSocials a {
+  color: #6d0101;
+  text-decoration: none;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  opacity: 0.65;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.navSocials a:hover {
+  opacity: 1;
+  color: #4a0000;
+}
+
+.navBurger {
+  display: none;
+  position: relative;
+  z-index: 4;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.navBurger span {
+  display: block;
+  width: 1.35rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #6d0101;
+  transform-origin: center;
+  transition: transform 0.28s ease, background-color 0.28s ease;
+}
+
+.navBurgerOpen span:nth-child(1) {
+  transform: translateY(4.5px) rotate(45deg);
+}
+
+.navBurgerOpen span:nth-child(2) {
+  transform: translateY(-4.5px) rotate(-45deg);
+}
+
+.navMenuOpen {
+  z-index: 3;
+  background: transparent;
+  box-shadow: none;
+}
+
+.navMenuOpen.navOnDark {
+  background: transparent;
+  box-shadow: none;
+}
+
+.navMenuOpen .navLogo img {
+  filter: brightness(0) invert(1);
+}
+
+.navMenuOpen .navBurger {
+  background: transparent;
+}
+
+.navBurgerOpen span {
+  background: #fcf4f0;
+}
+
+.mobileMenu {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 5rem 2rem 2rem;
+  background: #6d0101;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.mobileMenuOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobileMenuNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.mobileMenuNav a {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 10vw, 4rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fcf4f0;
+  text-decoration: none;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.mobileMenuNav a:hover {
+  color: #ffd5fb;
+  transform: translateX(6px);
+}
+
+.mobileMenuCta {
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: #ffd5fb;
+  color: #6d0101;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+
+.mobileMenuCta:hover {
+  transform: translateY(-2px);
+}
+
+.mobileMenuSocials {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.mobileMenuSocials a {
+  color: rgba(252, 244, 240, 0.55);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.mobileMenuSocials a:hover {
+  color: #ffd5fb;
+}
+
+.navOnDark .navBurger {
+  background: transparent;
+}
+
+.navOnDark .navBurger span {
+  background: #fcf4f0;
+}
+
+.navMenuOpen .navBurger span,
+.navBurger.navBurgerOpen span {
+  background: #fcf4f0;
+}
+
+.imageWrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: min(38vw, 520px);
+  height: min(78vh, 780px);
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform;
+  overflow: visible;
+}
+
+.imageWrapVisible {
+  opacity: 1;
+}
+
+.imageStack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  -webkit-mask-image: radial-gradient(
+    ellipse 78% 92% at 50% 44%,
+    #000 42%,
+    rgba(0, 0, 0, 0.92) 62%,
+    rgba(0, 0, 0, 0.55) 80%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 78% 92% at 50% 44%,
+    #000 42%,
+    rgba(0, 0, 0, 0.92) 62%,
+    rgba(0, 0, 0, 0.55) 80%,
+    transparent 100%
+  );
+}
+
+.imageStack::after {
+  content: none;
+}
+
+.blendOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 52%,
+    rgba(252, 244, 240, 0.25) 72%,
+    rgba(252, 244, 240, 0.72) 88%,
+    #FCF4F0 100%
+  );
+}
+
+.darkVignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      ellipse 72% 88% at 50% 42%,
+      transparent 28%,
+      rgba(26, 26, 26, 0.45) 62%,
+      rgba(26, 26, 26, 0.92) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 45%,
+      rgba(26, 26, 26, 0.55) 75%,
+      #1A1A1A 100%
+    );
+}
+
+.portrait {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+}
+
+.portraitBase {
+  z-index: 1;
+  filter:
+    brightness(0.72)
+    sepia(0.18)
+    saturate(1.08)
+    contrast(1.08);
+}
+
+.hoverReveal {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, #000 68%, transparent 100%);
+  mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, #000 68%, transparent 100%);
+  will-change: mask-image, -webkit-mask-image;
+}
+
+.portraitHover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center 46%;
+  display: block;
+  transform: translateY(-2.5%);
+}
+
+.logoOverlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 25;
+  width: min(42vw, 480px);
+  height: auto;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center center;
+}
+
+.signature {
+  position: absolute;
+  right: 2.5rem;
+  bottom: 28%;
+  z-index: 4;
+  width: clamp(80px, 12vw, 140px);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.signature path {
+  fill: none;
+  stroke: #6D0101;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.nextBlock {
+  position: absolute;
+  left: 5rem;
+  bottom: 2.5rem;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0;
+}
+
+.nextLabel {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.45);
+}
+
+.nextValue {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  color: #1A1A1A;
+}
+
+.lockBtn {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  background: none;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  color: #1A1A1A;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.lockBtn:hover {
+  border-color: #6D0101;
+  color: #6D0101;
+}
+
+.scrollCue {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 1.5rem;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  opacity: 0;
+}
+
+.scrollText {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.45);
+  writing-mode: vertical-rl;
+}
+
+.scrollLine {
+  display: block;
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, #6D0101, transparent);
+}
+
+.heroBgText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.heroBgLine,
+.heroBgLineWide {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #1A1A1A;
+  opacity: 0.1;
+}
+
+.heroBgLine {
+  font-size: clamp(4.5rem, 15vw, 11rem);
+}
+
+.heroBgLineWide {
+  margin-top: -0.08em;
+  font-size: clamp(5.5rem, 20vw, 14rem);
+}
+
+.scrollStrips {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scrollStrip {
+  overflow: hidden;
+  padding: 0.35rem 0;
+}
+
+.stripTrack {
+  display: flex;
+  gap: 4rem;
+  width: max-content;
+  animation: stripScrollLeft 140s linear infinite;
+  animation-play-state: paused;
+}
+
+.stripTrackLeft {
+  animation-name: stripScrollLeft;
+}
+
+.stripTrackRight {
+  animation-name: stripScrollRight;
+}
+
+.stripTrack span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.2rem, 6.5vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stripOne span {
+  color: #FFD5FB;
+  opacity: 0.38;
+}
+
+.stripTwo span {
+  color: #6D0101;
+  opacity: 0.42;
+}
+
+@keyframes stripScrollLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes stripScrollRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+@media (max-width: 900px) {
+  .nav {
+    padding: 1rem 1.25rem;
+    grid-template-columns: 1fr auto;
+  }
+
+  .navLinks,
+  .navSocials,
+  .navCta {
+    display: none;
+  }
+
+  .navRight {
+    gap: 0;
+  }
+
+  .navBurger {
+    display: inline-flex;
+  }
+
+  .signature {
+    right: 1.25rem;
+    bottom: 32%;
+    width: 70px;
+  }
+
+  .nextBlock {
+    left: 1.25rem;
+    bottom: 5.5rem;
+  }
+
+  .scrollCue {
+    display: none;
+  }
+
+  .imageWrap {
+    width: min(72vw, 400px);
+    height: min(62vh, 560px);
+    top: 54%;
+  }
+}

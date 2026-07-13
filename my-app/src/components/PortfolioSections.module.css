@@ -1,0 +1,281 @@
+.main {
+  position: relative;
+  z-index: 2;
+  background: #FCF4F0;
+  color: #1A1A1A;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6D0101;
+  margin-bottom: 0.75rem;
+}
+
+.sectionTitle {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.bodyCopy {
+  max-width: 42ch;
+  margin-top: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(26, 26, 26, 0.78);
+}
+
+.photoStrip {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 6rem 0 4rem;
+  overflow: hidden;
+  background: #1A1A1A;
+  transform: translateZ(0);
+}
+
+.photoStripHeader {
+  padding: 0 2.5rem 2.5rem;
+}
+
+.photoStripEyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #FCF4F0;
+  margin-bottom: 0.5rem;
+}
+
+.photoStripCount {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(252, 244, 240, 0.55);
+}
+
+.photoStrip :global(.inner) {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  padding: 0 2.5rem 2rem;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.workCardLink {
+  flex: 0 0 400px;
+  width: 400px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.workCard {
+  --work-accent: #6D0101;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(252, 244, 240, 0.14);
+  background: rgba(252, 244, 240, 0.04);
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.workCard:hover {
+  border-color: color-mix(in srgb, var(--work-accent) 55%, transparent);
+  transform: translateY(-6px);
+}
+
+.workCardThumb {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(252, 244, 240, 0.1);
+  background:
+    linear-gradient(145deg, rgba(252, 244, 240, 0.06), rgba(252, 244, 240, 0.01)),
+    linear-gradient(135deg, color-mix(in srgb, var(--work-accent) 22%, transparent), transparent 55%);
+}
+
+.workCardThumb::before {
+  content: '';
+  position: absolute;
+  inset: 1.25rem;
+  border: 1px dashed rgba(252, 244, 240, 0.16);
+  pointer-events: none;
+}
+
+.workCardIndex {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--work-accent) 70%, #FCF4F0);
+}
+
+.workCardPlaceholder {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(252, 244, 240, 0.35);
+}
+
+.workCardBody {
+  padding: 1.25rem 1.35rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.workCardBody h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  color: #FCF4F0;
+}
+
+.workCardBody p {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(252, 244, 240, 0.55);
+}
+
+.moreWorkLink {
+  flex: 0 0 400px;
+  width: 400px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.moreWorkCard {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(252, 244, 240, 0.14);
+  background: rgba(252, 244, 240, 0.04);
+  transition: border-color 0.25s, transform 0.25s, background-color 0.25s;
+}
+
+.moreWorkCard:hover {
+  border-color: rgba(255, 213, 251, 0.55);
+  background: rgba(255, 213, 251, 0.08);
+  transform: translateY(-6px);
+}
+
+.moreWorkInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.moreWorkText {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fcf4f0;
+}
+
+.moreWorkArrow {
+  font-size: 2rem;
+  line-height: 1;
+  color: #ffd5fb;
+  transition: transform 0.25s ease;
+}
+
+.moreWorkCard:hover .moreWorkArrow {
+  transform: translateX(8px);
+}
+
+.work {
+  padding: 8rem 2.5rem 10rem;
+}
+
+.workHeader {
+  margin-bottom: 3rem;
+}
+
+.work :global(.work-grid) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.projectCard {
+  padding: 1.25rem;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.4);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.projectCard:hover {
+  border-color: rgba(109, 1, 1, 0.35);
+  transform: translateY(-4px);
+}
+
+.projectThumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, rgba(109, 1, 1, 0.12), rgba(26, 26, 26, 0.06));
+}
+
+.projectCard h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.35rem;
+}
+
+.projectCard p {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.5);
+}
+
+@media (max-width: 900px) {
+  .photoStripHeader,
+  .photoStrip :global(.inner),
+  .work {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .workCardLink {
+    width: 300px;
+    flex-basis: 300px;
+  }
+
+  .moreWorkLink {
+    width: 300px;
+    flex-basis: 300px;
+  }
+
+  .moreWorkCard {
+    min-height: 420px;
+  }
+
+  .workCardThumb {
+    height: 320px;
+  }
+
+  .work :global(.work-grid) {
+    grid-template-columns: 1fr;
+  }
+}

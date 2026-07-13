@@ -1,0 +1,245 @@
+.bentoWrap {
+  --bento-accent: #ffd5fb;
+  width: 100%;
+  max-width: 54rem;
+  margin: 0 auto;
+  padding-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.bentoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bentoHint {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bento-accent);
+  opacity: 0.75;
+}
+
+.grip {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 5px);
+  gap: 4px;
+  padding: 0.35rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.gripDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bento-accent);
+  opacity: 0.9;
+}
+
+/* True bento — 4 asymmetric tiles */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  grid-template-rows: 1fr 1fr auto;
+  gap: 0.65rem;
+  min-height: 280px;
+  max-height: 340px;
+}
+
+.bentoCell {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 0;
+  animation: bentoIn 0.45s ease backwards;
+}
+
+.bentoCell:nth-child(1) { animation-delay: 0.05s; }
+.bentoCell:nth-child(2) { animation-delay: 0.1s; }
+.bentoCell:nth-child(3) { animation-delay: 0.15s; }
+.bentoCell:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes bentoIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bentoFrame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 0;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+  cursor: zoom-in;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.bentoFrame:hover {
+  transform: scale(1.02);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.bentoFrame:focus-visible {
+  outline: 2px solid var(--bento-accent);
+  outline-offset: 2px;
+}
+
+.bentoImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.bentoLabel {
+  flex-shrink: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(252, 244, 240, 0.45);
+  padding-left: 0.2rem;
+}
+
+/* Slot 1 — tall feature left */
+.bentoFeature {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.bentoFeature .bentoFrame {
+  min-height: 200px;
+}
+
+/* Slots 2 & 3 — stacked right */
+.bentoStackTop {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.bentoStackBottom {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.bentoStackTop .bentoFrame,
+.bentoStackBottom .bentoFrame {
+  min-height: 92px;
+}
+
+/* Slot 4 — wide strip bottom */
+.bentoWide {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}
+
+.bentoWide .bentoFrame {
+  min-height: 88px;
+  aspect-ratio: 21 / 7;
+}
+
+/* Fewer than 4 screens — keep bento feel */
+.bentoGrid[data-count='1'] {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  max-height: none;
+}
+
+.bentoGrid[data-count='1'] .bentoFeature {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.bentoGrid[data-count='1'] .bentoFeature .bentoFrame {
+  aspect-ratio: 16 / 10;
+  max-height: 240px;
+}
+
+.bentoGrid[data-count='2'] {
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: 1fr;
+  max-height: 260px;
+}
+
+.bentoGrid[data-count='2'] .bentoFeature {
+  grid-row: 1;
+}
+
+.bentoGrid[data-count='2'] .bentoStackTop {
+  grid-row: 1;
+}
+
+.bentoGrid[data-count='3'] {
+  grid-template-rows: 1fr 1fr;
+  max-height: 300px;
+}
+
+.bentoGrid[data-count='3'] .bentoWide {
+  display: none;
+}
+
+.bentoEmpty {
+  width: 100%;
+  max-width: 54rem;
+  margin: 1.5rem auto 0;
+  font-size: 0.85rem;
+  color: rgba(252, 244, 240, 0.5);
+}
+
+@media (max-width: 720px) {
+  .bentoGrid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .bentoFeature {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .bentoFeature .bentoFrame {
+    min-height: 180px;
+    aspect-ratio: 16 / 11;
+  }
+
+  .bentoStackTop {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .bentoStackBottom {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .bentoStackTop .bentoFrame,
+  .bentoStackBottom .bentoFrame {
+    min-height: 120px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .bentoWide {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .bentoWide .bentoFrame {
+    min-height: 100px;
+  }
+}

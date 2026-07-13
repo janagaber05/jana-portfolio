@@ -1,0 +1,133 @@
+.page {
+  min-height: 100vh;
+  background: #fcf4f0;
+  color: #1a1a1a;
+  padding: 2rem 2.5rem 5rem;
+}
+
+.header {
+  max-width: 52rem;
+  margin-bottom: 3rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6d0101;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  opacity: 0.75;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6d0101;
+  margin-bottom: 0.75rem;
+}
+
+.header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 10vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+}
+
+.intro {
+  max-width: 42ch;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(26, 26, 26, 0.72);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.projectLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.projectCard {
+  --work-accent: #6d0101;
+  height: 100%;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.45);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.projectCard:hover {
+  border-color: color-mix(in srgb, var(--work-accent) 45%, transparent);
+  transform: translateY(-6px);
+}
+
+.projectThumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05)),
+    linear-gradient(135deg, color-mix(in srgb, var(--work-accent) 18%, transparent), transparent 58%);
+}
+
+.projectIndex {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--work-accent) 75%, #1a1a1a);
+}
+
+.projectBody {
+  padding: 1.2rem 1.25rem 1.4rem;
+}
+
+.projectBody h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.projectBody p {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.55);
+}
+
+.projectYear {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.42);
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 1.25rem 1.25rem 4rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
