@@ -16,7 +16,7 @@ const NAV = [
 ];
 
 export default function Layout() {
-  const { error, loading } = useCms();
+  const { error, loading, load } = useCms();
   const navigate = useNavigate();
   const location = useLocation();
   const [navOpen, setNavOpen] = useState(false);
@@ -33,10 +33,13 @@ export default function Layout() {
       setPreviewOpen(media.matches);
     };
 
-    syncPreview();
+    if (!loading) {
+      syncPreview();
+    }
+
     media.addEventListener('change', syncPreview);
     return () => media.removeEventListener('change', syncPreview);
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     document.body.style.overflow = navOpen ? 'hidden' : '';
@@ -120,10 +123,17 @@ export default function Layout() {
       <div className={workspaceClass}>
         <main className="main">
           {loading ? <p className="status">Loading content…</p> : null}
-          {error ? <p className="status error">{error}</p> : null}
-          <Outlet />
+          {error ? (
+            <div className="status error">
+              <p>{error}</p>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={load}>
+                Retry load
+              </button>
+            </div>
+          ) : null}
+          {!loading ? <Outlet /> : null}
         </main>
-        <PreviewPanel open={previewOpen} onClose={() => setPreviewOpen(false)} />
+        <PreviewPanel open={previewOpen && !loading} onClose={() => setPreviewOpen(false)} />
       </div>
     </div>
   );

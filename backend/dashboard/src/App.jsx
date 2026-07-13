@@ -21,17 +21,30 @@ function RequireAuth({ children }) {
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
-    getSession().then((session) => {
-      setAuthed(!!session);
-      setChecking(false);
-    });
+    let active = true;
+
+    getSession()
+      .then((session) => {
+        if (!active) return;
+        setAuthed(!!session);
+        setChecking(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setAuthed(false);
+        setChecking(false);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!active) return;
       setAuthed(!!session);
       setChecking(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (checking) {

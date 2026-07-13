@@ -1,16 +1,43 @@
 import { STORAGE_BUCKET, supabase } from './lib/supabase';
 
+const REQUEST_TIMEOUT_MS = 12000;
+
+function assertSupabaseConfig() {
+  if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    throw new Error(
+      'Missing Supabase settings. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel, then redeploy.',
+    );
+  }
+}
+
+function withTimeout(promise, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error(message)), REQUEST_TIMEOUT_MS);
+    }),
+  ]);
+}
+
 export async function getSession() {
-  const { data } = await supabase.auth.getSession();
+  assertSupabaseConfig();
+  const { data } = await withTimeout(
+    supabase.auth.getSession(),
+    'Session check timed out. Check your Supabase URL and network connection.',
+  );
   return data.session;
 }
 
 export const api = {
   login: async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    assertSupabaseConfig();
+    const { data, error } = await withTimeout(
+      supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      }),
+      'Login timed out. Check your Supabase settings and network connection.',
+    );
 
     if (error) throw new Error(error.message);
     if (!data.session) throw new Error('Login failed');
@@ -24,13 +51,20 @@ export const api = {
   },
 
   getContent: async () => {
-    const { data, error } = await supabase
-      .from('site_content')
-      .select('data')
-      .eq('id', 'main')
-      .single();
+    assertSupabaseConfig();
+
+    const { data, error } = await withTimeout(
+      supabase
+        .from('site_content')
+        .select('data')
+        .eq('id', 'main')
+        .maybeSingle(),
+      'Loading content timed out. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel.',
+    );
 
     if (error) throw new Error(error.message);
+    if (!data?.data) throw new Error('No site content found in Supabase (site_content.main).');
+
     return data.data;
   },
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { api } from '../api';
+import defaultContent from '../data/defaultContent.json';
 import { mergeSiteContent } from '../utils/mergeContent';
 
 const PREVIEW_DEBOUNCE_MS = 1500;
@@ -30,7 +31,10 @@ export function ContentProvider({ children }) {
       setContent(merged);
       syncPreview(merged);
     } catch (err) {
-      setError(err.message);
+      const merged = mergeSiteContent(defaultContent);
+      setContent(merged);
+      syncPreview(merged);
+      setError(err.message || 'Could not load content from Supabase.');
     } finally {
       setLoading(false);
     }
