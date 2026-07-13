@@ -7,21 +7,15 @@ export async function getSession() {
 
 export const api = {
   login: async (email, password) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim(), password }),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
 
-    const payload = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(payload.error || 'Login failed');
-
-    if (!payload.session) throw new Error('No session returned from server');
-
-    const { error } = await supabase.auth.setSession(payload.session);
     if (error) throw new Error(error.message);
+    if (!data.session) throw new Error('Login failed');
 
-    return payload;
+    return data;
   },
 
   logout: async () => {

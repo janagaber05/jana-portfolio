@@ -47,8 +47,10 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
+  const adminBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+
   return (
-    <BrowserRouter basename="/admin">
+    <BrowserRouter basename={adminBase || undefined}>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
