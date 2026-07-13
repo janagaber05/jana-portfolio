@@ -49,11 +49,7 @@ export default function PreviewPanel({ open = true, onClose }) {
       <div className="preview-header">
         <div>
           <strong>Live preview</strong>
-          <p className="muted">
-            {previewStale
-              ? 'Typing… preview updates when you pause or click Update.'
-              : 'In sync with your edits. Save to publish.'}
-          </p>
+          <p className="muted">Open preview when you want to check changes. Save to publish.</p>
         </div>
         <div className="preview-header-actions">
           {!ready && !loading ? <span className="preview-status">Loading…</span> : null}

@@ -27,21 +27,6 @@ export default function Layout() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const media = window.matchMedia('(min-width: 1100px)');
-
-    const syncPreview = () => {
-      setPreviewOpen(media.matches);
-    };
-
-    if (!loading) {
-      syncPreview();
-    }
-
-    media.addEventListener('change', syncPreview);
-    return () => media.removeEventListener('change', syncPreview);
-  }, [loading]);
-
-  useEffect(() => {
     document.body.style.overflow = navOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
