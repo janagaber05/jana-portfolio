@@ -6,7 +6,16 @@ const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
 const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 async function fetchFromSupabase() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(
+        '[Portfolio] Missing REACT_APP_SUPABASE_URL or REACT_APP_SUPABASE_ANON_KEY. '
+        + 'The live site is using fallback content and will not reflect CMS edits. '
+        + 'Add both variables in Vercel, then redeploy the portfolio project.',
+      );
+    }
+    return null;
+  }
 
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/site_content?select=data&id=eq.main`,
@@ -18,7 +27,9 @@ async function fetchFromSupabase() {
     },
   );
 
-  if (!res.ok) throw new Error('Supabase unavailable');
+  if (!res.ok) {
+    throw new Error(`Supabase unavailable (${res.status})`);
+  }
 
   const rows = await res.json();
   if (!rows?.[0]?.data) throw new Error('No site content in Supabase');
