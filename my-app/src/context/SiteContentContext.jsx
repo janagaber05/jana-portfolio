@@ -23,18 +23,19 @@ export function SiteContentProvider({ children, preview = false }) {
 
     const onMessage = (event) => {
       if (event.data?.type !== 'CMS_PREVIEW_UPDATE') return;
+
       if (event.data.content) {
         setContent(mergeSiteContent(event.data.content));
         setLoading(false);
       }
 
       const scrollId = event.data.scrollTo;
-      if (scrollId) {
-        requestAnimationFrame(() => {
-          const target = document.getElementById(scrollId);
-          target?.scrollIntoView({ behavior: 'auto', block: 'start' });
-        });
-      }
+      if (!scrollId) return;
+
+      requestAnimationFrame(() => {
+        const target = document.getElementById(scrollId);
+        target?.scrollIntoView({ behavior: 'auto', block: 'start' });
+      });
     };
 
     window.addEventListener('message', onMessage);

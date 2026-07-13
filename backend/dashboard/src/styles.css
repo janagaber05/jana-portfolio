@@ -578,6 +578,13 @@ code {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.preview-update-pending {
+  border-color: #6d0101;
+  color: #6d0101;
 }
 
 .preview-close {

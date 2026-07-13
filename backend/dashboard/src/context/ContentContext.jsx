@@ -1,31 +1,49 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { api } from '../api';
 import { mergeSiteContent } from '../utils/mergeContent';
+
+const PREVIEW_DEBOUNCE_MS = 1500;
 
 const ContentContext = createContext(null);
 
 export function ContentProvider({ children }) {
   const [content, setContent] = useState(null);
+  const [previewContent, setPreviewContent] = useState(null);
+  const [previewStale, setPreviewStale] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const previewDebounceRef = useRef(null);
+
+  const syncPreview = useCallback((next) => {
+    clearTimeout(previewDebounceRef.current);
+    setPreviewContent(next);
+    setPreviewStale(false);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
       const data = await api.getContent();
-      setContent(mergeSiteContent(data));
+      const merged = mergeSiteContent(data);
+      setContent(merged);
+      syncPreview(merged);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [syncPreview]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  const refreshPreview = useCallback(() => {
+    if (!content) return;
+    syncPreview(content);
+  }, [content, syncPreview]);
 
   const saveAll = async (next) => {
     setSaving(true);
@@ -33,6 +51,7 @@ export function ContentProvider({ children }) {
     try {
       await api.saveContent(next);
       setContent(next);
+      syncPreview(next);
     } catch (err) {
       setError(err.message);
       throw err;
@@ -42,12 +61,33 @@ export function ContentProvider({ children }) {
   };
 
   const update = (updater) => {
-    setContent((prev) => (typeof updater === 'function' ? updater(prev) : updater));
+    setContent((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+
+      setPreviewStale(true);
+      clearTimeout(previewDebounceRef.current);
+      previewDebounceRef.current = window.setTimeout(() => {
+        setPreviewContent(next);
+        setPreviewStale(false);
+      }, PREVIEW_DEBOUNCE_MS);
+
+      return next;
+    });
   };
 
   return (
     <ContentContext.Provider value={{
-      content, loading, saving, error, load, saveAll, update, setError,
+      content,
+      previewContent,
+      previewStale,
+      loading,
+      saving,
+      error,
+      load,
+      saveAll,
+      update,
+      refreshPreview,
+      setError,
     }}>
       {children}
     </ContentContext.Provider>
