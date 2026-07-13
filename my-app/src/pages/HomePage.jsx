@@ -16,7 +16,9 @@ export default function HomePage() {
   const { loading } = useSiteContent();
 
   useLayoutEffect(() => {
-    if (!shouldSkipHomeIntro() && !location.hash) {
+    const hasHash = window.location.hash;
+
+    if (!shouldSkipHomeIntro() && !hasHash) {
       scrollToTop();
     }
 

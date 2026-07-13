@@ -1,0 +1,229 @@
+================================================================================
+  JANA PORTFOLIO — HOW TO DEPLOY THE WEBSITE AND CMS (SEPARATELY)
+================================================================================
+
+This project has 3 parts:
+
+  1. SUPABASE (database)     — already online at supabase.com (you do NOT deploy this)
+  2. PORTFOLIO WEBSITE       — folder: my-app/
+  3. CMS ADMIN PANEL         — folder: backend/
+
+Both the website and CMS connect to the SAME Supabase project.
+When you edit in the CMS and click Save, the website shows changes after refresh.
+
+GitHub repo: https://github.com/janagaber05/jana-portfolio.git
+
+
+================================================================================
+  BEFORE YOU DEPLOY (ONE TIME)
+================================================================================
+
+1. Supabase is set up
+   - You already ran backend/supabase/ALL_IN_ONE.sql in Supabase SQL Editor
+   - To check, run in SQL Editor:
+       select data from site_content where id = 'main';
+
+2. You have a CMS login user
+   - Supabase dashboard → Authentication → Users → Add user
+   - Use your email + password (you use this to log into the CMS)
+
+3. You know your Supabase values (Supabase → Project Settings → API)
+   - Project URL        (example: https://xxxx.supabase.co)
+   - anon / publishable key   (safe for the public website)
+
+
+================================================================================
+  PART A — DEPLOY THE PORTFOLIO WEBSITE (my-app)
+================================================================================
+
+WHAT IT IS
+  The public portfolio visitors see.
+  It is a static React site. It reads content from Supabase.
+
+RECOMMENDED HOSTS
+  - Vercel   https://vercel.com
+  - Netlify  https://netlify.com
+
+BUILD SETTINGS
+  Root folder ........... my-app
+  Build command ......... npm run build
+  Output / publish dir .. build
+  Node version .......... 18 or 20
+
+ENVIRONMENT VARIABLES (add in host dashboard)
+  REACT_APP_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+  REACT_APP_SUPABASE_ANON_KEY=your_anon_or_publishable_key
+
+  (Optional — only if Supabase is not set)
+  REACT_APP_API_URL=https://your-cms-url.onrender.com
+
+IMPORTANT — FIX ROUTING (so /work pages do not 404)
+  React is a single-page app. Your host must send all routes to index.html.
+
+  For VERCEL — create file: my-app/vercel.json
+  {
+    "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  }
+
+  For NETLIFY — create file: my-app/public/_redirects
+  /*    /index.html   200
+
+STEPS ON VERCEL (example)
+  1. Push code to GitHub (already done)
+  2. vercel.com → Add New Project → import jana-portfolio
+  3. Set Root Directory to: my-app
+  4. Add the 2 REACT_APP_SUPABASE_* env vars
+  5. Deploy
+  6. Your site will be like: https://jana-portfolio.vercel.app
+
+TEST THE WEBSITE
+  - Home page loads
+  - Click Work, About, Contact in menu
+  - Open /work and a project page like /work/wellness-app
+  - Refresh those pages (should NOT show 404)
+
+
+================================================================================
+  PART B — DEPLOY THE CMS (backend)
+================================================================================
+
+WHAT IT IS
+  The admin panel where YOU edit text and images.
+  URL will end with /admin
+
+RECOMMENDED HOSTS
+  - Render    https://render.com
+  - Railway   https://railway.app
+
+BUILD SETTINGS
+  Root folder ........... backend
+  Build command ......... npm install && npm run dashboard:build
+  Start command ......... npm start
+
+ENVIRONMENT VARIABLES (add in host dashboard)
+  SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+  SUPABASE_ANON_KEY=your_anon_or_publishable_key
+  JWT_SECRET=any-long-random-string-you-make-up
+  FRONTEND_URL=https://YOUR-LIVE-WEBSITE-URL.vercel.app
+
+  PORT is usually set automatically by the host (Render sets it for you).
+
+STEPS ON RENDER (example)
+  1. render.com → New → Web Service
+  2. Connect GitHub repo: jana-portfolio
+  3. Root Directory: backend
+  4. Build Command: npm install && npm run dashboard:build
+  5. Start Command: npm start
+  6. Add env vars listed above
+  7. Deploy
+  8. CMS URL: https://your-service.onrender.com/admin
+
+TEST THE CMS
+  1. Open https://your-service.onrender.com/admin
+  2. Log in with your Supabase email + password
+  3. Edit something (e.g. Hero headline)
+  4. Click Save
+  5. Refresh the live portfolio website — change should appear
+
+
+================================================================================
+  HOW THEY CONNECT
+================================================================================
+
+  YOU edit in CMS  →  saves to Supabase  →  website reads from Supabase
+
+       CMS (Render)  ──────►  Supabase  ◄──────  Website (Vercel)
+     /admin login              database            public visitors
+
+  - Website and CMS are on DIFFERENT URLs — that is normal.
+  - They share the SAME Supabase project.
+  - You do NOT need to run SQL every time you edit content.
+  - Only click Save in the CMS, then refresh the website.
+
+
+================================================================================
+  ENV FILES (LOCAL ONLY — NEVER UPLOAD TO GITHUB)
+================================================================================
+
+  These files stay on your computer. Set the SAME values on your host instead.
+
+  my-app/.env
+    REACT_APP_SUPABASE_URL=...
+    REACT_APP_SUPABASE_ANON_KEY=...
+    REACT_APP_API_URL=http://localhost:5001
+
+  backend/.env
+    SUPABASE_URL=...
+    SUPABASE_ANON_KEY=...
+    JWT_SECRET=...
+    FRONTEND_URL=http://localhost:3000
+
+  backend/dashboard/.env
+    VITE_SUPABASE_URL=...
+    VITE_SUPABASE_ANON_KEY=...
+
+
+================================================================================
+  LOCAL DEVELOPMENT (for reference)
+================================================================================
+
+  Terminal 1 — Website
+    cd my-app
+    npm start
+    → http://localhost:3000
+
+  Terminal 2 — CMS
+    cd backend
+    npm start
+    → http://localhost:5001/admin
+
+
+================================================================================
+  QUICK CHECKLIST
+================================================================================
+
+  [ ] Supabase SQL already run (ALL_IN_ONE.sql)
+  [ ] CMS user created in Supabase Authentication
+  [ ] Website deployed from my-app/ with Supabase env vars
+  [ ] SPA redirect added (vercel.json or _redirects)
+  [ ] CMS deployed from backend/ with env vars
+  [ ] FRONTEND_URL in CMS points to live website URL
+  [ ] Test: edit in CMS → Save → refresh website
+
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+  Website shows old/default content
+    → Check REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY on Vercel
+    → Hard refresh the browser (Cmd+Shift+R)
+
+  CMS login fails
+    → User must exist in Supabase → Authentication → Users
+    → Check SUPABASE_URL and SUPABASE_ANON_KEY on Render
+
+  /work page shows 404 on refresh
+    → Add vercel.json or _redirects (see Part A above)
+
+  Images not loading after upload
+    → Images save to Supabase Storage (bucket: portfolio-media)
+    → Make sure ALL_IN_ONE.sql was run (storage policies included)
+
+  "Disciplines" still in CMS menu editor
+    → Remove it manually in Hero & menu editor and Save
+    → The section was removed from the live site but may still be in old data
+
+
+================================================================================
+  NEED HELP?
+================================================================================
+
+  Repo: https://github.com/janagaber05/jana-portfolio
+
+  Folders:
+    my-app/   = public portfolio website
+    backend/  = CMS API + admin dashboard
+    backend/supabase/ = SQL files (run once in Supabase, not on deploy)
+
+================================================================================
