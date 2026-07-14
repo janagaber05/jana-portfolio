@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { getCaseStudy, PROGRESS_SECTIONS } from '../data/caseStudies';
 import { getAdjacentProjects, getProjectBySlug } from '../data/featuredWork';
 import { useSiteContent } from '../context/SiteContentContext';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
-import { resolveImageSources } from '../utils/resolveImageSources';
-import ProjectBentoGrid, { BENTO_MAX_SCREENS, GripIcon } from '../components/ProjectBentoGrid';
+import { getResolvedImageSrc, resolveImageSources } from '../utils/resolveImageSources';
+import ProjectBentoGrid, { GripIcon } from '../components/ProjectBentoGrid';
+import ImageLightbox from '../components/ImageLightbox';
 import styles from './ProjectPage.module.css';
 
 function HighlightTitle({ title, highlight, className, highlightClassName }) {
@@ -50,31 +51,45 @@ function CaseStudyImage({ imageUrl, candidates, fallback, alt, className }) {
   );
 }
 
-function ProcessImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt }) {
+function ProcessImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, onOpen }) {
   return (
     <figure className={styles.processCard}>
-      <CaseStudyImage
-        imageUrl={imageUrl}
-        candidates={imageCandidates}
-        fallback={fallbackImage}
-        alt={alt}
-        className={styles.processImage}
-      />
+      <button
+        type="button"
+        className={styles.inspectButton}
+        onClick={onOpen}
+        aria-label={`View full size: ${label}`}
+      >
+        <CaseStudyImage
+          imageUrl={imageUrl}
+          candidates={imageCandidates}
+          fallback={fallbackImage}
+          alt={alt}
+          className={styles.processImage}
+        />
+      </button>
       <figcaption className={styles.processLabel}>{label}</figcaption>
     </figure>
   );
 }
 
-function FinalImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, wide }) {
+function FinalImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, wide, onOpen }) {
   return (
     <figure className={`${styles.finalCard} ${wide ? styles.finalCardWide : ''}`}>
-      <CaseStudyImage
-        imageUrl={imageUrl}
-        candidates={imageCandidates}
-        fallback={fallbackImage}
-        alt={alt}
-        className={styles.finalImage}
-      />
+      <button
+        type="button"
+        className={styles.inspectButton}
+        onClick={onOpen}
+        aria-label={`View full size: ${label}`}
+      >
+        <CaseStudyImage
+          imageUrl={imageUrl}
+          candidates={imageCandidates}
+          fallback={fallbackImage}
+          alt={alt}
+          className={styles.finalImage}
+        />
+      </button>
       <figcaption className={styles.finalLabel}>{label}</figcaption>
     </figure>
   );
@@ -132,6 +147,16 @@ function useSectionSpy(sectionIds) {
   return activeIndex;
 }
 
+function toLightboxItem(label, imageUrl, candidates, fallback, alt) {
+  const src = getResolvedImageSrc(imageUrl, candidates, fallback);
+  if (!src) return null;
+  return {
+    src,
+    label,
+    alt: alt || label || '',
+  };
+}
+
 export default function ProjectPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -142,9 +167,14 @@ export default function ProjectPage() {
   const { next } = getAdjacentProjects(projects, slug);
   const sectionIds = PROGRESS_SECTIONS.map((section) => section.id);
   const activeSection = useSectionSpy(sectionIds);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [slug]);
+
+  useEffect(() => {
+    setLightboxIndex(null);
   }, [slug]);
 
   const goHome = (event) => {
@@ -163,14 +193,77 @@ export default function ProjectPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const heroScreens = useMemo(() => {
+    if (!caseStudy) return [];
+    return caseStudy.heroScreens?.length
+      ? caseStudy.heroScreens
+      : (caseStudy.finalDesign?.screens || []);
+  }, [caseStudy]);
+
+  const lightboxItems = useMemo(() => {
+    if (!caseStudy || !project) return [];
+
+    const items = [];
+
+    if (caseStudy.heroImage) {
+      items.push({
+        src: caseStudy.heroImage,
+        label: `${project.title} hero`,
+        alt: `${project.title} hero`,
+      });
+    }
+
+    heroScreens.forEach((screen, index) => {
+      const item = toLightboxItem(
+        screen.label || `Screen ${index + 1}`,
+        screen.imageUrl,
+        screen.imageCandidates,
+        screen.fallbackImage,
+        screen.alt,
+      );
+      if (item) items.push(item);
+    });
+
+    (caseStudy.designProcess?.stages || []).forEach((stage, index) => {
+      const item = toLightboxItem(
+        stage.label || `Wireframe ${index + 1}`,
+        stage.imageUrl,
+        stage.imageCandidates,
+        stage.fallbackImage,
+        stage.alt,
+      );
+      if (item) items.push(item);
+    });
+
+    (caseStudy.finalDesign?.screens || []).forEach((screen, index) => {
+      const item = toLightboxItem(
+        screen.label || `Final screen ${index + 1}`,
+        screen.imageUrl,
+        screen.imageCandidates,
+        screen.fallbackImage,
+        screen.alt,
+      );
+      if (item) items.push(item);
+    });
+
+    return items;
+  }, [caseStudy, project, heroScreens]);
+
+  const openLightboxBySrc = (src) => {
+    if (!src) return;
+    const index = lightboxItems.findIndex((item) => item.src === src);
+    if (index >= 0) setLightboxIndex(index);
+  };
+
+  const openLightboxItem = (label, imageUrl, candidates, fallback, alt) => {
+    const item = toLightboxItem(label, imageUrl, candidates, fallback, alt);
+    if (!item) return;
+    openLightboxBySrc(item.src);
+  };
+
   if (!project || !caseStudy) {
     return <Navigate to="/" replace />;
   }
-
-  const heroScreens = (caseStudy.heroScreens?.length
-    ? caseStudy.heroScreens
-    : caseStudy.finalDesign?.screens || []
-  ).slice(0, BENTO_MAX_SCREENS);
 
   return (
     <div className={styles.page}>
@@ -231,11 +324,32 @@ export default function ProjectPage() {
 
           {caseStudy.heroImage ? (
             <div className={styles.heroBanner}>
-              <img src={caseStudy.heroImage} alt={`${project.title} hero`} className={styles.heroBannerImage} />
+              <button
+                type="button"
+                className={styles.inspectButton}
+                onClick={() => openLightboxBySrc(caseStudy.heroImage)}
+                aria-label={`View full size: ${project.title} hero`}
+              >
+                <img
+                  src={caseStudy.heroImage}
+                  alt={`${project.title} hero`}
+                  className={styles.heroBannerImage}
+                />
+              </button>
             </div>
           ) : null}
 
-          <ProjectBentoGrid screens={heroScreens} accent={project.accent} />
+          <ProjectBentoGrid
+            screens={heroScreens}
+            accent={project.accent}
+            onInspect={(_index, screen) => openLightboxItem(
+              screen.label,
+              screen.imageUrl,
+              screen.imageCandidates,
+              screen.fallbackImage,
+              screen.alt,
+            )}
+          />
         </div>
       </section>
 
@@ -378,6 +492,13 @@ export default function ProjectPage() {
                 imageCandidates={stage.imageCandidates}
                 fallbackImage={stage.fallbackImage}
                 alt={stage.alt}
+                onOpen={() => openLightboxItem(
+                  stage.label,
+                  stage.imageUrl,
+                  stage.imageCandidates,
+                  stage.fallbackImage,
+                  stage.alt,
+                )}
               />
             ))}
           </div>
@@ -407,6 +528,13 @@ export default function ProjectPage() {
                 fallbackImage={screen.fallbackImage}
                 alt={screen.alt}
                 wide={index === 0}
+                onOpen={() => openLightboxItem(
+                  screen.label,
+                  screen.imageUrl,
+                  screen.imageCandidates,
+                  screen.fallbackImage,
+                  screen.alt,
+                )}
               />
             ))}
           </div>
@@ -453,6 +581,13 @@ export default function ProjectPage() {
           </span>
         </Link>
       ) : null}
+
+      <ImageLightbox
+        items={lightboxItems}
+        activeIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onChangeIndex={setLightboxIndex}
+      />
     </div>
   );
 }

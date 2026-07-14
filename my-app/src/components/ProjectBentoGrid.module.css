@@ -152,6 +152,24 @@
   aspect-ratio: 21 / 7;
 }
 
+/* 5+ screens — open flowing grid so you can add as many as you want */
+.bentoGrid[data-count='many'] {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-rows: none;
+  min-height: 0;
+  max-height: none;
+}
+
+.bentoExtra {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.bentoExtra .bentoFrame {
+  min-height: 160px;
+  aspect-ratio: 3 / 4;
+}
+
 /* Fewer than 4 screens — keep bento feel */
 .bentoGrid[data-count='1'] {
   grid-template-columns: 1fr;
@@ -208,6 +226,10 @@
     max-height: none;
   }
 
+  .bentoGrid[data-count='many'] {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .bentoFeature {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -241,5 +263,9 @@
 
   .bentoWide .bentoFrame {
     min-height: 100px;
+  }
+
+  .bentoExtra .bentoFrame {
+    min-height: 140px;
   }
 }

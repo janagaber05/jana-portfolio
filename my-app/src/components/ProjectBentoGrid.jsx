@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getResolvedImageSrc } from '../utils/resolveImageSources';
-import ImageLightbox from './ImageLightbox';
 import styles from './ProjectBentoGrid.module.css';
-
-export const BENTO_MAX_SCREENS = 4;
 
 const BENTO_SLOTS = ['Feature', 'StackTop', 'StackBottom', 'Wide'];
 
@@ -41,23 +38,15 @@ export function GripIcon({ className = '' }) {
   );
 }
 
-export default function ProjectBentoGrid({ screens, accent }) {
-  const visibleScreens = (screens || []).slice(0, BENTO_MAX_SCREENS);
-  const [lightboxIndex, setLightboxIndex] = useState(null);
-
-  const lightboxItems = useMemo(
-    () => visibleScreens.map((screen) => ({
-      src: getResolvedImageSrc(screen.imageUrl, screen.imageCandidates, screen.fallbackImage),
-      alt: screen.alt || screen.label,
-      label: screen.label,
-    })).filter((item) => item.src),
-    [visibleScreens],
-  );
+export default function ProjectBentoGrid({ screens, accent, onInspect }) {
+  const visibleScreens = screens || [];
+  const count = visibleScreens.length;
+  const useFlowLayout = count > 4;
 
   if (!visibleScreens.length) {
     return (
       <div className={styles.bentoEmpty}>
-        Add 4 screen images in the case study editor to show them here.
+        Add screen images in the case study editor to show them here.
       </div>
     );
   }
@@ -69,36 +58,38 @@ export default function ProjectBentoGrid({ screens, accent }) {
         <p className={styles.bentoHint}>Tap a screen to view full size</p>
       </div>
 
-      <div className={styles.bentoGrid} data-count={visibleScreens.length}>
-        {visibleScreens.map((screen, index) => (
-          <figure
-            key={screen.label || index}
-            className={`${styles.bentoCell} ${styles[`bento${BENTO_SLOTS[index]}`]}`}
-          >
-            <button
-              type="button"
-              className={styles.bentoFrame}
-              onClick={() => setLightboxIndex(index)}
-              aria-label={`View full size: ${screen.label}`}
-            >
-              <BentoImage
-                imageUrl={screen.imageUrl}
-                candidates={screen.imageCandidates || []}
-                fallback={screen.fallbackImage}
-                alt={screen.alt || screen.label}
-              />
-            </button>
-            <figcaption className={styles.bentoLabel}>{screen.label}</figcaption>
-          </figure>
-        ))}
-      </div>
+      <div
+        className={styles.bentoGrid}
+        data-count={useFlowLayout ? 'many' : String(count)}
+      >
+        {visibleScreens.map((screen, index) => {
+          const slotName = useFlowLayout
+            ? 'Extra'
+            : (BENTO_SLOTS[index] || 'Extra');
 
-      <ImageLightbox
-        items={lightboxItems}
-        activeIndex={lightboxIndex}
-        onClose={() => setLightboxIndex(null)}
-        onChangeIndex={setLightboxIndex}
-      />
+          return (
+            <figure
+              key={`${screen.label || 'screen'}-${index}`}
+              className={`${styles.bentoCell} ${styles[`bento${slotName}`]}`}
+            >
+              <button
+                type="button"
+                className={styles.bentoFrame}
+                onClick={() => onInspect?.(index, screen)}
+                aria-label={`View full size: ${screen.label || `Screen ${index + 1}`}`}
+              >
+                <BentoImage
+                  imageUrl={screen.imageUrl}
+                  candidates={screen.imageCandidates || []}
+                  fallback={screen.fallbackImage}
+                  alt={screen.alt || screen.label}
+                />
+              </button>
+              <figcaption className={styles.bentoLabel}>{screen.label}</figcaption>
+            </figure>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -2,8 +2,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, ImageUpload, Input, ListEditor, SaveBar, Textarea } from '../components/Form';
 
-const BENTO_MAX_SCREENS = 4;
-
 const DEFAULT_BENTO_SCREENS = [
   { label: 'Screen 1', imageUrl: '' },
   { label: 'Screen 2', imageUrl: '' },
@@ -67,33 +65,31 @@ export default function CaseStudyEditor() {
     );
   }
 
-  const bentoScreens = (cs.heroScreens?.length ? cs.heroScreens : DEFAULT_BENTO_SCREENS)
-    .slice(0, BENTO_MAX_SCREENS);
+  const bentoScreens = cs.heroScreens?.length ? cs.heroScreens : DEFAULT_BENTO_SCREENS;
 
   return (
     <div className="page">
       <header className="page-header">
         <p className="eyebrow"><Link to={`/work/project/${slug}`}>← {project.title}</Link></p>
         <h1>Case study — {project.title}</h1>
-        <p className="muted">Pick every image from your device. No links needed — just tap, choose, and save.</p>
+        <p className="muted">Pick every image from your device. No links needed — just tap, choose, and save. Add as many screens as you want.</p>
       </header>
 
       <Card title="Page hero image">
         <ImageUpload
           label="Hero image"
-          hint="Large image at the top of the project page, above the bento grid."
+          hint="Large image at the top of the project page, above the bento grid. Visitors can tap to inspect full size."
           value={cs.heroImage || ''}
           onChange={(v) => set('heroImage', v)}
         />
       </Card>
 
-      <Card title="Bento grid screens">
-        <p className="muted">Exactly 4 screens in the grid under the hero. Pick one image per slot.</p>
+      <Card title="Overview screens">
+        <p className="muted">Screens under the hero. Add as many as you want — visitors can tap any image to inspect it full size.</p>
         <ListEditor
           items={bentoScreens}
-          onChange={(v) => set('heroScreens', v.slice(0, BENTO_MAX_SCREENS))}
+          onChange={(v) => set('heroScreens', v)}
           newItem={{ label: `Screen ${bentoScreens.length + 1}`, imageUrl: '' }}
-          maxItems={BENTO_MAX_SCREENS}
           fields={SCREEN_FIELDS}
         />
       </Card>
@@ -147,7 +143,7 @@ export default function CaseStudyEditor() {
       </Card>
 
       <Card title="04 — Wireframes (design process)">
-        <p className="muted">One image per wireframe stage.</p>
+        <p className="muted">Add as many wireframe stages as you want. Visitors can tap each image to inspect it full size.</p>
         <ListEditor
           items={cs.designProcess.stages}
           onChange={(v) => set('designProcess.stages', v)}
@@ -157,7 +153,7 @@ export default function CaseStudyEditor() {
       </Card>
 
       <Card title="05 — Final screens">
-        <p className="muted">Final UI screens shown in the case study section.</p>
+        <p className="muted">Add as many final screens as you want. Visitors can tap each image to inspect it full size.</p>
         <ListEditor
           items={cs.finalDesign.screens}
           onChange={(v) => set('finalDesign.screens', v)}
