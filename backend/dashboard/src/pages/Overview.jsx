@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useCms } from '../context/ContentContext';
+import { PORTFOLIO_ORIGIN } from '../utils/preview';
 
 export default function Overview() {
   const { content } = useCms();
@@ -39,9 +40,14 @@ export default function Overview() {
 
       <section className="card">
         <h3 className="card-title">Live site</h3>
-        <p className="muted">Portfolio: <a href="http://localhost:3000" target="_blank" rel="noreferrer">http://localhost:3000</a></p>
-        <p className="muted">More work page: <a href="http://localhost:3000/work" target="_blank" rel="noreferrer">http://localhost:3000/work</a></p>
-        <p className="muted">Keep <code>npm start</code> running in <code>my-app</code> while editing so preview works.</p>
+        <p className="muted">
+          Portfolio:{' '}
+          <a href={PORTFOLIO_ORIGIN} target="_blank" rel="noreferrer">{PORTFOLIO_ORIGIN}</a>
+        </p>
+        <p className="muted">
+          More work page:{' '}
+          <a href={`${PORTFOLIO_ORIGIN}/work`} target="_blank" rel="noreferrer">{PORTFOLIO_ORIGIN}/work</a>
+        </p>
       </section>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ContentProvider } from './context/ContentContext';
 import Layout from './components/Layout';
@@ -16,12 +16,45 @@ import MediaLibrary from './pages/MediaLibrary';
 import { getSession } from './api';
 import { supabase } from './lib/supabase';
 
+const SESSION_TIMEOUT_MS = 12000;
+
+function getConfigError() {
+  if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    return 'Missing Supabase settings. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel, then redeploy.';
+  }
+  return '';
+}
+
+function ConfigError({ message }) {
+  return (
+    <div className="login-page">
+      <div className="login-card">
+        <p className="eyebrow">Jana CMS</p>
+        <h1>Configuration needed</h1>
+        <p className="status error">{message}</p>
+      </div>
+    </div>
+  );
+}
+
 function RequireAuth({ children }) {
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
+  const configError = getConfigError();
 
   useEffect(() => {
+    if (configError) {
+      setChecking(false);
+      return undefined;
+    }
+
     let active = true;
+
+    const timeoutId = window.setTimeout(() => {
+      if (!active) return;
+      setAuthed(false);
+      setChecking(false);
+    }, SESSION_TIMEOUT_MS);
 
     getSession()
       .then((session) => {
@@ -43,10 +76,12 @@ function RequireAuth({ children }) {
 
     return () => {
       active = false;
+      window.clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [configError]);
 
+  if (configError) return <ConfigError message={configError} />;
   if (checking) {
     return (
       <div className="login-page">

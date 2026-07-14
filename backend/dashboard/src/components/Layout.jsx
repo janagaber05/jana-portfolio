@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useCms } from '../context/ContentContext';
 import { api } from '../api';
-import PreviewPanel from './PreviewPanel';
 
 const NAV = [
   { to: '/', label: 'Overview', end: true },
@@ -20,7 +19,6 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [navOpen, setNavOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     setNavOpen(false);
@@ -38,10 +36,8 @@ export default function Layout() {
     navigate('/login');
   };
 
-  const workspaceClass = previewOpen ? 'workspace preview-open' : 'workspace';
-
   return (
-    <div className="layout layout-with-preview">
+    <div className="layout">
       <header className="mobile-topbar">
         <button
           type="button"
@@ -55,13 +51,6 @@ export default function Layout() {
           <strong>Jana CMS</strong>
           <span className="muted">Portfolio control</span>
         </div>
-        <button
-          type="button"
-          className={`btn btn-secondary btn-sm ${previewOpen ? 'is-active' : ''}`}
-          onClick={() => setPreviewOpen((open) => !open)}
-        >
-          Preview
-        </button>
       </header>
 
       <button
@@ -105,21 +94,18 @@ export default function Layout() {
         </button>
       </aside>
 
-      <div className={workspaceClass}>
-        <main className="main">
-          {loading ? <p className="status">Loading content…</p> : null}
-          {error ? (
-            <div className="status error">
-              <p>{error}</p>
-              <button type="button" className="btn btn-secondary btn-sm" onClick={load}>
-                Retry load
-              </button>
-            </div>
-          ) : null}
-          {!loading ? <Outlet /> : null}
-        </main>
-        <PreviewPanel open={previewOpen && !loading} onClose={() => setPreviewOpen(false)} />
-      </div>
+      <main className="main">
+        {loading ? <p className="status">Loading content…</p> : null}
+        {error ? (
+          <div className="status error">
+            <p>{error}</p>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={load}>
+              Retry load
+            </button>
+          </div>
+        ) : null}
+        {!loading ? <Outlet /> : null}
+      </main>
     </div>
   );
 }

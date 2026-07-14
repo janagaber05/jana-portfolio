@@ -1,4 +1,4 @@
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, Input, SaveBar } from '../components/Form';
 
 function DisciplinePanel({ title, data, onChange }) {
@@ -18,11 +18,10 @@ function DisciplinePanel({ title, data, onChange }) {
 }
 
 export default function DisciplinesEditor() {
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
-  const d = content.disciplines;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const save = () => saveAll(content);
+  const d = draft.disciplines;
 
   return (
     <div className="page">
@@ -34,7 +33,7 @@ export default function DisciplinesEditor() {
       <DisciplinePanel
         title="UX / UI"
         data={d.ux}
-        onChange={(v) => update((prev) => ({ ...prev, disciplines: { ...prev.disciplines, ux: v } }))}
+        onChange={(v) => updateDraft((prev) => ({ ...prev, disciplines: { ...prev.disciplines, ux: v } }))}
       />
 
       <SaveBar onSave={save} saving={saving} />

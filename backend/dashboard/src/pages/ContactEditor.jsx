@@ -1,13 +1,12 @@
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, ImageUpload, Input, ListEditor, SaveBar } from '../components/Form';
 
 export default function ContactEditor() {
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
-  const c = content.contact;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const save = () => saveAll(content);
-  const set = (key, val) => update((prev) => ({ ...prev, contact: { ...prev.contact, [key]: val } }));
+  const c = draft.contact;
+  const set = (key, val) => updateDraft((prev) => ({ ...prev, contact: { ...prev.contact, [key]: val } }));
 
   return (
     <div className="page">

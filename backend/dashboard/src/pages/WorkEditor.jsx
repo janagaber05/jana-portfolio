@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, Input, SaveBar, Textarea } from '../components/Form';
 import { createProject } from '../utils/projectHelpers';
-import { getMoreWorkPreviewUrl } from '../utils/preview';
+import { getMoreWorkUrl } from '../utils/preview';
 
 function ProjectCard({ project, onHome, onOpen }) {
   return (
@@ -27,23 +27,21 @@ function ProjectCard({ project, onHome, onOpen }) {
 
 export default function WorkEditor() {
   const navigate = useNavigate();
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const fw = content.featuredWork;
+  const fw = draft.featuredWork;
   const homeLimit = fw.homeLimit ?? 6;
   const homeSlugs = fw.homeProjectSlugs || [];
   const homeCount = homeSlugs.length;
 
-  const save = () => saveAll(content);
-
   const setFw = (key, val) => {
-    update((prev) => ({ ...prev, featuredWork: { ...prev.featuredWork, [key]: val } }));
+    updateDraft((prev) => ({ ...prev, featuredWork: { ...prev.featuredWork, [key]: val } }));
   };
 
   const addProject = () => {
     const project = createProject(fw.projects);
-    update((prev) => ({
+    updateDraft((prev) => ({
       ...prev,
       featuredWork: {
         ...prev.featuredWork,
@@ -91,7 +89,7 @@ export default function WorkEditor() {
         <p className="muted">
           All projects appear on this page.
           {' '}
-          <a href={getMoreWorkPreviewUrl()} target="_blank" rel="noreferrer">Preview /work</a>
+          <a href={getMoreWorkUrl()} target="_blank" rel="noreferrer">Open /work</a>
         </p>
       </Card>
 

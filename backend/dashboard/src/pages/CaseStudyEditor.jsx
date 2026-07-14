@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, ImageUpload, Input, ListEditor, SaveBar, Textarea } from '../components/Form';
 
 const BENTO_MAX_SCREENS = 4;
@@ -37,32 +37,26 @@ function ensureCaseStudy(content, slug) {
 
 export default function CaseStudyEditor() {
   const { slug } = useParams();
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const project = content.featuredWork.projects.find((p) => p.slug === slug);
-  const cs = content.caseStudies?.[slug] || ensureCaseStudy(content, slug);
+  const project = draft.featuredWork.projects.find((p) => p.slug === slug);
+  const cs = draft.caseStudies?.[slug] || ensureCaseStudy(draft, slug);
 
   const setCs = (next) => {
-    update((prev) => ({
+    updateDraft((prev) => ({
       ...prev,
       caseStudies: { ...prev.caseStudies, [slug]: next },
     }));
   };
 
   const set = (path, val) => {
-    const next = JSON.parse(JSON.stringify(cs));
+    const next = structuredClone(cs);
     const keys = path.split('.');
     let ref = next;
     for (let i = 0; i < keys.length - 1; i += 1) ref = ref[keys[i]];
     ref[keys[keys.length - 1]] = val;
     setCs(next);
-  };
-
-  const save = () => {
-    const next = JSON.parse(JSON.stringify(content));
-    if (!next.caseStudies[slug]) next.caseStudies[slug] = cs;
-    return saveAll(next);
   };
 
   if (!project) {

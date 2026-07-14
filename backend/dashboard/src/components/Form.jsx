@@ -1,40 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { api, mediaUrl } from '../api';
-
-const FIELD_SYNC_DELAY_MS = 350;
-
-function useDraftField(value, onChange) {
-  const [local, setLocal] = useState(value ?? '');
-  const fieldRef = useRef(null);
-  const debounceRef = useRef(null);
-  const onChangeRef = useRef(onChange);
-
-  onChangeRef.current = onChange;
-
-  useEffect(() => {
-    if (fieldRef.current && document.activeElement === fieldRef.current) return;
-    setLocal(value ?? '');
-  }, [value]);
-
-  const commit = (next) => {
-    clearTimeout(debounceRef.current);
-    onChangeRef.current(next);
-  };
-
-  const handleChange = (event) => {
-    const next = event.target.value;
-    setLocal(next);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => commit(next), FIELD_SYNC_DELAY_MS);
-  };
-
-  const handleBlur = () => {
-    clearTimeout(debounceRef.current);
-    commit(local);
-  };
-
-  return { local, fieldRef, handleChange, handleBlur };
-}
 
 export function Field({ label, hint, children }) {
   return (
@@ -47,31 +12,23 @@ export function Field({ label, hint, children }) {
 }
 
 export function Input({ value, onChange, ...props }) {
-  const { local, fieldRef, handleChange, handleBlur } = useDraftField(value, onChange);
-
   return (
     <input
-      ref={fieldRef}
       className="input"
-      value={local}
-      onChange={handleChange}
-      onBlur={handleBlur}
+      value={value ?? ''}
+      onChange={(e) => onChange(e.target.value)}
       {...props}
     />
   );
 }
 
 export function Textarea({ value, onChange, rows = 4, ...props }) {
-  const { local, fieldRef, handleChange, handleBlur } = useDraftField(value, onChange);
-
   return (
     <textarea
-      ref={fieldRef}
       className="textarea"
       rows={rows}
-      value={local}
-      onChange={handleChange}
-      onBlur={handleBlur}
+      value={value ?? ''}
+      onChange={(e) => onChange(e.target.value)}
       {...props}
     />
   );
@@ -87,16 +44,9 @@ export function ColorInput({ value, onChange }) {
 }
 
 export function SaveBar({ onSave, saving, label = 'Save changes' }) {
-  const handleSave = () => {
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-    window.setTimeout(() => onSave(), 50);
-  };
-
   return (
     <div className="save-bar">
-      <button type="button" className="btn btn-primary" onClick={handleSave} disabled={saving}>
+      <button type="button" className="btn btn-primary" onClick={onSave} disabled={saving}>
         {saving ? 'Saving…' : label}
       </button>
     </div>

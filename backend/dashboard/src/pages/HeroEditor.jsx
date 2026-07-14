@@ -1,17 +1,15 @@
-import { useCms } from '../context/ContentContext';
-import { Card, Field, ImageUpload, Input, SaveBar, Textarea } from '../components/Form';
+import { useContentDraft } from '../hooks/useContentDraft';
+import { Card, Field, ImageUpload, Input, SaveBar } from '../components/Form';
 import { ListEditor } from '../components/Form';
 
 export default function HeroEditor() {
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const hero = content.hero;
-
-  const save = () => saveAll(content);
+  const hero = draft.hero;
 
   const setHero = (key, val) => {
-    update((prev) => ({ ...prev, hero: { ...prev.hero, [key]: val } }));
+    updateDraft((prev) => ({ ...prev, hero: { ...prev.hero, [key]: val } }));
   };
 
   return (

@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import RouteChangeHandler from './components/RouteChangeHandler';
 import { SiteContentProvider } from './context/SiteContentContext';
 import HomePage from './pages/HomePage';
-import PreviewLayout from './pages/PreviewLayout';
 import ProjectPage from './pages/ProjectPage';
 import WorkPage from './pages/WorkPage';
 
@@ -17,40 +16,20 @@ const globalStyles = `
   }
 `;
 
-function MainSite() {
-  return (
-    <SiteContentProvider>
-      <RouteChangeHandler>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/work" element={<WorkPage />} />
-          <Route path="/work/:slug" element={<ProjectPage />} />
-        </Routes>
-      </RouteChangeHandler>
-    </SiteContentProvider>
-  );
-}
-
 export default function App() {
   return (
     <>
       <style>{globalStyles}</style>
       <BrowserRouter>
-        <Routes>
-          <Route
-            path="/preview"
-            element={(
-              <SiteContentProvider preview>
-                <PreviewLayout />
-              </SiteContentProvider>
-            )}
-          >
-            <Route index element={<HomePage />} />
-            <Route path="work" element={<WorkPage />} />
-            <Route path="work/:slug" element={<ProjectPage />} />
-          </Route>
-          <Route path="/*" element={<MainSite />} />
-        </Routes>
+        <SiteContentProvider>
+          <RouteChangeHandler>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/work" element={<WorkPage />} />
+              <Route path="/work/:slug" element={<ProjectPage />} />
+            </Routes>
+          </RouteChangeHandler>
+        </SiteContentProvider>
       </BrowserRouter>
     </>
   );

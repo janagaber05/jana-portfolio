@@ -1,17 +1,17 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, ColorInput, Field, Input, SaveBar, Textarea } from '../components/Form';
 import { findProjectIndex } from '../utils/projectHelpers';
-import { PREVIEW_ORIGIN } from '../utils/preview';
+import { getProjectUrl } from '../utils/preview';
 
 export default function ProjectEditor() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { content, update, saveAll, saving } = useCms();
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
 
-  if (!content) return null;
+  if (!ready) return null;
 
-  const fw = content.featuredWork;
+  const fw = draft.featuredWork;
   const homeLimit = fw.homeLimit ?? 6;
   const homeSlugs = fw.homeProjectSlugs || [];
   const index = findProjectIndex(fw.projects, slug);
@@ -29,10 +29,8 @@ export default function ProjectEditor() {
   const homeFull = homeSlugs.length >= homeLimit;
   const canToggleHome = onHome || !homeFull;
 
-  const save = () => saveAll(content);
-
   const setField = (key, val) => {
-    update((prev) => {
+    updateDraft((prev) => {
       const current = prev.featuredWork;
       const projectIndex = findProjectIndex(current.projects, slug);
       if (projectIndex < 0) return prev;
@@ -59,7 +57,7 @@ export default function ProjectEditor() {
   };
 
   const toggleHomeProject = () => {
-    update((prev) => {
+    updateDraft((prev) => {
       const current = [...(prev.featuredWork.homeProjectSlugs || [])];
       const idx = current.indexOf(project.slug);
       if (idx >= 0) {
@@ -77,7 +75,7 @@ export default function ProjectEditor() {
   const removeProject = () => {
     if (!window.confirm(`Remove "${project.title}"? This cannot be undone.`)) return;
 
-    update((prev) => {
+    updateDraft((prev) => {
       const current = prev.featuredWork;
       const projects = current.projects.filter((p) => p.slug !== slug);
       const homeProjectSlugs = (current.homeProjectSlugs || []).filter((s) => s !== slug);
@@ -102,8 +100,8 @@ export default function ProjectEditor() {
         <p className="muted">
           Card fields for listings. Full page content is in the case study editor.
           {' '}
-          <a href={`${PREVIEW_ORIGIN}/preview/work/${project.slug}`} target="_blank" rel="noreferrer">
-            Preview page
+          <a href={getProjectUrl(project.slug)} target="_blank" rel="noreferrer">
+            Open project page
           </a>
         </p>
       </header>

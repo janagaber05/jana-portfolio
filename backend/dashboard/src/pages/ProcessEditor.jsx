@@ -1,4 +1,4 @@
-import { useCms } from '../context/ContentContext';
+import { useContentDraft } from '../hooks/useContentDraft';
 import { Card, Field, Input, SaveBar, Textarea } from '../components/Form';
 
 const STEP_KEYS = ['discover', 'define', 'design', 'deliver'];
@@ -22,12 +22,11 @@ function StepEditor({ stepKey, step, onChange }) {
 }
 
 export default function ProcessEditor() {
-  const { content, update, saveAll, saving } = useCms();
-  if (!content) return null;
-  const p = content.process;
+  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  if (!ready) return null;
 
-  const save = () => saveAll(content);
-  const set = (key, val) => update((prev) => ({ ...prev, process: { ...prev.process, [key]: val } }));
+  const p = draft.process;
+  const set = (key, val) => updateDraft((prev) => ({ ...prev, process: { ...prev.process, [key]: val } }));
 
   return (
     <div className="page">
@@ -48,7 +47,7 @@ export default function ProcessEditor() {
           key={key}
           stepKey={key}
           step={p.steps[key]}
-          onChange={(v) => update((prev) => ({
+          onChange={(v) => updateDraft((prev) => ({
             ...prev,
             process: { ...prev.process, steps: { ...prev.process.steps, [key]: v } },
           }))}
