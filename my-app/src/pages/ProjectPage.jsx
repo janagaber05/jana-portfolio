@@ -160,7 +160,7 @@ function toLightboxItem(label, imageUrl, candidates, fallback, alt) {
 export default function ProjectPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { content } = useSiteContent();
+  const { content, loading } = useSiteContent();
   const projects = content?.featuredWork?.projects || [];
   const project = getProjectBySlug(projects, slug);
   const caseStudy = getCaseStudy(project, content?.caseStudies);
@@ -168,14 +168,72 @@ export default function ProjectPage() {
   const sectionIds = PROGRESS_SECTIONS.map((section) => section.id);
   const activeSection = useSectionSpy(sectionIds);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [slug]);
+  const scrollKey = `jana:projectScroll:${slug}`;
 
   useEffect(() => {
     setLightboxIndex(null);
   }, [slug]);
+
+  // Restore scroll after content loads. Do not redirect while still loading.
+  useEffect(() => {
+    if (loading || !project) return undefined;
+
+    let cancelled = false;
+    const saved = Number(sessionStorage.getItem(scrollKey) || 0);
+
+    const apply = (y) => {
+      window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = y;
+      document.body.scrollTop = y;
+    };
+
+    if (saved > 0) {
+      apply(saved);
+      const t1 = window.setTimeout(() => { if (!cancelled) apply(saved); }, 50);
+      const t2 = window.setTimeout(() => { if (!cancelled) apply(saved); }, 250);
+      return () => {
+        cancelled = true;
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
+      };
+    }
+
+    apply(0);
+    return undefined;
+  }, [loading, project, scrollKey, slug]);
+
+  useEffect(() => {
+    if (loading || !project) return undefined;
+
+    let timerId = 0;
+    const persist = () => {
+      try {
+        sessionStorage.setItem(
+          scrollKey,
+          String(window.scrollY || document.documentElement.scrollTop || 0),
+        );
+      } catch {
+        // ignore
+      }
+    };
+
+    const onScroll = () => {
+      window.clearTimeout(timerId);
+      timerId = window.setTimeout(persist, 80);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('pagehide', persist);
+    window.addEventListener('beforeunload', persist);
+
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('pagehide', persist);
+      window.removeEventListener('beforeunload', persist);
+      persist();
+    };
+  }, [loading, project, scrollKey]);
 
   const goHome = (event) => {
     event.preventDefault();
@@ -186,6 +244,11 @@ export default function ProjectPage() {
   const goToProject = (event, targetSlug) => {
     event.preventDefault();
     cleanupScrollEffects();
+    try {
+      sessionStorage.removeItem(`jana:projectScroll:${targetSlug}`);
+    } catch {
+      // ignore
+    }
     navigate(`/work/${targetSlug}`);
   };
 
@@ -260,6 +323,10 @@ export default function ProjectPage() {
     if (!item) return;
     openLightboxBySrc(item.src);
   };
+
+  if (loading) {
+    return <div className={styles.page} aria-busy="true" />;
+  }
 
   if (!project || !caseStudy) {
     return <Navigate to="/" replace />;
