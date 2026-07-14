@@ -701,6 +701,16 @@
     padding-right: 1.25rem;
   }
 
+  .hero {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .heroBody {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
   .heroBack {
     left: 1.25rem;
     top: 1.25rem;
