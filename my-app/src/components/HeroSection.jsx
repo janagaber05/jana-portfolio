@@ -11,7 +11,7 @@ import { scrollToTop } from '../utils/scrollCleanup';
 import { filterNavLinks, scrollToNavTarget } from '../utils/navScroll';
 import {
   markHomeIntroPlayed,
-  peekHomeScrollRestore,
+  peekHomeSection,
   saveHomeScrollPosition,
   shouldSkipHomeIntro,
 } from '../utils/visitState';
@@ -125,7 +125,10 @@ export default function HeroSection() {
     const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)) });
     lenisRef.current = lenis;
 
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis.on('scroll', ({ scroll }) => {
+      ScrollTrigger.update();
+      saveHomeScrollPosition(scroll);
+    });
 
     ScrollTrigger.scrollerProxy(document.documentElement, {
       scrollTop(value) {
@@ -154,20 +157,18 @@ export default function HeroSection() {
     };
     rafId = requestAnimationFrame(raf);
 
-    const restoreY = shouldSkipHomeIntro() ? peekHomeScrollRestore() : 0;
-    if (restoreY > 0) {
-      window.scrollTo({ top: restoreY, left: 0, behavior: 'instant' });
-      lenis.scrollTo(restoreY, { immediate: true });
-      // Keep the value in sessionStorage so Strict Mode remount / refresh still works.
-      saveHomeScrollPosition(restoreY);
-    } else {
+    // Do not force scroll to top when we are about to restore a section.
+    const restoring = shouldSkipHomeIntro() && (() => {
+      const section = (window.location.hash || '').replace(/^#/, '') || peekHomeSection();
+      return Boolean(section && section !== 'home');
+    })();
+
+    if (!restoring && !shouldSkipHomeIntro()) {
       scrollToTop();
       lenis.scrollTo(0, { immediate: true });
     }
+
     ScrollTrigger.refresh();
-    if (restoreY > 0) {
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    }
 
     return () => {
       cancelAnimationFrame(rafId);
@@ -620,6 +621,14 @@ export default function HeroSection() {
       requestAnimationFrame(() => {
         ScrollTrigger.refresh();
         applySkipIntroState();
+
+        const targetId = (window.location.hash || '').replace(/^#/, '') || peekHomeSection();
+        if (targetId && targetId !== 'home' && document.getElementById(targetId)) {
+          scrollToNavTarget(`#${targetId}`, lenisRef.current, { immediate: true });
+          window.setTimeout(() => {
+            scrollToNavTarget(`#${targetId}`, lenisRef.current, { immediate: true });
+          }, 120);
+        }
       });
     }
 

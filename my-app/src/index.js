@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { scrollToTop } from './utils/scrollCleanup';
-import { peekHomeScrollRestore, shouldSkipHomeIntro } from './utils/visitState';
+import { peekHomeSection, shouldSkipHomeIntro } from './utils/visitState';
 
 if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -10,12 +10,15 @@ if ('scrollRestoration' in window.history) {
 
 const path = window.location.pathname.replace(/\/$/, '') || '/';
 const isHome = path === '/';
-const hasHash = Boolean(window.location.hash);
-const restoreY = peekHomeScrollRestore();
-const shouldRestoreHome = isHome && shouldSkipHomeIntro() && restoreY > 0 && !hasHash;
+const hashSection = (window.location.hash || '').replace(/^#/, '');
+const savedSection = peekHomeSection();
+const shouldKeepPlace = isHome && shouldSkipHomeIntro() && (
+  (hashSection && hashSection !== 'home')
+  || (savedSection && savedSection !== 'home')
+);
 
-// Keep scroll for a returning home visit; only force top on first intro / other pages.
-if (!shouldRestoreHome) {
+// First visit stays at the hero intro. Returning visits keep your place.
+if (!shouldKeepPlace) {
   scrollToTop();
 }
 

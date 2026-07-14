@@ -1,4 +1,4 @@
-import { clearHomeScrollRestore, saveHomeScrollPosition } from './visitState';
+import { clearHomeScrollRestore, saveHomeScrollPosition, saveHomeSection } from './visitState';
 
 const NAV_OFFSET = 80;
 const KNOWN_SECTIONS = new Set(['home', 'work', 'about', 'contact']);
@@ -11,15 +11,21 @@ export function getNavTargetId(href) {
   return raw;
 }
 
-export function scrollToNavTarget(href, lenis) {
+export function scrollToNavTarget(href, lenis, options = {}) {
+  const immediate = Boolean(options.immediate);
   const targetId = getNavTargetId(href);
 
   if (targetId === 'home') {
     clearHomeScrollRestore();
+    saveHomeSection('home');
     if (lenis) {
-      lenis.scrollTo(0, { duration: 1.1 });
+      lenis.scrollTo(0, immediate ? { immediate: true } : { duration: 1.1 });
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: immediate ? 'auto' : 'smooth',
+      });
     }
     window.history.replaceState(null, '', window.location.pathname);
     return;
@@ -28,19 +34,26 @@ export function scrollToNavTarget(href, lenis) {
   const target = document.getElementById(targetId);
   if (!target) return;
 
+  saveHomeSection(targetId);
+
   if (lenis) {
-    lenis.scrollTo(target, { offset: -NAV_OFFSET, duration: 1.1 });
+    lenis.scrollTo(
+      target,
+      immediate
+        ? { offset: -NAV_OFFSET, immediate: true }
+        : { offset: -NAV_OFFSET, duration: 1.1 },
+    );
   } else {
     const top = target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
-    window.scrollTo({ top, behavior: 'smooth' });
+    window.scrollTo({
+      top,
+      left: 0,
+      behavior: immediate ? 'auto' : 'smooth',
+    });
   }
 
   window.history.replaceState(null, '', `#${targetId}`);
-
-  // Approximate save for hash targets so reload can recover mid-page.
-  window.setTimeout(() => {
-    saveHomeScrollPosition(window.scrollY || document.documentElement.scrollTop || 0);
-  }, 1200);
+  saveHomeScrollPosition(window.scrollY || document.documentElement.scrollTop || 0);
 }
 
 export function filterNavLinks(links = []) {
