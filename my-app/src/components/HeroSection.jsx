@@ -10,8 +10,9 @@ import { resolveMediaUrl } from '../utils/mediaUrl';
 import { scrollToTop } from '../utils/scrollCleanup';
 import { filterNavLinks, scrollToNavTarget } from '../utils/navScroll';
 import {
-  consumeHomeScrollRestore,
   markHomeIntroPlayed,
+  peekHomeScrollRestore,
+  saveHomeScrollPosition,
   shouldSkipHomeIntro,
 } from '../utils/visitState';
 import styles from './HeroSection.module.css';
@@ -153,10 +154,12 @@ export default function HeroSection() {
     };
     rafId = requestAnimationFrame(raf);
 
-    const restoreY = shouldSkipHomeIntro() ? consumeHomeScrollRestore() : 0;
+    const restoreY = shouldSkipHomeIntro() ? peekHomeScrollRestore() : 0;
     if (restoreY > 0) {
       window.scrollTo({ top: restoreY, left: 0, behavior: 'instant' });
       lenis.scrollTo(restoreY, { immediate: true });
+      // Keep the value in sessionStorage so Strict Mode remount / refresh still works.
+      saveHomeScrollPosition(restoreY);
     } else {
       scrollToTop();
       lenis.scrollTo(0, { immediate: true });

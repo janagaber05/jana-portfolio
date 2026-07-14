@@ -5,7 +5,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroSection from '../components/HeroSection';
 import PortfolioSections from '../components/PortfolioSections';
 import { useSiteContent } from '../context/SiteContentContext';
-import { shouldSkipHomeIntro } from '../utils/visitState';
+import {
+  saveHomeScrollPosition,
+  shouldSkipHomeIntro,
+} from '../utils/visitState';
 import { scrollToNavTarget } from '../utils/navScroll';
 import { cleanupScrollEffects, scrollToTop } from '../utils/scrollCleanup';
 
@@ -47,6 +50,30 @@ export default function HomePage() {
 
     return () => window.clearTimeout(timerId);
   }, [location]);
+
+  // Keep scroll position so a browser reload stays where you were.
+  useEffect(() => {
+    let timerId = 0;
+
+    const persist = () => {
+      saveHomeScrollPosition(window.scrollY || document.documentElement.scrollTop || 0);
+    };
+
+    const onScroll = () => {
+      window.clearTimeout(timerId);
+      timerId = window.setTimeout(persist, 120);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('pagehide', persist);
+
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('pagehide', persist);
+      persist();
+    };
+  }, []);
 
   return (
     <>

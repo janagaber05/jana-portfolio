@@ -1,3 +1,5 @@
+import { clearHomeScrollRestore, saveHomeScrollPosition } from './visitState';
+
 const NAV_OFFSET = 80;
 const KNOWN_SECTIONS = new Set(['home', 'work', 'about', 'contact']);
 
@@ -13,6 +15,7 @@ export function scrollToNavTarget(href, lenis) {
   const targetId = getNavTargetId(href);
 
   if (targetId === 'home') {
+    clearHomeScrollRestore();
     if (lenis) {
       lenis.scrollTo(0, { duration: 1.1 });
     } else {
@@ -33,6 +36,11 @@ export function scrollToNavTarget(href, lenis) {
   }
 
   window.history.replaceState(null, '', `#${targetId}`);
+
+  // Approximate save for hash targets so reload can recover mid-page.
+  window.setTimeout(() => {
+    saveHomeScrollPosition(window.scrollY || document.documentElement.scrollTop || 0);
+  }, 1200);
 }
 
 export function filterNavLinks(links = []) {
