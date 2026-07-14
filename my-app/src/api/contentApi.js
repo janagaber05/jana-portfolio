@@ -1,63 +1,63 @@
 import defaultContent from '../data/defaultContent.json';
 import { mergeSiteContent } from '../utils/mergeContent';
+import { hasSupabaseConfig, supabase } from '../lib/supabase';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 async function fetchFromSupabase() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
+  if (!hasSupabaseConfig || !supabase) {
     if (process.env.NODE_ENV === 'production') {
       console.warn(
         '[Portfolio] Missing REACT_APP_SUPABASE_URL or REACT_APP_SUPABASE_ANON_KEY. '
-        + 'The live site is using fallback content and will not reflect CMS edits. '
-        + 'Add both variables in Vercel, then redeploy the portfolio project.',
+        + 'Add both in Vercel (Portfolio project) → Settings → Environment Variables, then Redeploy.',
       );
     }
     return null;
   }
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/site_content?select=data&id=eq.main`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-    },
-  );
+  const { data, error } = await supabase
+    .from('site_content')
+    .select('data')
+    .eq('id', 'main')
+    .maybeSingle();
 
-  if (!res.ok) {
-    throw new Error(`Supabase unavailable (${res.status})`);
-  }
+  if (error) throw new Error(error.message);
+  if (!data?.data) throw new Error('No site content in Supabase (site_content.main)');
 
-  const rows = await res.json();
-  if (!rows?.[0]?.data) throw new Error('No site content in Supabase');
-
-  return mergeSiteContent(rows[0].data);
+  return mergeSiteContent(data.data);
 }
 
 export async function fetchSiteContent() {
   try {
     const fromSupabase = await fetchFromSupabase();
     if (fromSupabase) return fromSupabase;
-  } catch {
-    // try local API next
+  } catch (err) {
+    console.warn('[Portfolio] Could not load from Supabase:', err.message);
+  }
+
+  // Local Express API (dev only). Never call localhost from the deployed site.
+  const isBrowserLocal = typeof window !== 'undefined'
+    && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  if (isBrowserLocal || process.env.NODE_ENV !== 'production') {
+    try {
+      const res = await fetch(`${API_BASE}/api/content`);
+      if (!res.ok) throw new Error('API unavailable');
+      return mergeSiteContent(await res.json());
+    } catch (err) {
+      console.warn('[Portfolio] Could not load from local API:', err.message);
+    }
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/content`);
-    if (!res.ok) throw new Error('API unavailable');
-    return mergeSiteContent(await res.json());
+    const res = await fetch('/cms-default.json');
+    if (res.ok) return mergeSiteContent(await res.json());
   } catch {
-    try {
-      const res = await fetch('/cms-default.json');
-      if (res.ok) return mergeSiteContent(await res.json());
-    } catch {
-      // use bundled default
-    }
-    return mergeSiteContent(defaultContent);
+    // bundled default
   }
+
+  return mergeSiteContent(defaultContent);
 }
 
-export { API_BASE, SUPABASE_URL };
+export { API_BASE, SUPABASE_URL, hasSupabaseConfig };

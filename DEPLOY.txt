@@ -84,46 +84,40 @@ TEST THE WEBSITE
 
 
 ================================================================================
-  PART B — DEPLOY THE CMS (backend)
+  PART B — DEPLOY THE CMS (backend/dashboard) ON VERCEL
 ================================================================================
 
 WHAT IT IS
   The admin panel where YOU edit text and images.
-  URL will end with /admin
-
-RECOMMENDED HOSTS
-  - Render    https://render.com
-  - Railway   https://railway.app
+  Deploy as a SEPARATE Vercel project from the portfolio.
 
 BUILD SETTINGS
-  Root folder ........... backend
-  Build command ......... npm install && npm run dashboard:build
-  Start command ......... npm start
+  Root folder ........... backend/dashboard
+  Build command ......... npm run build
+  Output / publish dir .. dist
+  Node version .......... 18 or 20
 
-ENVIRONMENT VARIABLES (add in host dashboard)
-  SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-  SUPABASE_ANON_KEY=your_anon_or_publishable_key
-  JWT_SECRET=any-long-random-string-you-make-up
-  FRONTEND_URL=https://YOUR-LIVE-WEBSITE-URL.vercel.app
+ENVIRONMENT VARIABLES (CMS Vercel project)
+  VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+  VITE_SUPABASE_ANON_KEY=your_publishable_or_anon_key
+  VITE_BASE_PATH=/
+  VITE_PREVIEW_URL=https://YOUR-LIVE-PORTFOLIO.vercel.app
 
-  PORT is usually set automatically by the host (Render sets it for you).
+  Use the SAME Supabase URL + key as the portfolio project.
+  VITE_PREVIEW_URL must be your live portfolio URL (not localhost).
 
-STEPS ON RENDER (example)
-  1. render.com → New → Web Service
-  2. Connect GitHub repo: jana-portfolio
-  3. Root Directory: backend
-  4. Build Command: npm install && npm run dashboard:build
-  5. Start Command: npm start
-  6. Add env vars listed above
-  7. Deploy
-  8. CMS URL: https://your-service.onrender.com/admin
+STEPS ON VERCEL
+  1. vercel.com → Add New Project → import jana-portfolio
+  2. Set Root Directory to: backend/dashboard
+  3. Add the env vars above
+  4. Deploy
+  5. CMS URL: https://your-cms.vercel.app/login
 
 TEST THE CMS
-  1. Open https://your-service.onrender.com/admin
-  2. Log in with your Supabase email + password
-  3. Edit something (e.g. Hero headline)
-  4. Click Save
-  5. Refresh the live portfolio website — change should appear
+  1. Log in with your Supabase email + password
+  2. Edit something (e.g. Hero text)
+  3. Click Save changes
+  4. Hard refresh the live portfolio — change should appear
 
 
 ================================================================================
@@ -132,13 +126,14 @@ TEST THE CMS
 
   YOU edit in CMS  →  saves to Supabase  →  website reads from Supabase
 
-       CMS (Render)  ──────►  Supabase  ◄──────  Website (Vercel)
-     /admin login              database            public visitors
+       CMS (Vercel)  ──────►  Supabase  ◄──────  Website (Vercel)
+     login + Save              database            public visitors
 
   - Website and CMS are on DIFFERENT URLs — that is normal.
-  - They share the SAME Supabase project.
-  - You do NOT need to run SQL every time you edit content.
-  - Only click Save in the CMS, then refresh the website.
+  - They share the SAME Supabase project (same URL + same key).
+  - There is NO direct “backend URL” between them.
+  - If the website ignores CMS edits, the portfolio is missing
+    REACT_APP_SUPABASE_URL / REACT_APP_SUPABASE_ANON_KEY — add them and Redeploy.
 
 
 ================================================================================
@@ -161,6 +156,8 @@ TEST THE CMS
   backend/dashboard/.env
     VITE_SUPABASE_URL=...
     VITE_SUPABASE_ANON_KEY=...
+    VITE_PREVIEW_URL=http://localhost:3000
+    VITE_BASE_PATH=/
 
 
 ================================================================================
@@ -172,8 +169,14 @@ TEST THE CMS
     npm start
     → http://localhost:3000
 
-  Terminal 2 — CMS
+  Terminal 2 — CMS (Vite, recommended)
+    cd backend/dashboard
+    npm run dev
+    → http://localhost:5173/admin/
+
+  OR Terminal 2 — CMS via Express
     cd backend
+    npm run dashboard:build
     npm start
     → http://localhost:5001/admin
 
@@ -184,24 +187,29 @@ TEST THE CMS
 
   [ ] Supabase SQL already run (ALL_IN_ONE.sql)
   [ ] CMS user created in Supabase Authentication
-  [ ] Website deployed from my-app/ with Supabase env vars
-  [ ] SPA redirect added (vercel.json or _redirects)
-  [ ] CMS deployed from backend/ with env vars
-  [ ] FRONTEND_URL in CMS points to live website URL
-  [ ] Test: edit in CMS → Save → refresh website
+  [ ] Website deployed from my-app/ with REACT_APP_SUPABASE_* env vars
+  [ ] SPA redirect added (vercel.json)
+  [ ] CMS deployed from backend/dashboard/ with VITE_SUPABASE_* env vars
+  [ ] CMS VITE_BASE_PATH=/
+  [ ] CMS VITE_PREVIEW_URL = live portfolio URL
+  [ ] Same Supabase project on BOTH Vercel projects
+  [ ] Test: edit in CMS → Save → hard refresh website
 
 
 ================================================================================
   TROUBLESHOOTING
 ================================================================================
 
-  Website shows old/default content
-    → Check REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY on Vercel
+  Website shows old/default content (CMS edits ignored)
+    → Portfolio Vercel project is missing REACT_APP_SUPABASE_URL
+      and REACT_APP_SUPABASE_ANON_KEY
+    → After adding them you MUST Redeploy (env vars are baked into the build)
     → Hard refresh the browser (Cmd+Shift+R)
+    → Confirm both projects use the same Supabase URL/key
 
   CMS login fails
     → User must exist in Supabase → Authentication → Users
-    → Check SUPABASE_URL and SUPABASE_ANON_KEY on Render
+    → Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY on the CMS Vercel project
 
   /work page shows 404 on refresh
     → Add vercel.json or _redirects (see Part A above)
@@ -223,7 +231,7 @@ TEST THE CMS
 
   Folders:
     my-app/   = public portfolio website
-    backend/  = CMS API + admin dashboard
+    backend/dashboard/ = CMS admin (deploy this folder on Vercel)
     backend/supabase/ = SQL files (run once in Supabase, not on deploy)
 
 ================================================================================
