@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api, mediaUrl } from '../api';
+import ImageCropModal from './ImageCropModal';
 
 export function Field({ label, hint, children }) {
   return (
@@ -62,59 +63,109 @@ export function Card({ title, children }) {
   );
 }
 
-export function ImageUpload({ value, onChange, label = 'Image', hint }) {
+export function ImageUpload({
+  value,
+  onChange,
+  label = 'Image',
+  hint,
+  aspect = 21 / 9,
+  outputWidth = 2400,
+  enableCrop = true,
+}) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [cropSrc, setCropSrc] = useState('');
+  const [pendingName, setPendingName] = useState('image.jpg');
 
-  const handleFile = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const uploadBlobFile = async (file) => {
     setUploading(true);
     setError('');
-
     try {
       const result = await api.upload(file);
       onChange(result.url);
     } catch (err) {
       setError(err.message || 'Upload failed');
+      throw err;
     } finally {
       setUploading(false);
-      event.target.value = '';
     }
   };
 
+  const handleFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setError('');
+
+    if (!enableCrop) {
+      try {
+        await uploadBlobFile(file);
+      } catch {
+        // shown in error state
+      }
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPendingName(file.name || 'image.jpg');
+    setCropSrc(objectUrl);
+  };
+
+  const closeCrop = () => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc('');
+  };
+
+  const confirmCrop = async (file) => {
+    await uploadBlobFile(file);
+    closeCrop();
+  };
+
   return (
-    <Field
-      label={label}
-      hint={hint || 'Tap to choose an image from your device.'}
-    >
-      <div className="image-picker">
-        {value ? (
-          <div className="image-picker-preview">
-            <img src={mediaUrl(value)} alt="" className="image-picker-img" />
-            <div className="image-picker-actions">
-              <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
-                {uploading ? 'Uploading…' : 'Change image'}
-                <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
-              </label>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')}>
-                Remove
-              </button>
+    <div className="image-upload-block">
+      <Field
+        label={label}
+        hint={hint || 'Choose an image, crop it to fit the site, then upload.'}
+      >
+        <div className="image-picker">
+          {value ? (
+            <div className="image-picker-preview">
+              <img src={mediaUrl(value)} alt="" className="image-picker-img" />
+              <div className="image-picker-actions">
+                <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
+                  {uploading ? 'Uploading…' : 'Change image'}
+                  <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+                </label>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')}>
+                  Remove
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
-            <span className="image-picker-icon" aria-hidden="true">+</span>
-            <span className="image-picker-text">
-              {uploading ? 'Uploading…' : 'Choose image from device'}
-            </span>
-            <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
-          </label>
-        )}
-      </div>
-      {error ? <p className="field-error">{error}</p> : null}
-    </Field>
+          ) : (
+            <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
+              <span className="image-picker-icon" aria-hidden="true">+</span>
+              <span className="image-picker-text">
+                {uploading ? 'Uploading…' : 'Choose image from device'}
+              </span>
+              <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+            </label>
+          )}
+        </div>
+        {error ? <p className="field-error">{error}</p> : null}
+      </Field>
+
+      {cropSrc ? (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          fileName={pendingName}
+          initialAspect={aspect}
+          outputWidth={outputWidth}
+          onCancel={closeCrop}
+          onConfirm={confirmCrop}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -246,6 +297,8 @@ export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
                     value={item[field.key]}
                     onChange={(v) => updateItem(index, field.key, v)}
                     hint={field.hint}
+                    aspect={field.aspect ?? 3 / 4}
+                    outputWidth={field.outputWidth ?? 1400}
                   />
                 );
               }

@@ -356,74 +356,81 @@ export default function ProjectPage() {
 
       {/* Section 1 — Hero */}
       <section className={styles.hero} aria-label="Project hero">
-        <span className={styles.heroWatermark} aria-hidden="true">
-          {caseStudy.abbreviation}
-        </span>
-
-        <Link to="/#work" className={styles.heroBack} onClick={goHome}>
-          ← Back to work
-        </Link>
-
-        <div className={styles.heroInner}>
-          <div className={styles.heroContent}>
-            <p className={styles.heroTag}>
-              Case study · {project.index}
-            </p>
-            <div className={styles.heroTitleRow}>
-              <h1 className={styles.heroTitle}>{project.title}</h1>
-              <GripIcon className={styles.heroTitleGrip} />
-            </div>
-
-            <div className={styles.heroDivider} aria-hidden="true" />
-
-            <dl className={styles.factStrip}>
-              <div>
-                <dt>My role</dt>
-                <dd>{caseStudy.facts.role}</dd>
-              </div>
-              <div>
-                <dt>Timeline</dt>
-                <dd>{caseStudy.facts.timeline}</dd>
-              </div>
-              <div>
-                <dt>Tools</dt>
-                <dd>{caseStudy.facts.tools}</dd>
-              </div>
-              <div>
-                <dt>Type</dt>
-                <dd>{caseStudy.facts.type}</dd>
-              </div>
-            </dl>
+        {caseStudy.heroImage ? (
+          <div className={styles.heroBleed}>
+            <Link to="/#work" className={`${styles.heroBack} ${styles.heroBackOverlay}`} onClick={goHome}>
+              ← Back to work
+            </Link>
+            <button
+              type="button"
+              className={styles.inspectButton}
+              onClick={() => openLightboxBySrc(caseStudy.heroImage)}
+              aria-label={`View full size: ${project.title} hero`}
+            >
+              <img
+                src={caseStudy.heroImage}
+                alt={`${project.title} hero`}
+                className={styles.heroBleedImage}
+              />
+            </button>
           </div>
+        ) : null}
 
-          {caseStudy.heroImage ? (
-            <div className={styles.heroBanner}>
-              <button
-                type="button"
-                className={styles.inspectButton}
-                onClick={() => openLightboxBySrc(caseStudy.heroImage)}
-                aria-label={`View full size: ${project.title} hero`}
-              >
-                <img
-                  src={caseStudy.heroImage}
-                  alt={`${project.title} hero`}
-                  className={styles.heroBannerImage}
-                />
-              </button>
-            </div>
+        <div className={styles.heroBody}>
+          <span className={styles.heroWatermark} aria-hidden="true">
+            {caseStudy.abbreviation}
+          </span>
+
+          {!caseStudy.heroImage ? (
+            <Link to="/#work" className={styles.heroBack} onClick={goHome}>
+              ← Back to work
+            </Link>
           ) : null}
 
-          <ProjectBentoGrid
-            screens={heroScreens}
-            accent={project.accent}
-            onInspect={(_index, screen) => openLightboxItem(
-              screen.label,
-              screen.imageUrl,
-              screen.imageCandidates,
-              screen.fallbackImage,
-              screen.alt,
-            )}
-          />
+          <div className={styles.heroInner}>
+            <div className={styles.heroContent}>
+              <p className={styles.heroTag}>
+                Case study · {project.index}
+              </p>
+              <div className={styles.heroTitleRow}>
+                <h1 className={styles.heroTitle}>{project.title}</h1>
+                <GripIcon className={styles.heroTitleGrip} />
+              </div>
+
+              <div className={styles.heroDivider} aria-hidden="true" />
+
+              <dl className={styles.factStrip}>
+                <div>
+                  <dt>My role</dt>
+                  <dd>{caseStudy.facts.role}</dd>
+                </div>
+                <div>
+                  <dt>Timeline</dt>
+                  <dd>{caseStudy.facts.timeline}</dd>
+                </div>
+                <div>
+                  <dt>Tools</dt>
+                  <dd>{caseStudy.facts.tools}</dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{caseStudy.facts.type}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <ProjectBentoGrid
+              screens={heroScreens}
+              accent={project.accent}
+              onInspect={(_index, screen) => openLightboxItem(
+                screen.label,
+                screen.imageUrl,
+                screen.imageCandidates,
+                screen.fallbackImage,
+                screen.alt,
+              )}
+            />
+          </div>
         </div>
       </section>
 

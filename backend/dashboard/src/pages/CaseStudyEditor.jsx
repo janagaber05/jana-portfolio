@@ -28,8 +28,18 @@ const DEFAULT_WALKTHROUGH = {
 };
 
 const SCREEN_FIELDS = [
-  { key: 'label', label: 'Name' },
-  { key: 'imageUrl', label: 'Image', type: 'image', hint: 'Choose from your device.' },
+  {
+    key: 'label',
+    label: 'Name',
+  },
+  {
+    key: 'imageUrl',
+    label: 'Image',
+    type: 'image',
+    hint: 'Crop to a phone-screen shape before upload.',
+    aspect: 3 / 4,
+    outputWidth: 1400,
+  },
 ];
 
 function ensureCaseStudy(content, slug) {
@@ -104,7 +114,9 @@ export default function CaseStudyEditor() {
       <Card title="Page hero image">
         <ImageUpload
           label="Hero image"
-          hint="Large image at the top of the project page, above the bento grid. Visitors can tap to inspect full size."
+          hint="Full-width banner at the top of the project page (21:9). Crop it before upload so it fills the screen cleanly."
+          aspect={21 / 9}
+          outputWidth={2400}
           value={cs.heroImage || ''}
           onChange={(v) => set('heroImage', v)}
         />
@@ -186,7 +198,9 @@ export default function CaseStudyEditor() {
         />
         <ImageUpload
           label="Poster image (optional)"
-          hint="Shown before the video plays. Useful for uploaded files."
+          hint="Shown before the video plays. Crop to 16:9 to match the player."
+          aspect={16 / 9}
+          outputWidth={1600}
           value={cs.walkthrough?.posterUrl || ''}
           onChange={(v) => set('walkthrough.posterUrl', v)}
         />

@@ -692,3 +692,73 @@ code {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 26, 26, 0.55);
+}
+
+.crop-modal-card {
+  width: min(100%, 48rem);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  background: #fff;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  padding: 1rem 1.1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.crop-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.crop-modal-header .muted {
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+}
+
+.crop-aspect-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.crop-stage {
+  position: relative;
+  width: 100%;
+  height: min(52vh, 360px);
+  background: #111;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.crop-zoom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.crop-zoom input {
+  width: 100%;
+}
+
+.crop-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
