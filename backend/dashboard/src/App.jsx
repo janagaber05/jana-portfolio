@@ -49,29 +49,41 @@ function RequireAuth({ children }) {
     }
 
     let active = true;
+    let settled = false;
+
+    const settle = (session) => {
+      if (!active || settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      setAuthed(!!session);
+      setChecking(false);
+    };
 
     const timeoutId = window.setTimeout(() => {
-      if (!active) return;
-      setAuthed(false);
-      setChecking(false);
+      if (!active || settled) return;
+      settle(null);
     }, SESSION_TIMEOUT_MS);
 
     getSession()
-      .then((session) => {
-        if (!active) return;
-        setAuthed(!!session);
-        setChecking(false);
-      })
-      .catch(() => {
-        if (!active) return;
+      .then((session) => settle(session))
+      .catch(() => settle(null));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+
+      // Initial load is handled by getSession above.
+      if (event === 'INITIAL_SESSION') return;
+
+      if (event === 'SIGNED_OUT') {
         setAuthed(false);
         setChecking(false);
-      });
+        return;
+      }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!active) return;
-      setAuthed(!!session);
-      setChecking(false);
+      if (session) {
+        setAuthed(true);
+        setChecking(false);
+      }
     });
 
     return () => {

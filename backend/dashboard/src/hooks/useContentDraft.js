@@ -1,29 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useCallback } from 'react';
 import { useCms } from '../context/ContentContext';
-import { cloneContent } from '../utils/cloneContent';
 
+/** Shared draft from ContentProvider — survives navigation between editor pages. */
 export function useContentDraft() {
-  const { content, saveAll, saving } = useCms();
-  const location = useLocation();
-  const [draft, setDraft] = useState(() => cloneContent(content));
-
-  useEffect(() => {
-    setDraft(cloneContent(content));
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (content) {
-      setDraft(cloneContent(content));
-    }
-  }, [content]);
-
-  const updateDraft = useCallback((updater) => {
-    setDraft((prev) => {
-      if (!prev) return prev;
-      return typeof updater === 'function' ? updater(prev) : updater;
-    });
-  }, []);
+  const { draft, updateDraft, saveAll, saving } = useCms();
 
   const save = useCallback(async () => {
     if (!draft) return;
@@ -32,7 +12,6 @@ export function useContentDraft() {
 
   return {
     draft,
-    setDraft,
     updateDraft,
     save,
     saving,

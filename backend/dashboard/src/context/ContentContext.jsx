@@ -10,78 +10,88 @@ import {
 import { api } from '../api';
 import defaultContent from '../data/defaultContent.json';
 import { mergeSiteContent } from '../utils/mergeContent';
+import { cloneContent } from '../utils/cloneContent';
 
 const ContentContext = createContext(null);
 
 export function ContentProvider({ children }) {
   const [content, setContent] = useState(null);
+  const [draft, setDraft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const contentRef = useRef(null);
+  const draftRef = useRef(null);
+
+  const applyLoaded = useCallback((merged) => {
+    const nextDraft = cloneContent(merged);
+    draftRef.current = nextDraft;
+    setContent(merged);
+    setDraft(nextDraft);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
       const data = await api.getContent();
-      const merged = mergeSiteContent(data);
-      contentRef.current = merged;
-      setContent(merged);
+      applyLoaded(mergeSiteContent(data));
     } catch (err) {
-      const merged = mergeSiteContent(defaultContent);
-      contentRef.current = merged;
-      setContent(merged);
+      applyLoaded(mergeSiteContent(defaultContent));
       setError(err.message || 'Could not load content from Supabase.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyLoaded]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const updateDraft = useCallback((updater) => {
+    setDraft((prev) => {
+      if (!prev) return prev;
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      draftRef.current = next;
+      return next;
+    });
+  }, []);
+
   const saveAll = useCallback(async (next) => {
+    const payload = next ?? draftRef.current;
+    if (!payload) return;
+
     setSaving(true);
     setError('');
     try {
-      await api.saveContent(next);
-      contentRef.current = next;
-      setContent(next);
+      await api.saveContent(payload);
+      applyLoaded(payload);
     } catch (err) {
       setError(err.message);
       throw err;
     } finally {
       setSaving(false);
     }
-  }, []);
-
-  const update = useCallback((updater) => {
-    setContent((prev) => {
-      const next = typeof updater === 'function' ? updater(prev) : updater;
-      contentRef.current = next;
-      return next;
-    });
-  }, []);
+  }, [applyLoaded]);
 
   const value = useMemo(() => ({
     content,
+    draft,
     loading,
     saving,
     error,
     load,
     saveAll,
-    update,
+    updateDraft,
     setError,
   }), [
     content,
+    draft,
     loading,
     saving,
     error,
     load,
     saveAll,
-    update,
+    updateDraft,
   ]);
 
   return (
