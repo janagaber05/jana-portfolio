@@ -1,17 +1,28 @@
-import { useEffect, useState } from 'react';
-import { getResolvedImageSrc } from '../utils/resolveImageSources';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './ProjectBentoGrid.module.css';
 
-const BENTO_SLOTS = ['Feature', 'StackTop', 'StackBottom', 'Wide'];
-
 function BentoImage({ imageUrl, candidates, fallback, alt }) {
-  const src = getResolvedImageSrc(imageUrl, candidates, fallback);
-  const sources = [src, ...[...(candidates || []), fallback].filter((s) => s && s !== src)];
+  // Prefer the CMS upload. Local folder candidates are only a silent fallback.
+  const sources = useMemo(() => {
+    const list = [];
+    if (imageUrl) list.push(imageUrl);
+    [...(candidates || []), fallback].forEach((src) => {
+      if (src && !list.includes(src)) list.push(src);
+    });
+    return list;
+  }, [imageUrl, candidates, fallback]);
+
   const [sourceIndex, setSourceIndex] = useState(0);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     setSourceIndex(0);
+    setFailed(false);
   }, [imageUrl, candidates, fallback]);
+
+  if (!sources.length || failed) {
+    return <div className={styles.bentoMissing} aria-hidden="true" />;
+  }
 
   return (
     <img
@@ -20,9 +31,11 @@ function BentoImage({ imageUrl, candidates, fallback, alt }) {
       className={styles.bentoImage}
       loading="lazy"
       onError={() => {
-        setSourceIndex((current) => (
-          current < sources.length - 1 ? current + 1 : current
-        ));
+        setSourceIndex((current) => {
+          if (current < sources.length - 1) return current + 1;
+          setFailed(true);
+          return current;
+        });
       }}
     />
   );
@@ -39,16 +52,11 @@ export function GripIcon({ className = '' }) {
 }
 
 export default function ProjectBentoGrid({ screens, accent, onInspect }) {
-  const visibleScreens = screens || [];
-  const count = visibleScreens.length;
-  const useFlowLayout = count > 4;
+  // Only show screens that have a CMS-uploaded image URL.
+  const visibleScreens = (screens || []).filter((screen) => Boolean(screen?.imageUrl));
 
   if (!visibleScreens.length) {
-    return (
-      <div className={styles.bentoEmpty}>
-        Add screen images in the case study editor to show them here.
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -60,35 +68,31 @@ export default function ProjectBentoGrid({ screens, accent, onInspect }) {
 
       <div
         className={styles.bentoGrid}
-        data-count={useFlowLayout ? 'many' : String(count)}
+        data-count={Math.min(visibleScreens.length, 8)}
       >
-        {visibleScreens.map((screen, index) => {
-          const slotName = useFlowLayout
-            ? 'Extra'
-            : (BENTO_SLOTS[index] || 'Extra');
-
-          return (
-            <figure
-              key={`${screen.label || 'screen'}-${index}`}
-              className={`${styles.bentoCell} ${styles[`bento${slotName}`]}`}
+        {visibleScreens.map((screen, index) => (
+          <figure
+            key={`${screen.label || 'screen'}-${index}`}
+            className={styles.bentoCell}
+          >
+            <button
+              type="button"
+              className={styles.bentoFrame}
+              onClick={() => onInspect?.(index, screen)}
+              aria-label={`View full size: ${screen.label || `Screen ${index + 1}`}`}
             >
-              <button
-                type="button"
-                className={styles.bentoFrame}
-                onClick={() => onInspect?.(index, screen)}
-                aria-label={`View full size: ${screen.label || `Screen ${index + 1}`}`}
-              >
-                <BentoImage
-                  imageUrl={screen.imageUrl}
-                  candidates={screen.imageCandidates || []}
-                  fallback={screen.fallbackImage}
-                  alt={screen.alt || screen.label}
-                />
-              </button>
+              <BentoImage
+                imageUrl={screen.imageUrl}
+                candidates={[]}
+                fallback=""
+                alt={screen.alt || screen.label}
+              />
+            </button>
+            {screen.label ? (
               <figcaption className={styles.bentoLabel}>{screen.label}</figcaption>
-            </figure>
-          );
-        })}
+            ) : null}
+          </figure>
+        ))}
       </div>
     </div>
   );

@@ -265,9 +265,11 @@ export default function ProjectPage() {
 
   const heroScreens = useMemo(() => {
     if (!caseStudy) return [];
-    return caseStudy.heroScreens?.length
+    const raw = caseStudy.heroScreens?.length
       ? caseStudy.heroScreens
       : (caseStudy.finalDesign?.screens || []);
+    // Empty CMS slots used to render broken local placeholders and break the grid.
+    return raw.filter((screen) => Boolean(screen?.imageUrl));
   }, [caseStudy]);
 
   const lightboxItems = useMemo(() => {
