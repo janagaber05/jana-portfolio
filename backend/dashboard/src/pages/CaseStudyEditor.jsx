@@ -1,6 +1,15 @@
 import { useParams, Link } from 'react-router-dom';
 import { useContentDraft } from '../hooks/useContentDraft';
-import { Card, Field, ImageUpload, Input, ListEditor, SaveBar, Textarea } from '../components/Form';
+import {
+  Card,
+  Field,
+  ImageUpload,
+  Input,
+  ListEditor,
+  SaveBar,
+  Textarea,
+  VideoUpload,
+} from '../components/Form';
 
 const DEFAULT_BENTO_SCREENS = [
   { label: 'Screen 1', imageUrl: '' },
@@ -9,6 +18,15 @@ const DEFAULT_BENTO_SCREENS = [
   { label: 'Screen 4', imageUrl: '' },
 ];
 
+const DEFAULT_WALKTHROUGH = {
+  sectionNumber: '04',
+  title: 'Project walkthrough.',
+  highlight: 'walkthrough',
+  videoUrl: '',
+  posterUrl: '',
+  caption: '',
+};
+
 const SCREEN_FIELDS = [
   { key: 'label', label: 'Name' },
   { key: 'imageUrl', label: 'Image', type: 'image', hint: 'Choose from your device.' },
@@ -16,9 +34,8 @@ const SCREEN_FIELDS = [
 
 function ensureCaseStudy(content, slug) {
   const existing = content.caseStudies?.[slug];
-  if (existing) return existing;
   const project = content.featuredWork.projects.find((p) => p.slug === slug);
-  return {
+  const blank = {
     heroImage: '',
     abbreviation: project?.title?.split(' ').map((w) => w[0]).join('').slice(0, 3).toUpperCase() || 'PRJ',
     facts: { role: project?.role || '', timeline: `6 weeks · ${project?.year || ''}`, tools: (project?.tools || []).join(', '), type: project?.tag || '' },
@@ -26,10 +43,19 @@ function ensureCaseStudy(content, slug) {
     myRole: { sectionNumber: '02', title: 'What I specifically did.', highlight: 'specifically', intro: '', pills: [] },
     research: { sectionNumber: '03', title: 'What users actually told me.', highlight: 'actually', insights: [], persona: { name: '', role: '', goal: '', painPoint: '', behaviour: '', quote: '' } },
     quote: { text: '', attribution: '' },
+    walkthrough: { ...DEFAULT_WALKTHROUGH },
     heroScreens: [...DEFAULT_BENTO_SCREENS],
-    designProcess: { sectionNumber: '04', title: 'From sketch to final screen.', highlight: 'sketch', stages: [{ label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' }, { label: 'Mid fidelity', variant: 'mid', imageUrl: '' }, { label: 'High fidelity', variant: 'high', imageUrl: '' }] },
-    finalDesign: { sectionNumber: '05', title: 'The final screens.', highlight: 'final', screens: [{ label: 'Home screen', variant: 'home', imageUrl: '' }, { label: 'Detail screen', variant: 'detail', imageUrl: '' }, { label: 'Checkout screen', variant: 'checkout', imageUrl: '' }] },
-    outcomes: { sectionNumber: '06', title: 'The proof it worked.', highlight: 'proof', metrics: [] },
+    designProcess: { sectionNumber: '05', title: 'From sketch to final screen.', highlight: 'sketch', stages: [{ label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' }, { label: 'Mid fidelity', variant: 'mid', imageUrl: '' }, { label: 'High fidelity', variant: 'high', imageUrl: '' }] },
+    finalDesign: { sectionNumber: '06', title: 'The final screens.', highlight: 'final', screens: [{ label: 'Home screen', variant: 'home', imageUrl: '' }, { label: 'Detail screen', variant: 'detail', imageUrl: '' }, { label: 'Checkout screen', variant: 'checkout', imageUrl: '' }] },
+    outcomes: { sectionNumber: '07', title: 'The proof it worked.', highlight: 'proof', metrics: [] },
+  };
+
+  if (!existing) return blank;
+
+  return {
+    ...blank,
+    ...existing,
+    walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
   };
 }
 
@@ -39,7 +65,7 @@ export default function CaseStudyEditor() {
   if (!ready) return null;
 
   const project = draft.featuredWork.projects.find((p) => p.slug === slug);
-  const cs = draft.caseStudies?.[slug] || ensureCaseStudy(draft, slug);
+  const cs = ensureCaseStudy(draft, slug);
 
   const setCs = (next) => {
     updateDraft((prev) => ({
@@ -142,7 +168,34 @@ export default function CaseStudyEditor() {
         <Field label="Attribution"><Input value={cs.quote.attribution} onChange={(v) => set('quote.attribution', v)} /></Field>
       </Card>
 
-      <Card title="04 — Wireframes (design process)">
+      <Card title="04 — Project walkthrough video">
+        <p className="muted">
+          Add a product walkthrough video. Upload an MP4/WebM, or paste a YouTube / Vimeo link.
+          Leave empty to hide this section on the live site.
+        </p>
+        <Field label="Section title">
+          <Input value={cs.walkthrough?.title || ''} onChange={(v) => set('walkthrough.title', v)} />
+        </Field>
+        <Field label="Highlight word">
+          <Input value={cs.walkthrough?.highlight || ''} onChange={(v) => set('walkthrough.highlight', v)} />
+        </Field>
+        <VideoUpload
+          label="Walkthrough video"
+          value={cs.walkthrough?.videoUrl || ''}
+          onChange={(v) => set('walkthrough.videoUrl', v)}
+        />
+        <ImageUpload
+          label="Poster image (optional)"
+          hint="Shown before the video plays. Useful for uploaded files."
+          value={cs.walkthrough?.posterUrl || ''}
+          onChange={(v) => set('walkthrough.posterUrl', v)}
+        />
+        <Field label="Caption (optional)">
+          <Input value={cs.walkthrough?.caption || ''} onChange={(v) => set('walkthrough.caption', v)} />
+        </Field>
+      </Card>
+
+      <Card title="05 — Wireframes (design process)">
         <p className="muted">Add as many wireframe stages as you want. Visitors can tap each image to inspect it full size.</p>
         <ListEditor
           items={cs.designProcess.stages}
@@ -152,7 +205,7 @@ export default function CaseStudyEditor() {
         />
       </Card>
 
-      <Card title="05 — Final screens">
+      <Card title="06 — Final screens">
         <p className="muted">Add as many final screens as you want. Visitors can tap each image to inspect it full size.</p>
         <ListEditor
           items={cs.finalDesign.screens}
@@ -162,7 +215,7 @@ export default function CaseStudyEditor() {
         />
       </Card>
 
-      <Card title="06 — Outcomes">
+      <Card title="07 — Outcomes">
         <ListEditor
           items={cs.outcomes.metrics}
           onChange={(v) => set('outcomes.metrics', v)}

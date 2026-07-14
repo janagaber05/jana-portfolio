@@ -118,6 +118,106 @@ export function ImageUpload({ value, onChange, label = 'Image', hint }) {
   );
 }
 
+export function VideoUpload({
+  value,
+  onChange,
+  label = 'Walkthrough video',
+  hint,
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleFile = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 80 * 1024 * 1024) {
+      setError('Video is too large. Keep uploads under ~80MB, or paste a YouTube/Vimeo link instead.');
+      event.target.value = '';
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const result = await api.upload(file);
+      onChange(result.url);
+    } catch (err) {
+      setError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  const previewUrl = mediaUrl(value);
+  const isFileVideo = /\.(mp4|webm|mov|m4v)(\?|$)/i.test(previewUrl);
+
+  return (
+    <Field
+      label={label}
+      hint={hint || 'Upload an MP4/WebM from your device, or paste a YouTube / Vimeo / direct video URL below.'}
+    >
+      <div className="image-picker">
+        {value ? (
+          <div className="image-picker-preview">
+            {isFileVideo ? (
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video
+                className="image-picker-img"
+                src={previewUrl}
+                controls
+                playsInline
+                preload="metadata"
+              />
+            ) : (
+              <p className="muted" style={{ padding: '0.75rem 0' }}>
+                Linked video ready — save to show it on the project page.
+              </p>
+            )}
+            <div className="image-picker-actions">
+              <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
+                {uploading ? 'Uploading…' : 'Change video file'}
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  hidden
+                  onChange={handleFile}
+                  disabled={uploading}
+                />
+              </label>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')}>
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
+            <span className="image-picker-icon" aria-hidden="true">▶</span>
+            <span className="image-picker-text">
+              {uploading ? 'Uploading…' : 'Choose video from device'}
+            </span>
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime,video/*"
+              hidden
+              onChange={handleFile}
+              disabled={uploading}
+            />
+          </label>
+        )}
+      </div>
+      <Input
+        value={value}
+        onChange={onChange}
+        placeholder="Or paste YouTube / Vimeo / video URL"
+      />
+      {error ? <p className="field-error">{error}</p> : null}
+    </Field>
+  );
+}
+
 export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
   const updateItem = (index, key, val) => {
     const next = items.map((item, i) => (i === index ? { ...item, [key]: val } : item));

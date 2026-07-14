@@ -5,6 +5,7 @@ import { getAdjacentProjects, getProjectBySlug } from '../data/featuredWork';
 import { useSiteContent } from '../context/SiteContentContext';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import { getResolvedImageSrc, resolveImageSources } from '../utils/resolveImageSources';
+import { resolveWalkthroughVideo } from '../utils/walkthroughVideo';
 import ProjectBentoGrid, { GripIcon } from '../components/ProjectBentoGrid';
 import ImageLightbox from '../components/ImageLightbox';
 import styles from './ProjectPage.module.css';
@@ -165,7 +166,13 @@ export default function ProjectPage() {
   const project = getProjectBySlug(projects, slug);
   const caseStudy = getCaseStudy(project, content?.caseStudies);
   const { next } = getAdjacentProjects(projects, slug);
-  const sectionIds = PROGRESS_SECTIONS.map((section) => section.id);
+  const walkthroughVideo = resolveWalkthroughVideo(caseStudy?.walkthrough?.videoUrl);
+  const sectionIds = PROGRESS_SECTIONS
+    .filter((section) => section.id !== 'section-walkthrough' || walkthroughVideo)
+    .map((section) => section.id);
+  const progressSections = PROGRESS_SECTIONS.filter(
+    (section) => section.id !== 'section-walkthrough' || walkthroughVideo,
+  );
   const activeSection = useSectionSpy(sectionIds);
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const scrollKey = `jana:projectScroll:${slug}`;
@@ -335,7 +342,7 @@ export default function ProjectPage() {
   return (
     <div className={styles.page}>
       <nav className={styles.progressNav} aria-label="Case study progress">
-        {PROGRESS_SECTIONS.map((section, index) => (
+        {progressSections.map((section, index) => (
           <button
             key={section.id}
             type="button"
@@ -536,6 +543,48 @@ export default function ProjectPage() {
           </blockquote>
         </div>
       </section>
+
+      {/* Section — Walkthrough video */}
+      {walkthroughVideo ? (
+        <section id="section-walkthrough" className={`${styles.section} ${styles.sectionCream}`}>
+          <div className={styles.sectionInner}>
+            <p className={styles.sectionLabel}>
+              {caseStudy.walkthrough?.sectionNumber || '04'} — Walkthrough
+            </p>
+            <HighlightTitle
+              title={caseStudy.walkthrough?.title || 'Project walkthrough.'}
+              highlight={caseStudy.walkthrough?.highlight || 'walkthrough'}
+              className={styles.sectionTitle}
+              highlightClassName={styles.highlightBurgundy}
+            />
+
+            <div className={styles.walkthroughFrame}>
+              {walkthroughVideo.type === 'iframe' ? (
+                <iframe
+                  className={styles.walkthroughMedia}
+                  src={walkthroughVideo.src}
+                  title={walkthroughVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                // eslint-disable-next-line jsx-a11y/media-has-caption
+                <video
+                  className={styles.walkthroughMedia}
+                  src={walkthroughVideo.src}
+                  poster={caseStudy.walkthrough?.posterUrl || undefined}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              )}
+            </div>
+            {caseStudy.walkthrough?.caption ? (
+              <p className={styles.walkthroughCaption}>{caseStudy.walkthrough.caption}</p>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       {/* Section 6 — Design process */}
       <section id="section-process" className={`${styles.section} ${styles.sectionWhite}`}>

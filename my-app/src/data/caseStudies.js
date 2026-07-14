@@ -77,8 +77,16 @@ function buildCaseStudy(project) {
       text: '"I just want to know I am doing it right before I commit."',
       attribution: 'Sara M. — User interview, March 2025',
     },
-    designProcess: {
+    walkthrough: {
       sectionNumber: '04',
+      title: 'Project walkthrough.',
+      highlight: 'walkthrough',
+      videoUrl: '',
+      posterUrl: '',
+      caption: '',
+    },
+    designProcess: {
+      sectionNumber: '05',
       title: 'From sketch to final screen.',
       highlight: 'sketch',
       stages: [
@@ -88,7 +96,7 @@ function buildCaseStudy(project) {
       ],
     },
     finalDesign: {
-      sectionNumber: '05',
+      sectionNumber: '06',
       title: 'The final screens.',
       highlight: 'final',
       screens: [
@@ -98,7 +106,7 @@ function buildCaseStudy(project) {
       ],
     },
     outcomes: {
-      sectionNumber: '06',
+      sectionNumber: '07',
       title: 'The proof it worked.',
       highlight: 'proof',
       metrics: [
@@ -122,7 +130,19 @@ function buildCaseStudy(project) {
 export function getCaseStudy(project, caseStudies = {}) {
   if (!project) return null;
   const base = caseStudies[project.slug] || buildCaseStudy(project);
-  return attachCaseStudyImages(base, project.slug);
+  const withWalkthrough = {
+    ...base,
+    walkthrough: {
+      sectionNumber: '04',
+      title: 'Project walkthrough.',
+      highlight: 'walkthrough',
+      videoUrl: '',
+      posterUrl: '',
+      caption: '',
+      ...(base.walkthrough || {}),
+    },
+  };
+  return attachCaseStudyImages(withWalkthrough, project.slug);
 }
 
 export const PROGRESS_SECTIONS = [
@@ -130,6 +150,7 @@ export const PROGRESS_SECTIONS = [
   { id: 'section-role', label: 'My role' },
   { id: 'section-research', label: 'Research' },
   { id: 'section-quote', label: 'Quote' },
+  { id: 'section-walkthrough', label: 'Walkthrough' },
   { id: 'section-process', label: 'Design process' },
   { id: 'section-final', label: 'Final design' },
   { id: 'section-outcomes', label: 'Outcomes' },
