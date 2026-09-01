@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useSiteContent } from '../context/SiteContentContext';
@@ -6,163 +6,268 @@ import styles from './ProcessSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const THEME_CLASS = {
-  burgundy: styles.themeBurgundy,
-  dark: styles.themeDark,
-  petal: styles.themePetal,
+const SCROLL_RUNWAY_PER_STEP = 0.42;
+
+const ICONS = {
+  discovery: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="2.5" />
+      <path d="M15.5 15.5L21 21" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="10.5" cy="10.5" r="2.25" fill="currentColor" />
+    </svg>
+  ),
+  blueprint: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.75" stroke="currentColor" strokeWidth="2.25" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="1.75" stroke="currentColor" strokeWidth="2.25" />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1.75" stroke="currentColor" strokeWidth="2.25" />
+      <rect x="13.5" y="13.5" width="7" height="7" rx="1.75" fill="currentColor" />
+    </svg>
+  ),
+  build: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4.75 19.25 8 18l10.1-10.1a2.2 2.2 0 0 0 0-3.1L15.2 3.25a2.2 2.2 0 0 0-3.1 0L2 13.35l-1.25 4.65 4-1.75z"
+        fill="currentColor"
+      />
+      <path d="M13.25 5.25 18.75 10.75" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" />
+    </svg>
+  ),
+  testing: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 4.5a7.5 7.5 0 107.5 7.5"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path d="M12 8.5v4.25l2.75 1.75" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+    </svg>
+  ),
+  deploy: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2.5l8.5 6.25-8.5 6.75L3.5 8.75 12 2.5z"
+        fill="currentColor"
+      />
+      <path
+        d="M5.5 10.75v5.75c0 1.65 2.9 3 6.5 3s6.5-1.35 6.5-3v-5.75"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+      />
+      <path d="M12 19.5v2.25" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
-const SIZE_CLASS = {
-  hero: styles.sizeHero,
-  medium: styles.sizeMedium,
-  small: styles.sizeSmall,
-};
+function ProcessIcon({ icon }) {
+  return <span className={styles.stepIcon}>{ICONS[icon] || ICONS.discovery}</span>;
+}
 
-function ProcessCard({ step, className = '' }) {
-  const cardRef = useRef(null);
-  const hoverRef = useRef(null);
-  const hoverTlRef = useRef(null);
-
-  useEffect(() => {
-    const card = cardRef.current;
-    const hover = hoverRef.current;
-    if (!card || !hover) return;
-
-    const label = hover.querySelector('[data-hover="label"]');
-    const title = hover.querySelector('[data-hover="title"]');
-    const divider = hover.querySelector('[data-hover="divider"]');
-    const description = hover.querySelector('[data-hover="description"]');
-    const tags = hover.querySelector('[data-hover="tags"]');
-    const targets = [label, title, divider, description, tags].filter(Boolean);
-
-    gsap.set(targets, { autoAlpha: 0, y: 10 });
-    gsap.set(divider, { scaleX: 0, transformOrigin: 'left center' });
-
-    const playHover = () => {
-      hoverTlRef.current?.kill();
-      hoverTlRef.current = gsap
-        .timeline()
-        .to(label, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0)
-        .to(title, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.07)
-        .to(divider, { scaleX: 1, autoAlpha: 1, duration: 0.14, ease: 'power2.inOut' }, 0.14)
-        .to(description, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.21)
-        .to(tags, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.28);
-    };
-
-    const resetHover = () => {
-      hoverTlRef.current?.kill();
-      gsap.set(targets, { autoAlpha: 0, y: 10 });
-      gsap.set(divider, { scaleX: 0 });
-    };
-
-    const onEnter = () => playHover();
-    const onLeave = () => resetHover();
-
-    card.addEventListener('mouseenter', onEnter);
-    card.addEventListener('mouseleave', onLeave);
-    card.addEventListener('focusin', onEnter);
-    card.addEventListener('focusout', onLeave);
-
-    return () => {
-      card.removeEventListener('mouseenter', onEnter);
-      card.removeEventListener('mouseleave', onLeave);
-      card.removeEventListener('focusin', onEnter);
-      card.removeEventListener('focusout', onLeave);
-      hoverTlRef.current?.kill();
-    };
-  }, []);
+function TimelineStep({ step, index, stepRef }) {
+  const iconOnLeft = index % 2 === 0;
 
   return (
-    <article
-      ref={cardRef}
-      className={`${styles.stepCard} ${THEME_CLASS[step.theme]} ${SIZE_CLASS[step.size]} ${className}`}
-      tabIndex={0}
+    <li
+      ref={stepRef}
+      className={`${styles.timelineStep} ${iconOnLeft ? styles.iconLeft : styles.iconRight}`}
     >
-      <span className={styles.ghostNum} aria-hidden="true">
-        {step.num}
-      </span>
-
-      <div className={styles.cardBase}>
-        <div className={styles.cardBaseFooter}>
-          <div className={styles.bottomGradient} aria-hidden="true" />
-          <p className={styles.baseStepLabel}>Step {step.num}</p>
-          <h3 className={styles.baseTitle}>{step.title}</h3>
-        </div>
+      <div className={styles.stepRow}>
+        {iconOnLeft ? (
+          <>
+            <div className={styles.stepIconCol}>
+              <ProcessIcon icon={step.icon} />
+            </div>
+            <div className={styles.stepContentCol}>
+              <span className={styles.stepNum}>{step.num}</span>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepDescription}>{step.description}</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.stepContentCol}>
+              <span className={styles.stepNum}>{step.num}</span>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepDescription}>{step.description}</p>
+            </div>
+            <div className={styles.stepIconCol}>
+              <ProcessIcon icon={step.icon} />
+            </div>
+          </>
+        )}
       </div>
-
-      <div ref={hoverRef} className={styles.cardHover}>
-        <p className={styles.hoverStepLabel} data-hover="label">
-          Step {step.num}
-        </p>
-        <h3 className={styles.hoverTitle} data-hover="title">
-          {step.title}
-        </h3>
-        <div className={styles.hoverDivider} data-hover="divider" aria-hidden="true" />
-        <p className={styles.hoverDescription} data-hover="description">
-          {step.description}
-        </p>
-        <ul className={styles.hoverTags} data-hover="tags">
-          {step.tags.map((tag) => (
-            <li key={tag}>
-              <span className={styles.hoverTag}>{tag}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </article>
+    </li>
   );
 }
 
 export default function ProcessSection() {
-  const { content } = useSiteContent();
+  const { content, loading } = useSiteContent();
   const process = content?.process;
   const sectionRef = useRef(null);
+  const timelineRef = useRef(null);
+  const highlightRef = useRef(null);
+  const stepRefs = useRef([]);
+
+  const steps = Array.isArray(process?.steps) ? process.steps : [];
+  const stepCount = Math.max(steps.length, 1);
+
+  const sectionHeight = useMemo(
+    () => `calc(100vh + ${(stepCount - 1) * SCROLL_RUNWAY_PER_STEP * 100}vh)`,
+    [stepCount],
+  );
 
   useEffect(() => {
+    if (loading) return undefined;
+
     const section = sectionRef.current;
-    if (!section) return;
+    const timeline = timelineRef.current;
+    const highlight = highlightRef.current;
+    const stepEls = stepRefs.current.filter(Boolean);
+
+    if (!section || !timeline || !highlight || !stepEls.length) return undefined;
+
+    const getStepActivation = (raw, index) => Math.max(0, 1 - Math.abs(raw - index));
+
+    const measureSteps = () => {
+      const listTop = timeline.querySelector(`.${styles.timelineList}`)?.offsetTop || 0;
+
+      return stepEls.map((step) => ({
+        top: listTop + step.offsetTop,
+        height: step.offsetHeight,
+      }));
+    };
+
+    let stepMetrics = measureSteps();
+    let trigger;
+
+    const updateVisuals = (raw) => {
+      const clampedRaw = Math.min(stepEls.length - 1, Math.max(0, raw));
+
+      stepEls.forEach((stepEl, index) => {
+        const activation = getStepActivation(clampedRaw, index);
+        stepEl.style.setProperty('--step-progress', activation.toFixed(3));
+
+        const icon = stepEl.querySelector(`.${styles.stepIcon}`);
+        if (icon) {
+          icon.style.setProperty('--icon-progress', activation.toFixed(3));
+        }
+      });
+
+      const lower = Math.min(stepEls.length - 1, Math.floor(clampedRaw));
+      const upper = Math.min(stepEls.length - 1, lower + 1);
+      const segmentProgress = clampedRaw - lower;
+      const eased = gsap.parseEase('power2.inOut')(segmentProgress);
+
+      if (lower === upper) {
+        const metric = stepMetrics[lower];
+        if (!metric) return;
+        gsap.set(highlight, { top: metric.top, height: metric.height });
+        return;
+      }
+
+      const from = stepMetrics[lower];
+      const to = stepMetrics[upper];
+      if (!from || !to) return;
+
+      gsap.set(highlight, {
+        top: from.top + (to.top - from.top) * eased,
+        height: from.height + (to.height - from.height) * eased,
+      });
+    };
+
+    const syncProgress = () => {
+      if (!trigger) return;
+      updateVisuals(trigger.progress * (stepEls.length - 1));
+    };
 
     const ctx = gsap.context(() => {
-      gsap.from(section, {
-        autoAlpha: 0,
-        y: 40,
-        duration: 0.9,
-        ease: 'power3.out',
-        scrollTrigger: {
+      const setup = () => {
+        stepMetrics = measureSteps();
+        updateVisuals(0);
+
+        trigger = ScrollTrigger.create({
+          id: 'process-timeline',
           trigger: section,
-          start: 'top 88%',
-          toggleActions: 'play none none reverse',
-        },
-      });
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.35,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            stepMetrics = measureSteps();
+            syncProgress();
+          },
+          onUpdate: (self) => {
+            updateVisuals(self.progress * (stepEls.length - 1));
+          },
+        });
+
+        ScrollTrigger.refresh();
+        syncProgress();
+      };
+
+      const layoutId = window.setTimeout(setup, 120);
+      const refreshId = window.setTimeout(() => {
+        stepMetrics = measureSteps();
+        ScrollTrigger.refresh();
+        syncProgress();
+      }, 450);
+
+      const onResize = () => {
+        stepMetrics = measureSteps();
+        ScrollTrigger.refresh();
+        syncProgress();
+      };
+      window.addEventListener('resize', onResize);
+
+      return () => {
+        window.clearTimeout(layoutId);
+        window.clearTimeout(refreshId);
+        window.removeEventListener('resize', onResize);
+      };
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, stepCount]);
 
   if (!process) return null;
 
-  const { steps } = process;
-
   return (
-    <section ref={sectionRef} id="process" className={styles.processSection}>
-      <div className={styles.processInner}>
-        <header className={styles.processHeader}>
-          <div className={styles.processHeaderLeft}>
+    <section
+      ref={sectionRef}
+      id="process"
+      className={styles.processSection}
+      style={{ height: sectionHeight }}
+    >
+      <div className={styles.processSticky}>
+        <div className={styles.processCard}>
+          <header className={styles.processHeader}>
             <p className={styles.processEyebrow}>{process.eyebrow}</p>
-            <h2 className={styles.processTitle}>
-              <span className={styles.processTitleDark}>{process.titleDark}</span>
-              <span className={styles.processTitleAccent}>{process.titleAccent}</span>
-            </h2>
-          </div>
-          <p className={styles.processMeta}>{process.meta}</p>
-        </header>
+            <h2 className={styles.processTitle}>{process.title}</h2>
+            {process.subtitle ? <p className={styles.processSubtitle}>{process.subtitle}</p> : null}
+          </header>
 
-        <div className={styles.stepsGrid}>
-          <ProcessCard step={steps.discover} className={styles.layoutHero} />
-          <ProcessCard step={steps.define} className={styles.layoutDefine} />
-          <div className={styles.layoutPair}>
-            <ProcessCard step={steps.design} />
-            <ProcessCard step={steps.deliver} />
+          <div ref={timelineRef} className={styles.timeline}>
+            <div ref={highlightRef} className={styles.highlightBar} aria-hidden="true" />
+
+            <div className={styles.timelineLine}>
+              <span className={styles.timelineGlow} />
+            </div>
+
+            <ol className={styles.timelineList}>
+              {steps.map((step, index) => (
+                <TimelineStep
+                  key={step.num || index}
+                  step={step}
+                  index={index}
+                  stepRef={(el) => {
+                    stepRefs.current[index] = el;
+                  }}
+                />
+              ))}
+            </ol>
           </div>
         </div>
       </div>

@@ -14,29 +14,41 @@ import { cloneContent } from '../utils/cloneContent';
 
 const ContentContext = createContext(null);
 
+function snapshotsEqual(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
 export function ContentProvider({ children }) {
-  const [content, setContent] = useState(null);
+  const [published, setPublished] = useState(null);
   const [draft, setDraft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState('');
   const draftRef = useRef(null);
+  const publishedRef = useRef(null);
 
-  const applyLoaded = useCallback((merged) => {
-    const nextDraft = cloneContent(merged);
-    draftRef.current = nextDraft;
-    setContent(merged);
-    setDraft(nextDraft);
+  const applyLoaded = useCallback((nextPublished, nextDraft) => {
+    const mergedPublished = mergeSiteContent(nextPublished);
+    const mergedDraft = mergeSiteContent(nextDraft || nextPublished);
+    publishedRef.current = mergedPublished;
+    draftRef.current = mergedDraft;
+    setPublished(mergedPublished);
+    setDraft(mergedDraft);
   }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const data = await api.getContent();
-      applyLoaded(mergeSiteContent(data));
+      const [live, working] = await Promise.all([
+        api.getPublishedContent(),
+        api.getDraftContent(),
+      ]);
+      applyLoaded(live, working);
     } catch (err) {
-      applyLoaded(mergeSiteContent(defaultContent));
+      const fallback = mergeSiteContent(defaultContent);
+      applyLoaded(fallback, fallback);
       setError(err.message || 'Could not load content from Supabase.');
     } finally {
       setLoading(false);
@@ -56,41 +68,94 @@ export function ContentProvider({ children }) {
     });
   }, []);
 
-  const saveAll = useCallback(async (next) => {
+  const saveDraft = useCallback(async (next) => {
     const payload = next ?? draftRef.current;
     if (!payload) return;
 
     setSaving(true);
     setError('');
     try {
-      await api.saveContent(payload);
-      applyLoaded(payload);
+      await api.saveDraft(payload);
+      draftRef.current = payload;
+      setDraft(payload);
     } catch (err) {
       setError(err.message);
       throw err;
     } finally {
       setSaving(false);
     }
-  }, [applyLoaded]);
+  }, []);
+
+  const publish = useCallback(async (next) => {
+    const payload = next ?? draftRef.current;
+    if (!payload) return;
+
+    setPublishing(true);
+    setError('');
+    try {
+      await api.publishContent(payload);
+      publishedRef.current = payload;
+      draftRef.current = payload;
+      setPublished(payload);
+      setDraft(payload);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setPublishing(false);
+    }
+  }, []);
+
+  const discardDraft = useCallback(() => {
+    if (!publishedRef.current) return;
+    const reset = cloneContent(publishedRef.current);
+    draftRef.current = reset;
+    setDraft(reset);
+  }, []);
+
+  const restoreRevisionToDraft = useCallback(async (revisionId) => {
+    const content = await api.restoreRevision(revisionId);
+    const merged = mergeSiteContent(content);
+    draftRef.current = merged;
+    setDraft(merged);
+    return merged;
+  }, []);
+
+  const hasUnpublishedChanges = useMemo(() => {
+    if (!draft || !published) return false;
+    return !snapshotsEqual(draft, published);
+  }, [draft, published]);
 
   const value = useMemo(() => ({
-    content,
+    content: published,
+    published,
     draft,
     loading,
     saving,
+    publishing,
     error,
+    hasUnpublishedChanges,
     load,
-    saveAll,
+    saveDraft,
+    publish,
+    discardDraft,
+    restoreRevisionToDraft,
     updateDraft,
     setError,
+    saveAll: publish,
   }), [
-    content,
+    published,
     draft,
     loading,
     saving,
+    publishing,
     error,
+    hasUnpublishedChanges,
     load,
-    saveAll,
+    saveDraft,
+    publish,
+    discardDraft,
+    restoreRevisionToDraft,
     updateDraft,
   ]);
 

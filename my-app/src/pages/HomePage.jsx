@@ -49,7 +49,7 @@ export default function HomePage() {
 
     const refreshId = window.setTimeout(() => {
       ScrollTrigger.refresh();
-    }, 150);
+    }, 500);
 
     return () => window.clearTimeout(refreshId);
   }, [loading]);

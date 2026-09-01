@@ -18,9 +18,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm start --prefix ..",
+    "start:web": "BROWSER=none react-scripts start",
     "backend": "npm start --prefix ../backend",
-    "cms": "npm start --prefix ../backend",
+    "cms": "npm run dashboard:dev --prefix ../backend",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

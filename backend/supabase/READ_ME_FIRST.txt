@@ -15,6 +15,8 @@ Open these files. They end with .sql
 04_case_study.sql
 05_site_content.sql
 06_function.sql
+08_analytics.sql
+09_cms_features.sql
 
 Or use ALL_IN_ONE.sql to run everything at once.
 

@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
+import ProjectThumbnail from '../components/ProjectThumbnail';
 import { useSiteContent } from '../context/SiteContentContext';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import styles from './WorkPage.module.css';
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, index }) {
   const navigate = useNavigate();
 
   const handleClick = (event) => {
@@ -19,9 +20,14 @@ function ProjectCard({ project }) {
       onClick={handleClick}
     >
       <article className={styles.projectCard} style={{ '--work-accent': project.accent }}>
-        <div className={styles.projectThumb} aria-hidden="true">
-          <span className={styles.projectIndex}>{project.index}</span>
-        </div>
+        <ProjectThumbnail
+          project={project}
+          index={index}
+          className={styles.projectThumb}
+          imageClassName={styles.projectImage}
+          fallbackClassName={styles.projectIndex}
+          alt={`${project.title} project preview`}
+        />
         <div className={styles.projectBody}>
           <h2>{project.title}</h2>
           <p>{project.tag}</p>
@@ -53,8 +59,8 @@ export default function WorkPage() {
       </header>
 
       <div className={styles.grid}>
-        {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+        {projects.map((project, index) => (
+          <ProjectCard key={project.id} project={project} index={index} />
         ))}
       </div>
     </div>

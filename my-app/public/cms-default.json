@@ -253,58 +253,41 @@
     }
   },
   "process": {
-    "eyebrow": "How I work",
-    "titleDark": "My ",
-    "titleAccent": "process.",
-    "meta": "04 steps · hover to explore",
-    "steps": {
-      "discover": {
+    "eyebrow": "004 • PROCESS",
+    "title": "How We Work",
+    "subtitle": "A proven process designed to transform complex workflows into scalable, user-centered products — efficiently and strategically.",
+    "steps": [
+      {
         "num": "01",
-        "title": "Discover",
-        "theme": "burgundy",
-        "size": "hero",
-        "description": "Understand users, business goals, and the full context before touching any design tool",
-        "tags": [
-          "Interviews",
-          "Research",
-          "Audit"
-        ]
+        "title": "Discovery & Audit",
+        "description": "We analyze user needs, business goals, and existing product gaps.",
+        "icon": "discovery"
       },
-      "define": {
+      {
         "num": "02",
-        "title": "Define",
-        "theme": "dark",
-        "size": "medium",
-        "description": "Synthesize insights into clear problem statements and design opportunities worth solving",
-        "tags": [
-          "Personas",
-          "HMW",
-          "Journey maps"
-        ]
+        "title": "Strategy Blueprint",
+        "description": "We map user journeys and define a clear design direction aligned with outcomes.",
+        "icon": "blueprint"
       },
-      "design": {
+      {
         "num": "03",
-        "title": "Design",
-        "theme": "petal",
-        "size": "small",
-        "description": "Ideate and iterate in Figma until the solution feels right.",
-        "tags": [
-          "Wireframes",
-          "Prototype"
-        ]
+        "title": "Design & Prototype",
+        "description": "I design high-fidelity interfaces and interactive prototypes in Figma.",
+        "icon": "build"
       },
-      "deliver": {
+      {
         "num": "04",
-        "title": "Deliver",
-        "theme": "burgundy",
-        "size": "small",
-        "description": "Ship, test with real users and refine until the product truly works.",
-        "tags": [
-          "Handoff",
-          "Launch"
-        ]
+        "title": "Testing & Optimization",
+        "description": "Usability testing, feedback sessions, and continuous refinement.",
+        "icon": "testing"
+      },
+      {
+        "num": "05",
+        "title": "Delivery & Scaling",
+        "description": "Developer handoff, launch support, and post-release optimization.",
+        "icon": "deploy"
       }
-    }
+    ]
   },
   "contact": {
     "marqueeText": "LET'S BUILD · JANA · DESIGN · CAIRO · AVAILABLE · ",
@@ -335,6 +318,37 @@
       }
     ],
     "closingLine": "Designed with intention.",
+    "footerTagline": "UX/UI designer crafting clear, human-centered products from Cairo.",
+    "footerNote": "Usually responds within 24 hours",
+    "footerNav": [
+      {
+        "label": "Home",
+        "href": "#home"
+      },
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "About",
+        "href": "#about"
+      },
+      {
+        "label": "Process",
+        "href": "#process"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ],
+    "footerServices": [
+      "UX Research",
+      "UI Design",
+      "Prototyping",
+      "Branding",
+      "Design Systems"
+    ],
     "copyright": "© 2026 Jana · All rights reserved",
     "footerLogo": ""
   },

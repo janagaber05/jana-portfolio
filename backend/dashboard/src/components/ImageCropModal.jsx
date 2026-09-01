@@ -3,11 +3,20 @@ import Cropper from 'react-easy-crop';
 
 const ASPECT_PRESETS = [
   { id: 'hero', label: 'Hero 21:9', value: 21 / 9 },
+  { id: 'card', label: 'Project card', value: 400 / 420 },
   { id: 'wide', label: 'Wide 16:9', value: 16 / 9 },
   { id: 'screen', label: 'Screen 3:4', value: 3 / 4 },
   { id: 'square', label: 'Square 1:1', value: 1 },
   { id: 'free', label: 'Free', value: null },
 ];
+
+function findAspectPreset(initialAspect) {
+  if (!initialAspect) return ASPECT_PRESETS.find((preset) => preset.id === 'free');
+
+  return ASPECT_PRESETS.find((preset) => (
+    preset.value && Math.abs(preset.value - initialAspect) < 0.02
+  ));
+}
 
 function createImage(url) {
   return new Promise((resolve, reject) => {
@@ -65,17 +74,14 @@ export default function ImageCropModal({
   fileName = 'image.jpg',
   initialAspect = 21 / 9,
   outputWidth = 2400,
+  lockAspect = false,
   onCancel,
   onConfirm,
 }) {
+  const initialPreset = findAspectPreset(initialAspect);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [aspectId, setAspectId] = useState(() => {
-    const match = ASPECT_PRESETS.find((preset) => (
-      preset.value && Math.abs(preset.value - initialAspect) < 0.01
-    ));
-    return match?.id || 'hero';
-  });
+  const [aspectId, setAspectId] = useState(() => initialPreset?.id || 'card');
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -107,26 +113,34 @@ export default function ImageCropModal({
         <header className="crop-modal-header">
           <div>
             <strong>Edit image</strong>
-            <p className="muted">Crop and zoom to match how it will look on the site, then upload.</p>
+            <p className="muted">
+              {lockAspect
+                ? 'Drag and zoom so your image fills the project card frame, then upload.'
+                : 'Crop and zoom to match how it will look on the site, then upload.'}
+            </p>
           </div>
           <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel} disabled={busy}>
             Cancel
           </button>
         </header>
 
-        <div className="crop-aspect-row">
-          {ASPECT_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              className={`btn btn-sm ${aspectId === preset.id ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setAspectId(preset.id)}
-              disabled={busy}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
+        {!lockAspect ? (
+          <div className="crop-aspect-row">
+            {ASPECT_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                className={`btn btn-sm ${aspectId === preset.id ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setAspectId(preset.id)}
+                disabled={busy}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="crop-locked-aspect muted">Crop frame matches the project card on your site.</p>
+        )}
 
         <div className="crop-stage">
           <Cropper

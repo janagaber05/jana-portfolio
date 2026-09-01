@@ -1,6 +1,9 @@
 .main {
   position: relative;
   z-index: 2;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
   background: #FCF4F0;
   color: #1A1A1A;
 }
@@ -93,39 +96,49 @@
 .workCardThumb {
   position: relative;
   width: 100%;
-  height: 420px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+  aspect-ratio: 400 / 420;
+  overflow: hidden;
   border-bottom: 1px solid rgba(252, 244, 240, 0.1);
   background:
     linear-gradient(145deg, rgba(252, 244, 240, 0.06), rgba(252, 244, 240, 0.01)),
     linear-gradient(135deg, color-mix(in srgb, var(--work-accent) 22%, transparent), transparent 55%);
 }
 
-.workCardThumb::before {
+.workCardThumb::after {
   content: '';
   position: absolute;
-  inset: 1.25rem;
-  border: 1px dashed rgba(252, 244, 240, 0.16);
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(26, 26, 26, 0.42) 0%,
+    rgba(26, 26, 26, 0.08) 38%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
+.workCardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transition: transform 0.45s ease;
+}
+
+.workCard:hover .workCardImage {
+  transform: scale(1.05);
+}
+
 .workCardIndex {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 3.5rem;
   line-height: 1;
   letter-spacing: 0.06em;
   color: color-mix(in srgb, var(--work-accent) 70%, #FCF4F0);
-}
-
-.workCardPlaceholder {
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(252, 244, 240, 0.35);
 }
 
 .workCardBody {
@@ -269,10 +282,6 @@
 
   .moreWorkCard {
     min-height: 420px;
-  }
-
-  .workCardThumb {
-    height: 320px;
   }
 
   .work :global(.work-grid) {

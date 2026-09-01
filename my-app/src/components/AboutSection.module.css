@@ -8,6 +8,7 @@
   transform: scale(0.6);
   position: relative;
   z-index: 3;
+  margin: 0 clamp(1rem, 3vw, 2rem) clamp(2.5rem, 6vh, 4.5rem);
 }
 
 .aboutLeft {
@@ -247,6 +248,8 @@
 @media (max-width: 900px) {
   .about {
     grid-template-columns: 1fr;
+    margin-inline: 0.75rem;
+    margin-bottom: 2.5rem;
   }
 
   .aboutLeftInner {

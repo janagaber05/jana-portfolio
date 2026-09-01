@@ -12,17 +12,30 @@ import AboutEditor from './pages/AboutEditor';
 import DisciplinesEditor from './pages/DisciplinesEditor';
 import ProcessEditor from './pages/ProcessEditor';
 import ContactEditor from './pages/ContactEditor';
+import SettingsEditor from './pages/SettingsEditor';
+import InboxEditor from './pages/InboxEditor';
 import MediaLibrary from './pages/MediaLibrary';
 import { getSession } from './api';
 import { supabase } from './lib/supabase';
 
 const SESSION_TIMEOUT_MS = 12000;
 
+function isPlaceholderEnv(value) {
+  if (!value) return true;
+  return /your-project|your_publishable|your_anon|change-this/i.test(value);
+}
+
 function getConfigError() {
-  if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-    return 'Missing Supabase settings. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel, then redeploy.';
-  }
-  return '';
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const missing = [];
+
+  if (isPlaceholderEnv(url)) missing.push('VITE_SUPABASE_URL');
+  if (isPlaceholderEnv(key)) missing.push('VITE_SUPABASE_ANON_KEY');
+
+  if (missing.length === 0) return '';
+
+  return `Missing Supabase settings in backend/dashboard/.env: ${missing.join(', ')}. Get both values from Supabase → Project Settings → API, then restart npm start.`;
 }
 
 function ConfigError({ message }) {
@@ -108,11 +121,15 @@ function RequireAuth({ children }) {
 
 export default function App() {
   const adminBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const configError = getConfigError();
 
   return (
     <BrowserRouter basename={adminBase || undefined}>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={configError ? <ConfigError message={configError} /> : <Login />}
+        />
         <Route
           path="/"
           element={(
@@ -124,6 +141,8 @@ export default function App() {
           )}
         >
           <Route index element={<Overview />} />
+          <Route path="inbox" element={<InboxEditor />} />
+          <Route path="settings" element={<SettingsEditor />} />
           <Route path="hero" element={<HeroEditor />} />
           <Route path="work" element={<WorkEditor />} />
           <Route path="work/project/:slug" element={<ProjectEditor />} />

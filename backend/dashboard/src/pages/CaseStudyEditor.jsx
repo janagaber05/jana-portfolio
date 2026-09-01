@@ -1,12 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { useContentDraft } from '../hooks/useContentDraft';
+import EditorActions from '../components/EditorActions';
 import {
   Card,
   Field,
   ImageUpload,
   Input,
   ListEditor,
-  SaveBar,
   Textarea,
   VideoUpload,
 } from '../components/Form';
@@ -71,7 +71,9 @@ function ensureCaseStudy(content, slug) {
 
 export default function CaseStudyEditor() {
   const { slug } = useParams();
-  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  const {
+    draft, updateDraft, save, publish, preview, saving, publishing, hasUnpublishedChanges, ready,
+  } = useContentDraft();
   if (!ready) return null;
 
   const project = draft.featuredWork.projects.find((p) => p.slug === slug);
@@ -241,7 +243,16 @@ export default function CaseStudyEditor() {
         />
       </Card>
 
-      <SaveBar onSave={save} saving={saving} />
+      <EditorActions
+        draft={draft}
+        onSaveDraft={save}
+        onPublish={publish}
+        onPreview={preview}
+        saving={saving}
+        publishing={publishing}
+        hasChanges={hasUnpublishedChanges}
+        previewPath={`/work/${slug}`}
+      />
     </div>
   );
 }

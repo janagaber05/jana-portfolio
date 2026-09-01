@@ -1,11 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import useScrollAnimations from '../hooks/useScrollAnimations';
 import { getHomeCountLabel, getHomeProjects, HOME_WORK_LIMIT } from '../data/featuredWork';
+import defaultContent from '../data/defaultContent.json';
 import { useSiteContent } from '../context/SiteContentContext';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import AboutSection from './AboutSection';
 import ContactSection from './ContactSection';
 import ProcessSection from './ProcessSection';
+import ProjectThumbnail from './ProjectThumbnail';
 import styles from './PortfolioSections.module.css';
 
 function WorkCardLink({ work, cardCta, children }) {
@@ -57,14 +59,14 @@ function MoreWorkLink({ label, arrow }) {
 
 export default function PortfolioSections() {
   const { content } = useSiteContent();
-  const featuredWork = content?.featuredWork;
+  const featuredWork = content?.featuredWork || defaultContent.featuredWork;
   const homeLimit = featuredWork?.homeLimit ?? HOME_WORK_LIMIT;
   const homeProjects = getHomeProjects(featuredWork?.projects, featuredWork?.homeProjectSlugs, homeLimit);
   const homeCountLabel = featuredWork?.countLabel || getHomeCountLabel(featuredWork?.projects, featuredWork?.homeProjectSlugs, homeLimit);
 
-  useScrollAnimations(Boolean(featuredWork));
+  useScrollAnimations(Boolean(featuredWork?.projects?.length));
 
-  if (!featuredWork) return null;
+  if (!featuredWork?.projects?.length) return null;
 
   return (
     <main className={styles.main}>
@@ -74,16 +76,20 @@ export default function PortfolioSections() {
           <p className={styles.photoStripCount}>{homeCountLabel}</p>
         </div>
         <div className="inner">
-          {homeProjects.map((work) => (
+          {homeProjects.map((work, index) => (
             <WorkCardLink key={work.id} work={work} cardCta={featuredWork.cardCta}>
               <article
                 className={styles.workCard}
                 style={{ '--work-accent': work.accent }}
               >
-                <div className={styles.workCardThumb} aria-hidden="true">
-                  <span className={styles.workCardIndex}>{work.index}</span>
-                  <span className={styles.workCardPlaceholder}>{featuredWork.cardCta}</span>
-                </div>
+                <ProjectThumbnail
+                  project={work}
+                  index={index}
+                  className={styles.workCardThumb}
+                  imageClassName={styles.workCardImage}
+                  fallbackClassName={styles.workCardIndex}
+                  alt={`${work.title} project preview`}
+                />
                 <div className={styles.workCardBody}>
                   <h3>{work.title}</h3>
                   <p>{work.tag}</p>

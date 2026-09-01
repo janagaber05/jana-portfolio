@@ -1,8 +1,19 @@
 import { useContentDraft } from '../hooks/useContentDraft';
-import { Card, Field, ImageUpload, Input, ListEditor, SaveBar } from '../components/Form';
+import EditorActions from '../components/EditorActions';
+import { Card, Field, ImageUpload, Input, ListEditor, Textarea } from '../components/Form';
 
 export default function ContactEditor() {
-  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  const {
+    draft,
+    updateDraft,
+    save,
+    publish,
+    preview,
+    saving,
+    publishing,
+    hasUnpublishedChanges,
+    ready,
+  } = useContentDraft();
   if (!ready) return null;
 
   const c = draft.contact;
@@ -12,8 +23,22 @@ export default function ContactEditor() {
     <div className="page">
       <header className="page-header">
         <h1>Contact & footer</h1>
-        <p>Marquee, headline, email, socials, and footer copy.</p>
+        <p>Marquee, headline, email, socials, contact form, and footer copy.</p>
       </header>
+
+      <Card title="Contact form">
+        <label className="home-pick">
+          <input
+            type="checkbox"
+            checked={c.formEnabled !== false}
+            onChange={(e) => set('formEnabled', e.target.checked)}
+          />
+          <span>Show contact form on site</span>
+        </label>
+        <Field label="Submit button label"><Input value={c.formSubmitLabel || 'Send message'} onChange={(v) => set('formSubmitLabel', v)} /></Field>
+        <Field label="Success message"><Input value={c.formSuccess || 'Thanks — your message was sent.'} onChange={(v) => set('formSuccess', v)} /></Field>
+        <p className="muted">Messages appear in the CMS Inbox.</p>
+      </Card>
 
       <Card title="Marquee">
         <Field label="Marquee text"><Input value={c.marqueeText} onChange={(v) => set('marqueeText', v)} /></Field>
@@ -43,12 +68,38 @@ export default function ContactEditor() {
       </Card>
 
       <Card title="Footer">
+        <Field label="Tagline"><Input value={c.footerTagline || ''} onChange={(v) => set('footerTagline', v)} /></Field>
         <Field label="Closing line"><Input value={c.closingLine} onChange={(v) => set('closingLine', v)} /></Field>
+        <Field label="Footer note"><Input value={c.footerNote || ''} onChange={(v) => set('footerNote', v)} /></Field>
         <Field label="Copyright"><Input value={c.copyright} onChange={(v) => set('copyright', v)} /></Field>
         <ImageUpload label="Footer logo" value={c.footerLogo} onChange={(v) => set('footerLogo', v)} />
+        <ListEditor
+          items={c.footerNav || []}
+          onChange={(v) => set('footerNav', v)}
+          newItem={{ label: 'Link', href: '#section' }}
+          fields={[
+            { key: 'label', label: 'Label' },
+            { key: 'href', label: 'Href' },
+          ]}
+        />
+        <Field label="Footer services (comma separated)">
+          <Input
+            value={(c.footerServices || []).join(', ')}
+            onChange={(v) => set('footerServices', v.split(',').map((s) => s.trim()).filter(Boolean))}
+          />
+        </Field>
       </Card>
 
-      <SaveBar onSave={save} saving={saving} />
+      <EditorActions
+        draft={draft}
+        onSaveDraft={save}
+        onPublish={publish}
+        onPreview={preview}
+        saving={saving}
+        publishing={publishing}
+        hasChanges={hasUnpublishedChanges}
+        previewPath="/#contact"
+      />
     </div>
   );
 }

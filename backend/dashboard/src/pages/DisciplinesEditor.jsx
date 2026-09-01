@@ -1,5 +1,6 @@
 import { useContentDraft } from '../hooks/useContentDraft';
-import { Card, Field, Input, SaveBar } from '../components/Form';
+import EditorActions from '../components/EditorActions';
+import { Card, Field, Input } from '../components/Form';
 
 function DisciplinePanel({ title, data, onChange }) {
   const set = (key, val) => onChange({ ...data, [key]: val });
@@ -18,7 +19,9 @@ function DisciplinePanel({ title, data, onChange }) {
 }
 
 export default function DisciplinesEditor() {
-  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  const {
+    draft, updateDraft, save, publish, preview, saving, publishing, hasUnpublishedChanges, ready,
+  } = useContentDraft();
   if (!ready) return null;
 
   const d = draft.disciplines;
@@ -36,7 +39,15 @@ export default function DisciplinesEditor() {
         onChange={(v) => updateDraft((prev) => ({ ...prev, disciplines: { ...prev.disciplines, ux: v } }))}
       />
 
-      <SaveBar onSave={save} saving={saving} />
+      <EditorActions
+        draft={draft}
+        onSaveDraft={save}
+        onPublish={publish}
+        onPreview={preview}
+        saving={saving}
+        publishing={publishing}
+        hasChanges={hasUnpublishedChanges}
+      />
     </div>
   );
 }

@@ -1,13 +1,29 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import EditorActions from '../components/EditorActions';
+import { Card, ColorInput, Field, ImageUpload, Input, Textarea } from '../components/Form';
 import { useContentDraft } from '../hooks/useContentDraft';
-import { Card, ColorInput, Field, Input, SaveBar, Textarea } from '../components/Form';
+import {
+  PROJECT_CARD_ASPECT,
+  PROJECT_CARD_OUTPUT_WIDTH,
+} from '../utils/projectThumbnailAspect';
 import { findProjectIndex } from '../utils/projectHelpers';
+import { removeProjectFromDraft } from '../utils/removeProject';
 import { getProjectUrl } from '../utils/preview';
 
 export default function ProjectEditor() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  const {
+    draft,
+    updateDraft,
+    save,
+    publish,
+    preview,
+    saving,
+    publishing,
+    hasUnpublishedChanges,
+    ready,
+  } = useContentDraft();
 
   if (!ready) return null;
 
@@ -28,6 +44,7 @@ export default function ProjectEditor() {
   const onHome = homeSlugs.includes(project.slug);
   const homeFull = homeSlugs.length >= homeLimit;
   const canToggleHome = onHome || !homeFull;
+  const seo = project.seo || {};
 
   const setField = (key, val) => {
     updateDraft((prev) => {
@@ -56,6 +73,10 @@ export default function ProjectEditor() {
     }
   };
 
+  const setSeo = (key, val) => {
+    setField('seo', { ...seo, [key]: val });
+  };
+
   const toggleHomeProject = () => {
     updateDraft((prev) => {
       const current = [...(prev.featuredWork.homeProjectSlugs || [])];
@@ -73,22 +94,11 @@ export default function ProjectEditor() {
   };
 
   const removeProject = () => {
-    if (!window.confirm(`Remove "${project.title}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete "${project.title}"? This removes the project and its case study from your site.`)) {
+      return;
+    }
 
-    updateDraft((prev) => {
-      const current = prev.featuredWork;
-      const projects = current.projects.filter((p) => p.slug !== slug);
-      const homeProjectSlugs = (current.homeProjectSlugs || []).filter((s) => s !== slug);
-      const nextCaseStudies = { ...prev.caseStudies };
-      delete nextCaseStudies[slug];
-
-      return {
-        ...prev,
-        featuredWork: { ...current, projects, homeProjectSlugs },
-        caseStudies: nextCaseStudies,
-      };
-    });
-
+    updateDraft((prev) => removeProjectFromDraft(prev, project.slug));
     navigate('/work');
   };
 
@@ -106,7 +116,22 @@ export default function ProjectEditor() {
         </p>
       </header>
 
-      <Card title="Visibility">
+      <Card title="Visibility & scheduling">
+        <label className="home-pick">
+          <input
+            type="checkbox"
+            checked={project.published !== false}
+            onChange={(e) => setField('published', e.target.checked)}
+          />
+          <span>Published on site</span>
+        </label>
+        <Field label="Schedule publish (optional)" hint="Project stays hidden until this date/time.">
+          <Input
+            type="datetime-local"
+            value={project.publishAt ? project.publishAt.slice(0, 16) : ''}
+            onChange={(v) => setField('publishAt', v ? new Date(v).toISOString() : null)}
+          />
+        </Field>
         <label className={`home-pick ${!canToggleHome ? 'home-pick-disabled' : ''}`}>
           <input
             type="checkbox"
@@ -125,7 +150,23 @@ export default function ProjectEditor() {
         <p className="muted home-pick-hint">{homeSlugs.length} / {homeLimit} homepage slots used.</p>
       </Card>
 
+      <Card title="SEO">
+        <Field label="Meta title"><Input value={seo.title || ''} onChange={(v) => setSeo('title', v)} /></Field>
+        <Field label="Meta description"><Textarea value={seo.description || ''} onChange={(v) => setSeo('description', v)} rows={2} /></Field>
+        <Field label="Share image URL"><Input value={seo.ogImage || ''} onChange={(v) => setSeo('ogImage', v)} /></Field>
+      </Card>
+
       <Card title="Project card">
+        <ImageUpload
+          label="Project thumbnail"
+          hint="Crop to fill the card frame — it will match the homepage and /work page exactly."
+          value={project.thumbnail || ''}
+          onChange={(v) => setField('thumbnail', v)}
+          aspect={PROJECT_CARD_ASPECT}
+          outputWidth={PROJECT_CARD_OUTPUT_WIDTH}
+          lockAspect
+          previewAspect={`${400} / ${420}`}
+        />
         <div className="form-grid">
           <Field label="Slug"><Input value={project.slug} onChange={(v) => setField('slug', v)} /></Field>
           <Field label="Index"><Input value={project.index} onChange={(v) => setField('index', v)} /></Field>
@@ -147,16 +188,31 @@ export default function ProjectEditor() {
         </Field>
       </Card>
 
+      <Card title="Danger zone">
+        <p className="muted">
+          Permanently delete this project from the CMS and your live site after you publish.
+        </p>
+        <button type="button" className="btn btn-danger" onClick={removeProject}>
+          Delete project
+        </button>
+      </Card>
+
       <div className="project-actions">
         <Link to={`/work/case-study/${project.slug}`} className="btn btn-secondary">
           Edit full case study →
         </Link>
-        <button type="button" className="btn btn-ghost" onClick={removeProject}>
-          Remove project
-        </button>
       </div>
 
-      <SaveBar onSave={save} saving={saving} />
+      <EditorActions
+        draft={draft}
+        onSaveDraft={save}
+        onPublish={publish}
+        onPreview={preview}
+        saving={saving}
+        publishing={publishing}
+        hasChanges={hasUnpublishedChanges}
+        previewPath={`/work/${project.slug}`}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { clearHomeScrollRestore, saveHomeScrollPosition, saveHomeSection } from './visitState';
 
 const NAV_OFFSET = 80;
-const KNOWN_SECTIONS = new Set(['home', 'work', 'about', 'contact']);
+const KNOWN_SECTIONS = new Set(['home', 'work', 'about', 'process', 'contact']);
 
 export function getNavTargetId(href) {
   const raw = (href || '').trim();

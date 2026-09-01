@@ -9,6 +9,48 @@
   color: var(--cream);
 }
 
+.notFound {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.notFound h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.notFound p {
+  line-height: 1.7;
+  color: rgba(252, 244, 240, 0.72);
+}
+
+.notFound code {
+  font-size: 0.92em;
+  color: var(--pink);
+}
+
+.notFoundLink {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+  text-decoration: none;
+}
+
+.notFoundLink:hover {
+  opacity: 0.8;
+}
+
 /* ── Progress dots ── */
 .progressNav {
   position: fixed;

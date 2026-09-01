@@ -5,6 +5,7 @@ import Lenis from 'lenis';
 import heroImage from '../assets/jana hero.png';
 import heroAnimated from '../assets/jana_animated.png';
 import logo from '../assets/logo/Asset 3.png';
+import defaultContent from '../data/defaultContent.json';
 import { useSiteContent } from '../context/SiteContentContext';
 import { resolveMediaUrl } from '../utils/mediaUrl';
 import { scrollToTop } from '../utils/scrollCleanup';
@@ -23,7 +24,7 @@ const LOAD_STEPS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 8
 
 export default function HeroSection() {
   const { content } = useSiteContent();
-  const hero = content?.hero;
+  const hero = content?.hero || defaultContent.hero;
   const gateRef = useRef(null);
   const loadPctRef = useRef(null);
   const navRef = useRef(null);
@@ -55,6 +56,7 @@ export default function HeroSection() {
   const [menuOpen, setMenuOpen] = useState(false);
   const lenisRef = useRef(null);
   const introPlayedRef = useRef(false);
+  const introInitRef = useRef(false);
   const scrollAnimInitRef = useRef(false);
   const hoverInitRef = useRef(false);
 
@@ -333,10 +335,30 @@ export default function HeroSection() {
   }, [hero]);
 
   useEffect(() => {
-    if (!hero || skipIntro) return undefined;
-    if (introPlayedRef.current) return undefined;
+    if (!hero || introInitRef.current) return undefined;
 
-    const ctx = gsap.context(() => {
+    if (skipIntro || shouldSkipHomeIntro()) {
+      applySkipIntroState();
+      introPlayedRef.current = true;
+      introInitRef.current = true;
+      return undefined;
+    }
+
+    introInitRef.current = true;
+
+    let ctx;
+    let cancelled = false;
+
+    const failSafeId = window.setTimeout(() => {
+      if (cancelled) return;
+      applySkipIntroState();
+      markHomeIntroPlayed();
+      introPlayedRef.current = true;
+    }, 4000);
+
+    const startIntro = () => {
+      if (cancelled || introPlayedRef.current) return;
+
       const gate = gateRef.current;
       const loadPct = loadPctRef.current;
       const nav = navRef.current;
@@ -348,81 +370,87 @@ export default function HeroSection() {
       const lockBtn = lockBtnRef.current;
       const scrollCue = scrollCueRef.current;
 
-      if (!gate || !loadPct || !nav || !imageWrap || !heroEl) return;
+      if (!gate || !loadPct || !nav || !imageWrap || !heroEl) {
+        requestAnimationFrame(startIntro);
+        return;
+      }
 
       introPlayedRef.current = true;
 
-      gsap.set(imageWrap, { xPercent: -50, yPercent: -50 });
-      gsap.set(loadPct, { textContent: '0%' });
-      gsap.set(imageWrap, { opacity: 0, y: 40 });
-      gsap.set([marquee, signature, nextBlock, lockBtn, scrollCue], { opacity: 0 });
+      ctx = gsap.context(() => {
+        gsap.set(imageWrap, { xPercent: -50, yPercent: -50 });
+        gsap.set(loadPct, { textContent: '0%' });
+        gsap.set(imageWrap, { opacity: 0, y: 40 });
+        gsap.set([marquee, signature, nextBlock, lockBtn, scrollCue], { opacity: 0 });
 
-      const tl = gsap.timeline();
-      const pctObj = { val: 0 };
+        const tl = gsap.timeline();
+        const pctObj = { val: 0 };
 
-      // Step 1 — Load gate (like "Load Norris")
-      tl.to(pctObj, {
-        val: 100,
-        duration: 1.6,
-        ease: 'none',
-        onUpdate: () => {
-          const step = LOAD_STEPS.reduce((prev, curr) =>
-            (pctObj.val >= curr ? curr : prev), 0);
-          loadPct.textContent = `${step}%`;
-        },
-      })
-        .to(gate, {
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            gate.style.display = 'none';
-            markHomeIntroPlayed();
+        tl.to(pctObj, {
+          val: 100,
+          duration: 1.6,
+          ease: 'none',
+          onUpdate: () => {
+            const step = LOAD_STEPS.reduce((prev, curr) =>
+              (pctObj.val >= curr ? curr : prev), 0);
+            loadPct.textContent = `${step}%`;
           },
         })
-        // Portrait rises in
-        .to(
-          imageWrap,
-          { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
-          '-=0.1',
-        )
-        // UI chrome
-        .to(marquee, { opacity: 1, duration: 0.5 }, '-=0.3')
-        .to(signature, { opacity: 1, duration: 0.5 }, '-=0.4')
-        .to(nextBlock, { opacity: 1, duration: 0.5 }, '-=0.4')
-        .to(lockBtn, { opacity: 1, duration: 0.5 }, '-=0.4')
-        .to(scrollCue, { opacity: 1, duration: 0.5 }, '-=0.4')
-        // Scroll cue bounce
-        .to(
-          scrollCue,
-          { y: 8, duration: 1.2, ease: 'sine.inOut', yoyo: true, repeat: -1 },
-          '-=0.2',
-        );
+          .to(gate, {
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              gate.style.display = 'none';
+              markHomeIntroPlayed();
+            },
+          })
+          .to(
+            imageWrap,
+            { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+            '-=0.1',
+          )
+          .to(marquee, { opacity: 1, duration: 0.5 }, '-=0.3')
+          .to(signature, { opacity: 1, duration: 0.5 }, '-=0.4')
+          .to(nextBlock, { opacity: 1, duration: 0.5 }, '-=0.4')
+          .to(lockBtn, { opacity: 1, duration: 0.5 }, '-=0.4')
+          .to(scrollCue, { opacity: 1, duration: 0.5 }, '-=0.4')
+          .to(
+            scrollCue,
+            { y: 8, duration: 1.2, ease: 'sine.inOut', yoyo: true, repeat: -1 },
+            '-=0.2',
+          );
 
-      // Nav scroll
-      ScrollTrigger.create({
-        trigger: document.body,
-        start: '80px top',
-        onEnter: () => {
-          gsap.to(nav, {
-            backgroundColor: 'rgba(252, 244, 240, 0.92)',
-            boxShadow: '0 1px 0 rgba(26, 26, 26, 0.08)',
-            duration: 0.3,
-          });
-        },
-        onLeaveBack: () => {
-          gsap.to(nav, {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-            duration: 0.3,
-          });
-        },
+        ScrollTrigger.create({
+          trigger: document.body,
+          start: '80px top',
+          onEnter: () => {
+            gsap.to(nav, {
+              backgroundColor: 'rgba(252, 244, 240, 0.92)',
+              boxShadow: '0 1px 0 rgba(26, 26, 26, 0.08)',
+              duration: 0.3,
+            });
+          },
+          onLeaveBack: () => {
+            gsap.to(nav, {
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+              duration: 0.3,
+            });
+          },
+        });
       });
+    };
 
-    });
+    startIntro();
 
-    return () => ctx.revert();
-  }, [hero, skipIntro]);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(failSafeId);
+      ctx?.revert();
+      introPlayedRef.current = false;
+    };
+  }, [hero, skipIntro, applySkipIntroState]);
 
   useEffect(() => {
     if (!hero || scrollAnimInitRef.current) return undefined;
@@ -639,8 +667,6 @@ export default function HeroSection() {
   }, [hero, applySkipIntroState]);
 
   const onImagePointerDown = useCallback((e) => e.stopPropagation(), []);
-
-  if (!hero) return null;
 
   const navLinks = filterNavLinks(hero.navLinks);
 

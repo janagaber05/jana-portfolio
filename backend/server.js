@@ -138,7 +138,7 @@ const server = app.listen(PORT, () => {
   if (fs.existsSync(DASHBOARD_DIR)) {
     console.log(`Dashboard at http://localhost:${PORT}/admin`);
   } else {
-    console.log('Dashboard not built — run: npm run dashboard:build');
+    console.log('CMS in dev: http://localhost:5173/admin/  (build for http://localhost:' + PORT + '/admin)');
   }
 });
 

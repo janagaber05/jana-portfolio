@@ -28,7 +28,7 @@ export default function AboutSection() {
         {
           scale: 1,
           opacity: 1,
-          borderRadius: '0px',
+          borderRadius: '40px',
           ease: 'none',
           scrollTrigger: {
             trigger: section,
@@ -159,7 +159,7 @@ export default function AboutSection() {
       ScrollTrigger.refresh();
       const rect = section.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.85) {
-        gsap.set(section, { scale: 1, opacity: 1, borderRadius: '0px' });
+        gsap.set(section, { scale: 1, opacity: 1, borderRadius: '40px' });
         gsap.set(section.querySelectorAll('.about-label, .about-headline, .about-para-1, .about-para-2, .about-stat, .about-actions, .about-photo, .about-float-card, .about-badge'), { autoAlpha: 1, x: 0, y: 0 });
         gsap.set(section.querySelectorAll('.about-divider'), { scaleX: 1 });
       }

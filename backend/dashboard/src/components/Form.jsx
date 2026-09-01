@@ -71,6 +71,8 @@ export function ImageUpload({
   aspect = 21 / 9,
   outputWidth = 2400,
   enableCrop = true,
+  lockAspect = false,
+  previewAspect,
 }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -131,7 +133,12 @@ export function ImageUpload({
         <div className="image-picker">
           {value ? (
             <div className="image-picker-preview">
-              <img src={mediaUrl(value)} alt="" className="image-picker-img" />
+              <img
+                src={mediaUrl(value)}
+                alt=""
+                className="image-picker-img"
+                style={previewAspect ? { aspectRatio: previewAspect } : undefined}
+              />
               <div className="image-picker-actions">
                 <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
                   {uploading ? 'Uploading…' : 'Change image'}
@@ -161,6 +168,7 @@ export function ImageUpload({
           fileName={pendingName}
           initialAspect={aspect}
           outputWidth={outputWidth}
+          lockAspect={lockAspect}
           onCancel={closeCrop}
           onConfirm={confirmCrop}
         />

@@ -3,8 +3,12 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useCms } from '../context/ContentContext';
 import { api } from '../api';
 
+import PreviewPanel from './PreviewPanel';
+
 const NAV = [
   { to: '/', label: 'Overview', end: true },
+  { to: '/inbox', label: 'Inbox' },
+  { to: '/settings', label: 'Settings' },
   { to: '/hero', label: 'Hero' },
   { to: '/work', label: 'Projects' },
   { to: '/about', label: 'About' },
@@ -105,6 +109,7 @@ export default function Layout() {
           </div>
         ) : null}
         {!loading ? <Outlet /> : null}
+        {!loading ? <PreviewPanel /> : null}
       </main>
     </div>
   );

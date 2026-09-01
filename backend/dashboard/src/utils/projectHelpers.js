@@ -15,7 +15,10 @@ export const EMPTY_PROJECT = {
 };
 
 export function findProjectIndex(projects, slug) {
-  return projects.findIndex((project) => project.slug === slug);
+  const target = decodeURIComponent(slug || '').trim().toLowerCase();
+  return projects.findIndex(
+    (project) => (project.slug || '').trim().toLowerCase() === target,
+  );
 }
 
 export function createProject(projects) {

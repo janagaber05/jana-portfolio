@@ -4,6 +4,16 @@ import { hasSupabaseConfig, supabase } from '../lib/supabase';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+const FETCH_TIMEOUT_MS = 8000;
+
+function withTimeout(promise, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error(message)), FETCH_TIMEOUT_MS);
+    }),
+  ]);
+}
 
 async function fetchFromSupabase() {
   if (!hasSupabaseConfig || !supabase) {
@@ -16,11 +26,14 @@ async function fetchFromSupabase() {
     return null;
   }
 
-  const { data, error } = await supabase
-    .from('site_content')
-    .select('data')
-    .eq('id', 'main')
-    .maybeSingle();
+  const { data, error } = await withTimeout(
+    supabase
+      .from('site_content')
+      .select('data')
+      .eq('id', 'main')
+      .maybeSingle(),
+    'Supabase content request timed out',
+  );
 
   if (error) throw new Error(error.message);
   if (!data?.data) throw new Error('No site content in Supabase (site_content.main)');

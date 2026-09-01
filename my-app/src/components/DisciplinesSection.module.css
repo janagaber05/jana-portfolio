@@ -254,6 +254,10 @@
 }
 
 @media (max-width: 900px) {
+  .panels {
+    flex-direction: column;
+  }
+
   .panelMain {
     min-height: 100vh;
   }

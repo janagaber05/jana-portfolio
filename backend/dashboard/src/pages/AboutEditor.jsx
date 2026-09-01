@@ -1,8 +1,11 @@
 import { useContentDraft } from '../hooks/useContentDraft';
-import { Card, Field, ImageUpload, Input, ListEditor, SaveBar, Textarea } from '../components/Form';
+import EditorActions from '../components/EditorActions';
+import { Card, Field, ImageUpload, Input, ListEditor, Textarea } from '../components/Form';
 
 export default function AboutEditor() {
-  const { draft, updateDraft, save, saving, ready } = useContentDraft();
+  const {
+    draft, updateDraft, save, publish, preview, saving, publishing, hasUnpublishedChanges, ready,
+  } = useContentDraft();
   if (!ready) return null;
 
   const about = draft.about;
@@ -50,7 +53,16 @@ export default function AboutEditor() {
         <ImageUpload label="About photo" value={about.photo} onChange={(v) => set('photo', v)} />
       </Card>
 
-      <SaveBar onSave={save} saving={saving} />
+      <EditorActions
+        draft={draft}
+        onSaveDraft={save}
+        onPublish={publish}
+        onPreview={preview}
+        saving={saving}
+        publishing={publishing}
+        hasChanges={hasUnpublishedChanges}
+        previewPath="/#about"
+      />
     </div>
   );
 }

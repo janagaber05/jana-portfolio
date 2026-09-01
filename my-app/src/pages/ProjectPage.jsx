@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getCaseStudy, PROGRESS_SECTIONS } from '../data/caseStudies';
 import { getAdjacentProjects, getProjectBySlug } from '../data/featuredWork';
 import { useSiteContent } from '../context/SiteContentContext';
+import { isProjectPublished } from '../utils/publishFilters';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import { getResolvedImageSrc, resolveImageSources } from '../utils/resolveImageSources';
 import { resolveWalkthroughVideo } from '../utils/walkthroughVideo';
@@ -161,11 +162,12 @@ function toLightboxItem(label, imageUrl, candidates, fallback, alt) {
 export default function ProjectPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { content, loading } = useSiteContent();
-  const projects = content?.featuredWork?.projects || [];
+  const { content, mergedContent, loading, isPreview } = useSiteContent();
+  const projects = mergedContent?.featuredWork?.projects || [];
   const project = getProjectBySlug(projects, slug);
-  const caseStudy = getCaseStudy(project, content?.caseStudies);
-  const { next } = getAdjacentProjects(projects, slug);
+  const caseStudy = getCaseStudy(project, mergedContent?.caseStudies);
+  const publishedProjects = content?.featuredWork?.projects || [];
+  const { next } = getAdjacentProjects(publishedProjects, slug);
   const walkthroughVideo = resolveWalkthroughVideo(caseStudy?.walkthrough?.videoUrl);
   const sectionIds = PROGRESS_SECTIONS
     .filter((section) => section.id !== 'section-walkthrough' || walkthroughVideo)
@@ -338,7 +340,39 @@ export default function ProjectPage() {
   }
 
   if (!project || !caseStudy) {
-    return <Navigate to="/" replace />;
+    return (
+      <div className={styles.page}>
+        <div className={styles.notFound}>
+          <Link to="/work" className={styles.notFoundLink} onClick={cleanupScrollEffects}>
+            ← Back to work
+          </Link>
+          <h1>Project not found</h1>
+          <p>
+            We couldn&apos;t find a project at <code>/work/{slug}</code>.
+            It may have been renamed, removed, or not published yet.
+          </p>
+          <Link to="/" className={styles.notFoundLink} onClick={cleanupScrollEffects}>
+            Go home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isProjectPublished(project) && !isPreview) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.notFound}>
+          <Link to="/work" className={styles.notFoundLink} onClick={cleanupScrollEffects}>
+            ← Back to work
+          </Link>
+          <h1>{project.title}</h1>
+          <p>
+            This project isn&apos;t published yet. Open the CMS and publish it to make the case study live.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
