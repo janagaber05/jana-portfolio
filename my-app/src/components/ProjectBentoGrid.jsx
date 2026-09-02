@@ -6,7 +6,10 @@ import styles from './ProjectBentoGrid.module.css';
 function BentoImage({ screen, alt }) {
   const imageUrl = getScreenImageSrc(screen);
   const displayCrop = getScreenDisplayCrop(screen);
-  const candidates = screen?.imageCandidates || [];
+  const candidates = useMemo(
+    () => screen?.imageCandidates || [],
+    [screen?.imageCandidates],
+  );
   const fallback = screen?.fallbackImage || '';
 
   const sources = useMemo(() => {
