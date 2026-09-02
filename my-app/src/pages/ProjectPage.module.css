@@ -449,8 +449,8 @@
   border-radius: 0.75rem;
   border: 1px solid color-mix(in srgb, var(--burgundy) 14%, transparent);
   background: var(--cream);
-  flex: 0 0 min(94vw, 56rem);
-  scroll-snap-align: center;
+  flex: 0 0 clamp(18rem, 78vw, 28rem);
+  scroll-snap-align: start;
   min-height: 100%;
 }
 

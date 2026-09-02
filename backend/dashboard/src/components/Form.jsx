@@ -418,7 +418,15 @@ export function VideoUpload({
   );
 }
 
-export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
+export function ListEditor({
+  items,
+  onChange,
+  fields,
+  newItem,
+  maxItems,
+  addLabel = 'Add item',
+  itemLabel,
+}) {
   const updateItem = (index, key, val) => {
     const next = items.map((item, i) => (i === index ? { ...item, [key]: val } : item));
     onChange(next);
@@ -446,6 +454,11 @@ export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
       {items.map((item, index) => (
         <div key={index} className="list-item">
           <div className="list-item-fields">
+            {itemLabel ? (
+              <p className="list-item-title">
+                {typeof itemLabel === 'function' ? itemLabel(item, index) : `${itemLabel} ${index + 1}`}
+              </p>
+            ) : null}
             {fields.map((field) => {
               if (field.type === 'framed-image') {
                 return (
@@ -502,7 +515,7 @@ export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
       {atMax ? (
         <p className="muted list-max-hint">Maximum {maxItems} items.</p>
       ) : (
-        <button type="button" className="btn btn-secondary" onClick={addItem}>Add item</button>
+        <button type="button" className="btn btn-secondary" onClick={addItem}>{addLabel}</button>
       )}
     </div>
   );

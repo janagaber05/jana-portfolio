@@ -104,14 +104,18 @@ function ensureCaseStudy(content, slug) {
 
   if (!existing) return blank;
 
+  const researchRest = { ...(existing.research || {}) };
+  delete researchRest.persona;
+  const personas = normalizeEditorPersonas(existing.research);
+
   return {
     ...blank,
     ...existing,
     walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
     research: {
       ...blank.research,
-      ...(existing.research || {}),
-      personas: normalizeEditorPersonas(existing.research),
+      ...researchRest,
+      personas,
     },
     sectionVisibility: mergeSectionVisibility(existing.sectionVisibility),
   };
@@ -140,6 +144,9 @@ export default function CaseStudyEditor() {
     let ref = next;
     for (let i = 0; i < keys.length - 1; i += 1) ref = ref[keys[i]];
     ref[keys[keys.length - 1]] = val;
+    if (path === 'research.personas' && next.research) {
+      delete next.research.persona;
+    }
     setCs(next);
   };
 
@@ -233,6 +240,8 @@ export default function CaseStudyEditor() {
           onChange={(v) => set('research.personas', v)}
           newItem={{ ...EMPTY_PERSONA }}
           fields={PERSONA_FIELDS}
+          addLabel="Add persona"
+          itemLabel="Persona"
         />
       </SectionCard>
 

@@ -18,6 +18,14 @@ export function normalizeResearchPersonas(research = {}) {
   return [];
 }
 
+export function withNormalizedResearch(research = {}) {
+  const { persona, ...rest } = research;
+  return {
+    ...rest,
+    personas: normalizeResearchPersonas(research),
+  };
+}
+
 function buildCaseStudy(project) {
   return {
     heroImage: '',
@@ -162,10 +170,7 @@ export function getCaseStudy(project, caseStudies = {}) {
       caption: '',
       ...(base.walkthrough || {}),
     },
-    research: {
-      ...(base.research || {}),
-      personas: normalizeResearchPersonas(base.research),
-    },
+    research: withNormalizedResearch(base.research),
     sectionVisibility: mergeSectionVisibility(base.sectionVisibility),
   };
   return attachCaseStudyImages(withWalkthrough, project.slug);

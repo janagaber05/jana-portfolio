@@ -225,6 +225,13 @@ a { color: var(--burgundy); }
   align-items: flex-start;
 }
 .list-item-fields { flex: 1; }
+.list-item-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
 .image-picker { width: 100%; }
 
