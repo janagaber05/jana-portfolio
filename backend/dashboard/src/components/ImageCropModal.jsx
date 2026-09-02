@@ -75,8 +75,10 @@ export default function ImageCropModal({
   initialAspect = 21 / 9,
   outputWidth = 2400,
   lockAspect = false,
+  metadataOnly = false,
   onCancel,
   onConfirm,
+  onConfirmMetadata,
 }) {
   const initialPreset = findAspectPreset(initialAspect);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -97,6 +99,15 @@ export default function ImageCropModal({
     setBusy(true);
     setError('');
     try {
+      if (metadataOnly) {
+        const image = await createImage(imageSrc);
+        await onConfirmMetadata?.(croppedAreaPixels, {
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
+        return;
+      }
+
       const blob = await getCroppedBlob(imageSrc, croppedAreaPixels, outputWidth);
       const base = fileName.replace(/\.[^.]+$/, '') || 'image';
       const file = new File([blob], `${base}-cropped.jpg`, { type: 'image/jpeg' });
@@ -114,9 +125,11 @@ export default function ImageCropModal({
           <div>
             <strong>Edit image</strong>
             <p className="muted">
-              {lockAspect
-                ? 'Drag and zoom so your image fills the project card frame, then upload.'
-                : 'Crop and zoom to match how it will look on the site, then upload.'}
+              {metadataOnly
+                ? 'Choose the part visitors see on the page. The full image opens when they tap it.'
+                : lockAspect
+                  ? 'Drag and zoom so your image fills the project card frame, then upload.'
+                  : 'Crop and zoom to match how it will look on the site, then upload.'}
             </p>
           </div>
           <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel} disabled={busy}>
@@ -175,7 +188,7 @@ export default function ImageCropModal({
             Cancel
           </button>
           <button type="button" className="btn btn-primary" onClick={confirm} disabled={busy || !croppedAreaPixels}>
-            {busy ? 'Uploading…' : 'Crop & upload'}
+            {busy ? 'Saving…' : metadataOnly ? 'Set visible area' : 'Crop & upload'}
           </button>
         </div>
       </div>

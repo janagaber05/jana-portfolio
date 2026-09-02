@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, mediaUrl } from '../api';
 import ImageCropModal from './ImageCropModal';
+import { normalizeDisplayCrop } from '../utils/caseStudyImage';
 
 export function Field({ label, hint, children }) {
   return (
@@ -177,6 +178,146 @@ export function ImageUpload({
   );
 }
 
+export function FramedImageUpload({
+  imageUrl = '',
+  fullImageUrl = '',
+  displayCrop = null,
+  onChange,
+  label = 'Image',
+  hint,
+  aspect = 3 / 4,
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [cropSrc, setCropSrc] = useState('');
+  const [pendingName, setPendingName] = useState('image.jpg');
+  const [pendingFullUrl, setPendingFullUrl] = useState('');
+
+  const src = fullImageUrl || imageUrl;
+
+  const openCrop = (url, name = 'image.jpg', fullUrl = url) => {
+    setPendingName(name);
+    setPendingFullUrl(fullUrl);
+    setCropSrc(url);
+  };
+
+  const closeCrop = () => {
+    if (cropSrc.startsWith('blob:')) URL.revokeObjectURL(cropSrc);
+    setCropSrc('');
+    setPendingFullUrl('');
+  };
+
+  const handleFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const result = await api.upload(file);
+      const objectUrl = URL.createObjectURL(file);
+      openCrop(objectUrl, file.name || 'image.jpg', result.url);
+    } catch (err) {
+      setError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const confirmMetadata = async (pixelCrop, imageSize) => {
+    const crop = normalizeDisplayCrop(pixelCrop, imageSize.width, imageSize.height);
+    const fullUrl = pendingFullUrl || src;
+    onChange({
+      imageUrl: fullUrl,
+      fullImageUrl: fullUrl,
+      displayCrop: crop,
+    });
+    closeCrop();
+  };
+
+  const clearImage = () => {
+    onChange({ imageUrl: '', fullImageUrl: '', displayCrop: null });
+  };
+
+  return (
+    <div className="image-upload-block">
+      <Field
+        label={label}
+        hint={hint || 'Upload the full image, then choose which part shows on the page. Visitors tap to see the full image.'}
+      >
+        <div className="image-picker">
+          {src ? (
+            <div className="image-picker-preview">
+              <img
+                src={mediaUrl(src)}
+                alt=""
+                className="image-picker-img"
+                style={{ aspectRatio: aspect }}
+              />
+              <div className="image-picker-actions">
+                <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
+                  {uploading ? 'Uploading…' : 'Replace image'}
+                  <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => openCrop(mediaUrl(src), 'image.jpg', src)}
+                  disabled={uploading}
+                >
+                  Adjust visible area
+                </button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={clearImage}>
+                  Remove
+                </button>
+              </div>
+              {displayCrop ? (
+                <p className="field-hint">Visible area set — tap opens full image.</p>
+              ) : null}
+            </div>
+          ) : (
+            <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
+              <span className="image-picker-icon" aria-hidden="true">+</span>
+              <span className="image-picker-text">
+                {uploading ? 'Uploading…' : 'Choose full image from device'}
+              </span>
+              <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+            </label>
+          )}
+        </div>
+        {error ? <p className="field-error">{error}</p> : null}
+      </Field>
+
+      {cropSrc ? (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          fileName={pendingName}
+          initialAspect={aspect}
+          lockAspect={false}
+          metadataOnly
+          onCancel={closeCrop}
+          onConfirmMetadata={confirmMetadata}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+export function SectionVisibilityToggle({ checked, onChange, label = 'Show on site' }) {
+  return (
+    <label className="section-visibility-toggle">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
+
 export function VideoUpload({
   value,
   onChange,
@@ -283,6 +424,15 @@ export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
     onChange(next);
   };
 
+  const updateFramedImage = (index, data) => {
+    const next = items.map((item, i) => (
+      i === index
+        ? { ...item, imageUrl: data.imageUrl, fullImageUrl: data.fullImageUrl, displayCrop: data.displayCrop }
+        : item
+    ));
+    onChange(next);
+  };
+
   const removeItem = (index) => onChange(items.filter((_, i) => i !== index));
   const addItem = () => {
     if (maxItems && items.length >= maxItems) return;
@@ -297,6 +447,21 @@ export function ListEditor({ items, onChange, fields, newItem, maxItems }) {
         <div key={index} className="list-item">
           <div className="list-item-fields">
             {fields.map((field) => {
+              if (field.type === 'framed-image') {
+                return (
+                  <FramedImageUpload
+                    key={field.key}
+                    label={field.label}
+                    imageUrl={item.imageUrl}
+                    fullImageUrl={item.fullImageUrl}
+                    displayCrop={item.displayCrop}
+                    onChange={(data) => updateFramedImage(index, data)}
+                    hint={field.hint}
+                    aspect={field.aspect ?? 3 / 4}
+                  />
+                );
+              }
+
               if (field.type === 'image') {
                 return (
                   <ImageUpload

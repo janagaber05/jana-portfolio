@@ -356,6 +356,8 @@ export default function HeroSection() {
       introPlayedRef.current = true;
     }, 4000);
 
+    let rafAttempts = 0;
+
     const startIntro = () => {
       if (cancelled || introPlayedRef.current) return;
 
@@ -371,6 +373,13 @@ export default function HeroSection() {
       const scrollCue = scrollCueRef.current;
 
       if (!gate || !loadPct || !nav || !imageWrap || !heroEl) {
+        rafAttempts += 1;
+        if (rafAttempts > 120) {
+          applySkipIntroState();
+          markHomeIntroPlayed();
+          introPlayedRef.current = true;
+          return;
+        }
         requestAnimationFrame(startIntro);
         return;
       }
@@ -449,6 +458,7 @@ export default function HeroSection() {
       window.clearTimeout(failSafeId);
       ctx?.revert();
       introPlayedRef.current = false;
+      introInitRef.current = false;
     };
   }, [hero, skipIntro, applySkipIntroState]);
 

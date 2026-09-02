@@ -1,13 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { getCaseStudy, PROGRESS_SECTIONS } from '../data/caseStudies';
+import { getCaseStudy } from '../data/caseStudies';
 import { getAdjacentProjects, getProjectBySlug } from '../data/featuredWork';
 import { useSiteContent } from '../context/SiteContentContext';
 import { isProjectPublished } from '../utils/publishFilters';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import { getResolvedImageSrc, resolveImageSources } from '../utils/resolveImageSources';
+import {
+  getScreenDisplayCrop,
+  getScreenImageSrc,
+  getScreenLightboxSrc,
+  getVisibleProgressSections,
+  isCaseStudySectionVisible,
+} from '../utils/caseStudyImage';
 import { resolveWalkthroughVideo } from '../utils/walkthroughVideo';
 import ProjectBentoGrid, { GripIcon } from '../components/ProjectBentoGrid';
+import FramedImage from '../components/FramedImage';
 import ImageLightbox from '../components/ImageLightbox';
 import styles from './ProjectPage.module.css';
 
@@ -30,7 +38,14 @@ function HighlightTitle({ title, highlight, className, highlightClassName }) {
   );
 }
 
-function CaseStudyImage({ imageUrl, candidates, fallback, alt, className }) {
+function CaseStudyImage({
+  imageUrl,
+  candidates,
+  fallback,
+  alt,
+  className,
+  displayCrop,
+}) {
   const sources = resolveImageSources(imageUrl, candidates, fallback);
   const [sourceIndex, setSourceIndex] = useState(0);
 
@@ -38,9 +53,23 @@ function CaseStudyImage({ imageUrl, candidates, fallback, alt, className }) {
     setSourceIndex(0);
   }, [imageUrl, candidates, fallback]);
 
+  const src = sources[sourceIndex];
+  if (!src) return null;
+
+  if (displayCrop) {
+    return (
+      <FramedImage
+        src={src}
+        crop={displayCrop}
+        alt={alt}
+        className={className}
+      />
+    );
+  }
+
   return (
     <img
-      src={sources[sourceIndex]}
+      src={src}
       alt={alt}
       className={className}
       loading="lazy"
@@ -53,7 +82,15 @@ function CaseStudyImage({ imageUrl, candidates, fallback, alt, className }) {
   );
 }
 
-function ProcessImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, onOpen }) {
+function ProcessImageCard({
+  label,
+  imageUrl,
+  imageCandidates,
+  fallbackImage,
+  alt,
+  displayCrop,
+  onOpen,
+}) {
   return (
     <figure className={styles.processCard}>
       <button
@@ -67,6 +104,7 @@ function ProcessImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt
           candidates={imageCandidates}
           fallback={fallbackImage}
           alt={alt}
+          displayCrop={displayCrop}
           className={styles.processImage}
         />
       </button>
@@ -75,7 +113,16 @@ function ProcessImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt
   );
 }
 
-function FinalImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, wide, onOpen }) {
+function FinalImageCard({
+  label,
+  imageUrl,
+  imageCandidates,
+  fallbackImage,
+  alt,
+  wide,
+  displayCrop,
+  onOpen,
+}) {
   return (
     <figure className={`${styles.finalCard} ${wide ? styles.finalCardWide : ''}`}>
       <button
@@ -89,6 +136,7 @@ function FinalImageCard({ label, imageUrl, imageCandidates, fallbackImage, alt, 
           candidates={imageCandidates}
           fallback={fallbackImage}
           alt={alt}
+          displayCrop={displayCrop}
           className={styles.finalImage}
         />
       </button>
@@ -149,11 +197,12 @@ function useSectionSpy(sectionIds) {
   return activeIndex;
 }
 
-function toLightboxItem(label, imageUrl, candidates, fallback, alt) {
-  const src = getResolvedImageSrc(imageUrl, candidates, fallback);
-  if (!src) return null;
+function toLightboxItem(label, imageUrl, candidates, fallback, alt, fullImageUrl) {
+  const displaySrc = getResolvedImageSrc(imageUrl, candidates, fallback);
+  const fullSrc = fullImageUrl || displaySrc;
+  if (!fullSrc) return null;
   return {
-    src,
+    src: fullSrc,
     label,
     alt: alt || label || '',
   };
@@ -169,12 +218,9 @@ export default function ProjectPage() {
   const publishedProjects = content?.featuredWork?.projects || [];
   const { next } = getAdjacentProjects(publishedProjects, slug);
   const walkthroughVideo = resolveWalkthroughVideo(caseStudy?.walkthrough?.videoUrl);
-  const sectionIds = PROGRESS_SECTIONS
-    .filter((section) => section.id !== 'section-walkthrough' || walkthroughVideo)
-    .map((section) => section.id);
-  const progressSections = PROGRESS_SECTIONS.filter(
-    (section) => section.id !== 'section-walkthrough' || walkthroughVideo,
-  );
+  const showWalkthrough = isCaseStudySectionVisible(caseStudy, 'walkthrough') && walkthroughVideo;
+  const progressSections = getVisibleProgressSections(caseStudy, showWalkthrough ? walkthroughVideo : null);
+  const sectionIds = progressSections.map((section) => section.id);
   const activeSection = useSectionSpy(sectionIds);
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const scrollKey = `jana:projectScroll:${slug}`;
@@ -271,7 +317,7 @@ export default function ProjectPage() {
       ? caseStudy.heroScreens
       : (caseStudy.finalDesign?.screens || []);
     // Empty CMS slots used to render broken local placeholders and break the grid.
-    return raw.filter((screen) => Boolean(screen?.imageUrl));
+    return raw.filter((screen) => Boolean(getScreenImageSrc(screen)));
   }, [caseStudy]);
 
   const lightboxItems = useMemo(() => {
@@ -290,10 +336,11 @@ export default function ProjectPage() {
     heroScreens.forEach((screen, index) => {
       const item = toLightboxItem(
         screen.label || `Screen ${index + 1}`,
-        screen.imageUrl,
+        getScreenImageSrc(screen),
         screen.imageCandidates,
         screen.fallbackImage,
         screen.alt,
+        getScreenLightboxSrc(screen),
       );
       if (item) items.push(item);
     });
@@ -301,10 +348,11 @@ export default function ProjectPage() {
     (caseStudy.designProcess?.stages || []).forEach((stage, index) => {
       const item = toLightboxItem(
         stage.label || `Wireframe ${index + 1}`,
-        stage.imageUrl,
+        getScreenImageSrc(stage),
         stage.imageCandidates,
         stage.fallbackImage,
         stage.alt,
+        getScreenLightboxSrc(stage),
       );
       if (item) items.push(item);
     });
@@ -312,10 +360,11 @@ export default function ProjectPage() {
     (caseStudy.finalDesign?.screens || []).forEach((screen, index) => {
       const item = toLightboxItem(
         screen.label || `Final screen ${index + 1}`,
-        screen.imageUrl,
+        getScreenImageSrc(screen),
         screen.imageCandidates,
         screen.fallbackImage,
         screen.alt,
+        getScreenLightboxSrc(screen),
       );
       if (item) items.push(item);
     });
@@ -329,10 +378,21 @@ export default function ProjectPage() {
     if (index >= 0) setLightboxIndex(index);
   };
 
-  const openLightboxItem = (label, imageUrl, candidates, fallback, alt) => {
-    const item = toLightboxItem(label, imageUrl, candidates, fallback, alt);
+  const openLightboxItem = (label, imageUrl, candidates, fallback, alt, fullImageUrl) => {
+    const item = toLightboxItem(label, imageUrl, candidates, fallback, alt, fullImageUrl);
     if (!item) return;
     openLightboxBySrc(item.src);
+  };
+
+  const openScreenLightbox = (screen) => {
+    openLightboxItem(
+      screen.label,
+      getScreenImageSrc(screen),
+      screen.imageCandidates,
+      screen.fallbackImage,
+      screen.alt,
+      getScreenLightboxSrc(screen),
+    );
   };
 
   if (loading) {
@@ -392,7 +452,7 @@ export default function ProjectPage() {
 
       {/* Section 1 — Hero */}
       <section className={styles.hero} aria-label="Project hero">
-        {caseStudy.heroImage ? (
+        {caseStudy.heroImage && isCaseStudySectionVisible(caseStudy, 'heroImage') ? (
           <div className={styles.heroBleed}>
             <Link to="/#work" className={`${styles.heroBack} ${styles.heroBackOverlay}`} onClick={goHome}>
               ← Back to work
@@ -417,7 +477,7 @@ export default function ProjectPage() {
             {caseStudy.abbreviation}
           </span>
 
-          {!caseStudy.heroImage ? (
+          {!caseStudy.heroImage || !isCaseStudySectionVisible(caseStudy, 'heroImage') ? (
             <Link to="/#work" className={styles.heroBack} onClick={goHome}>
               ← Back to work
             </Link>
@@ -455,22 +515,18 @@ export default function ProjectPage() {
               </dl>
             </div>
 
-            <ProjectBentoGrid
-              screens={heroScreens}
-              accent={project.accent}
-              onInspect={(_index, screen) => openLightboxItem(
-                screen.label,
-                screen.imageUrl,
-                screen.imageCandidates,
-                screen.fallbackImage,
-                screen.alt,
-              )}
-            />
+            {isCaseStudySectionVisible(caseStudy, 'heroScreens') ? (
+              <ProjectBentoGrid
+                screens={heroScreens}
+                accent={project.accent}
+                onInspect={(_index, screen) => openScreenLightbox(screen)}
+              />
+            ) : null}
           </div>
         </div>
       </section>
 
-      {/* Section 2 — Overview */}
+      {isCaseStudySectionVisible(caseStudy, 'overview') ? (
       <section id="section-overview" className={`${styles.section} ${styles.sectionCream}`}>
         <div className={styles.sectionInner}>
           <p className={styles.sectionLabel}>
@@ -499,8 +555,9 @@ export default function ProjectPage() {
           </div>
         </div>
       </section>
+      ) : null}
 
-      {/* Section 3 — My role */}
+      {isCaseStudySectionVisible(caseStudy, 'myRole') ? (
       <section id="section-role" className={`${styles.section} ${styles.sectionWhite}`}>
         <div className={styles.sectionInner}>
           <p className={styles.sectionLabel}>
@@ -520,8 +577,9 @@ export default function ProjectPage() {
           </ul>
         </div>
       </section>
+      ) : null}
 
-      {/* Section 4 — Research */}
+      {isCaseStudySectionVisible(caseStudy, 'research') ? (
       <section id="section-research" className={`${styles.section} ${styles.sectionCream}`}>
         <div className={styles.sectionInner}>
           <p className={styles.sectionLabel}>
@@ -573,8 +631,9 @@ export default function ProjectPage() {
           </article>
         </div>
       </section>
+      ) : null}
 
-      {/* Section 5 — Quote */}
+      {isCaseStudySectionVisible(caseStudy, 'quote') ? (
       <section id="section-quote" className={`${styles.section} ${styles.sectionBurgundy} ${styles.quoteSection}`}>
         <div className={styles.sectionInner}>
           <blockquote className={styles.quoteBlock}>
@@ -586,9 +645,9 @@ export default function ProjectPage() {
           </blockquote>
         </div>
       </section>
+      ) : null}
 
-      {/* Section — Walkthrough video */}
-      {walkthroughVideo ? (
+      {showWalkthrough ? (
         <section id="section-walkthrough" className={`${styles.section} ${styles.sectionCream}`}>
           <div className={styles.sectionInner}>
             <p className={styles.sectionLabel}>
@@ -629,7 +688,7 @@ export default function ProjectPage() {
         </section>
       ) : null}
 
-      {/* Section 6 — Design process */}
+      {isCaseStudySectionVisible(caseStudy, 'designProcess') ? (
       <section id="section-process" className={`${styles.section} ${styles.sectionWhite}`}>
         <div className={styles.sectionInner}>
           <p className={styles.sectionLabel}>
@@ -647,24 +706,20 @@ export default function ProjectPage() {
               <ProcessImageCard
                 key={stage.label}
                 label={stage.label}
-                imageUrl={stage.imageUrl}
+                imageUrl={getScreenImageSrc(stage)}
                 imageCandidates={stage.imageCandidates}
                 fallbackImage={stage.fallbackImage}
                 alt={stage.alt}
-                onOpen={() => openLightboxItem(
-                  stage.label,
-                  stage.imageUrl,
-                  stage.imageCandidates,
-                  stage.fallbackImage,
-                  stage.alt,
-                )}
+                displayCrop={getScreenDisplayCrop(stage)}
+                onOpen={() => openScreenLightbox(stage)}
               />
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
-      {/* Section 7 — Final design */}
+      {isCaseStudySectionVisible(caseStudy, 'finalDesign') ? (
       <section id="section-final" className={`${styles.section} ${styles.sectionDark}`}>
         <div className={styles.sectionInner}>
           <p className={`${styles.sectionLabel} ${styles.sectionLabelPink}`}>
@@ -682,25 +737,21 @@ export default function ProjectPage() {
               <FinalImageCard
                 key={screen.label}
                 label={screen.label}
-                imageUrl={screen.imageUrl}
+                imageUrl={getScreenImageSrc(screen)}
                 imageCandidates={screen.imageCandidates}
                 fallbackImage={screen.fallbackImage}
                 alt={screen.alt}
                 wide={index === 0}
-                onOpen={() => openLightboxItem(
-                  screen.label,
-                  screen.imageUrl,
-                  screen.imageCandidates,
-                  screen.fallbackImage,
-                  screen.alt,
-                )}
+                displayCrop={getScreenDisplayCrop(screen)}
+                onOpen={() => openScreenLightbox(screen)}
               />
             ))}
           </div>
         </div>
       </section>
+      ) : null}
 
-      {/* Section 8 — Outcomes */}
+      {isCaseStudySectionVisible(caseStudy, 'outcomes') ? (
       <section id="section-outcomes" className={`${styles.section} ${styles.sectionBurgundy}`}>
         <div className={styles.sectionInner}>
           <p className={`${styles.sectionLabel} ${styles.sectionLabelPink}`}>
@@ -723,6 +774,7 @@ export default function ProjectPage() {
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Section 9 — Next project */}
       {next ? (

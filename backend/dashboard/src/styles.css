@@ -116,6 +116,37 @@ a { color: var(--burgundy); }
   border-bottom: 1px solid var(--border);
 }
 
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header-row .card-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.section-visibility-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: rgba(26, 26, 26, 0.72);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-visibility-toggle input {
+  accent-color: var(--burgundy);
+}
+
 .sub-title { margin: 1rem 0 0.75rem; font-size: 0.9rem; }
 
 .field {

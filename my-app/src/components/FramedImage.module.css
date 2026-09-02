@@ -1,0 +1,12 @@
+.frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  position: absolute;
+  max-width: none;
+  display: block;
+}

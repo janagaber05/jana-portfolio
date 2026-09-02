@@ -1,4 +1,5 @@
 import { attachCaseStudyImages } from './caseStudyImages';
+import { mergeSectionVisibility } from '../utils/caseStudyImage';
 
 function buildCaseStudy(project) {
   return {
@@ -124,6 +125,7 @@ function buildCaseStudy(project) {
         },
       ],
     },
+    sectionVisibility: mergeSectionVisibility(),
   };
 }
 
@@ -141,6 +143,7 @@ export function getCaseStudy(project, caseStudies = {}) {
       caption: '',
       ...(base.walkthrough || {}),
     },
+    sectionVisibility: mergeSectionVisibility(base.sectionVisibility),
   };
   return attachCaseStudyImages(withWalkthrough, project.slug);
 }

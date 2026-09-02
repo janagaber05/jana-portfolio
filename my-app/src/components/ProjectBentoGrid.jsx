@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
+import FramedImage from './FramedImage';
+import { getScreenDisplayCrop, getScreenImageSrc } from '../utils/caseStudyImage';
 import styles from './ProjectBentoGrid.module.css';
 
-function BentoImage({ imageUrl, candidates, fallback, alt }) {
-  // Prefer the CMS upload. Local folder candidates are only a silent fallback.
+function BentoImage({ screen, alt }) {
+  const imageUrl = getScreenImageSrc(screen);
+  const displayCrop = getScreenDisplayCrop(screen);
+  const candidates = screen?.imageCandidates || [];
+  const fallback = screen?.fallbackImage || '';
+
   const sources = useMemo(() => {
     const list = [];
     if (imageUrl) list.push(imageUrl);
-    [...(candidates || []), fallback].forEach((src) => {
+    [...candidates, fallback].forEach((src) => {
       if (src && !list.includes(src)) list.push(src);
     });
     return list;
@@ -24,9 +30,22 @@ function BentoImage({ imageUrl, candidates, fallback, alt }) {
     return <div className={styles.bentoMissing} aria-hidden="true" />;
   }
 
+  const src = sources[sourceIndex];
+
+  if (displayCrop) {
+    return (
+      <FramedImage
+        src={src}
+        crop={displayCrop}
+        alt={alt}
+        className={styles.bentoImage}
+      />
+    );
+  }
+
   return (
     <img
-      src={sources[sourceIndex]}
+      src={src}
       alt={alt}
       className={styles.bentoImage}
       loading="lazy"
@@ -52,8 +71,7 @@ export function GripIcon({ className = '' }) {
 }
 
 export default function ProjectBentoGrid({ screens, accent, onInspect }) {
-  // Only show screens that have a CMS-uploaded image URL.
-  const visibleScreens = (screens || []).filter((screen) => Boolean(screen?.imageUrl));
+  const visibleScreens = (screens || []).filter((screen) => Boolean(getScreenImageSrc(screen)));
 
   if (!visibleScreens.length) {
     return null;
@@ -82,9 +100,7 @@ export default function ProjectBentoGrid({ screens, accent, onInspect }) {
               aria-label={`View full size: ${screen.label || `Screen ${index + 1}`}`}
             >
               <BentoImage
-                imageUrl={screen.imageUrl}
-                candidates={[]}
-                fallback=""
+                screen={screen}
                 alt={screen.alt || screen.label}
               />
             </button>

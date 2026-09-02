@@ -7,9 +7,11 @@ import {
   ImageUpload,
   Input,
   ListEditor,
+  SectionVisibilityToggle,
   Textarea,
   VideoUpload,
 } from '../components/Form';
+import { DEFAULT_SECTION_VISIBILITY, mergeSectionVisibility } from '../utils/caseStudyImage';
 
 const DEFAULT_BENTO_SCREENS = [
   { label: 'Screen 1', imageUrl: '' },
@@ -35,12 +37,23 @@ const SCREEN_FIELDS = [
   {
     key: 'imageUrl',
     label: 'Image',
-    type: 'image',
-    hint: 'Crop to a phone-screen shape before upload.',
+    type: 'framed-image',
+    hint: 'Upload the full image, then choose the visible part. Visitors tap to see the full image.',
     aspect: 3 / 4,
-    outputWidth: 1400,
   },
 ];
+
+function SectionCard({ title, visible, onVisibleChange, children }) {
+  return (
+    <section className="card">
+      <div className="card-header-row">
+        <h3 className="card-title">{title}</h3>
+        <SectionVisibilityToggle checked={visible} onChange={onVisibleChange} />
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function ensureCaseStudy(content, slug) {
   const existing = content.caseStudies?.[slug];
@@ -58,6 +71,7 @@ function ensureCaseStudy(content, slug) {
     designProcess: { sectionNumber: '05', title: 'From sketch to final screen.', highlight: 'sketch', stages: [{ label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' }, { label: 'Mid fidelity', variant: 'mid', imageUrl: '' }, { label: 'High fidelity', variant: 'high', imageUrl: '' }] },
     finalDesign: { sectionNumber: '06', title: 'The final screens.', highlight: 'final', screens: [{ label: 'Home screen', variant: 'home', imageUrl: '' }, { label: 'Detail screen', variant: 'detail', imageUrl: '' }, { label: 'Checkout screen', variant: 'checkout', imageUrl: '' }] },
     outcomes: { sectionNumber: '07', title: 'The proof it worked.', highlight: 'proof', metrics: [] },
+    sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
   };
 
   if (!existing) return blank;
@@ -66,6 +80,7 @@ function ensureCaseStudy(content, slug) {
     ...blank,
     ...existing,
     walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
+    sectionVisibility: mergeSectionVisibility(existing.sectionVisibility),
   };
 }
 
@@ -103,6 +118,11 @@ export default function CaseStudyEditor() {
     );
   }
 
+  const setVisibility = (key, val) => {
+    set('sectionVisibility', { ...cs.sectionVisibility, [key]: val });
+  };
+
+  const vis = cs.sectionVisibility;
   const bentoScreens = cs.heroScreens?.length ? cs.heroScreens : DEFAULT_BENTO_SCREENS;
 
   return (
@@ -110,10 +130,14 @@ export default function CaseStudyEditor() {
       <header className="page-header">
         <p className="eyebrow"><Link to={`/work/project/${slug}`}>← {project.title}</Link></p>
         <h1>Case study — {project.title}</h1>
-        <p className="muted">Pick every image from your device. No links needed — just tap, choose, and save. Add as many screens as you want.</p>
+        <p className="muted">Turn sections on or off with &ldquo;Show on site&rdquo;. Upload full images, then choose the visible part — visitors tap to see the full image.</p>
       </header>
 
-      <Card title="Page hero image">
+      <SectionCard
+        title="Page hero image"
+        visible={vis.heroImage}
+        onVisibleChange={(v) => setVisibility('heroImage', v)}
+      >
         <ImageUpload
           label="Hero image"
           hint="Full-width banner at the top of the project page (21:9). Crop it before upload so it fills the screen cleanly."
@@ -122,17 +146,21 @@ export default function CaseStudyEditor() {
           value={cs.heroImage || ''}
           onChange={(v) => set('heroImage', v)}
         />
-      </Card>
+      </SectionCard>
 
-      <Card title="Overview screens">
-        <p className="muted">Screens under the hero. Add as many as you want — visitors can tap any image to inspect it full size.</p>
+      <SectionCard
+        title="Overview screens"
+        visible={vis.heroScreens}
+        onVisibleChange={(v) => setVisibility('heroScreens', v)}
+      >
+        <p className="muted">Screens under the hero. Upload the full image, pick what shows in the grid, and visitors tap to see the full file.</p>
         <ListEditor
           items={bentoScreens}
           onChange={(v) => set('heroScreens', v)}
           newItem={{ label: `Screen ${bentoScreens.length + 1}`, imageUrl: '' }}
           fields={SCREEN_FIELDS}
         />
-      </Card>
+      </SectionCard>
 
       <Card title="Hero facts">
         <Field label="Watermark abbreviation"><Input value={cs.abbreviation} onChange={(v) => set('abbreviation', v)} /></Field>
@@ -142,22 +170,34 @@ export default function CaseStudyEditor() {
         <Field label="Type"><Input value={cs.facts.type} onChange={(v) => set('facts.type', v)} /></Field>
       </Card>
 
-      <Card title="01 — Overview">
+      <SectionCard
+        title="01 — Overview"
+        visible={vis.overview}
+        onVisibleChange={(v) => setVisibility('overview', v)}
+      >
         <Field label="Title"><Input value={cs.overview.title} onChange={(v) => set('overview.title', v)} /></Field>
         <Field label="Highlight word"><Input value={cs.overview.highlight} onChange={(v) => set('overview.highlight', v)} /></Field>
         <Field label="Problem text"><Textarea value={cs.overview.problemText} onChange={(v) => set('overview.problemText', v)} rows={4} /></Field>
         <Field label="Solution text"><Textarea value={cs.overview.solutionText} onChange={(v) => set('overview.solutionText', v)} rows={4} /></Field>
-      </Card>
+      </SectionCard>
 
-      <Card title="02 — My role">
+      <SectionCard
+        title="02 — My role"
+        visible={vis.myRole}
+        onVisibleChange={(v) => setVisibility('myRole', v)}
+      >
         <Field label="Title"><Input value={cs.myRole.title} onChange={(v) => set('myRole.title', v)} /></Field>
         <Field label="Intro"><Textarea value={cs.myRole.intro} onChange={(v) => set('myRole.intro', v)} rows={4} /></Field>
         <Field label="Pills (comma separated)">
           <Input value={(cs.myRole.pills || []).join(', ')} onChange={(v) => set('myRole.pills', v.split(',').map((s) => s.trim()).filter(Boolean))} />
         </Field>
-      </Card>
+      </SectionCard>
 
-      <Card title="03 — Research insights">
+      <SectionCard
+        title="03 — Research insights"
+        visible={vis.research}
+        onVisibleChange={(v) => setVisibility('research', v)}
+      >
         <ListEditor
           items={cs.research.insights}
           onChange={(v) => set('research.insights', v)}
@@ -175,17 +215,25 @@ export default function CaseStudyEditor() {
         <Field label="Pain point"><Textarea value={cs.research.persona.painPoint} onChange={(v) => set('research.persona.painPoint', v)} /></Field>
         <Field label="Behaviour"><Textarea value={cs.research.persona.behaviour} onChange={(v) => set('research.persona.behaviour', v)} /></Field>
         <Field label="Quote"><Textarea value={cs.research.persona.quote} onChange={(v) => set('research.persona.quote', v)} /></Field>
-      </Card>
+      </SectionCard>
 
-      <Card title="Quote section">
+      <SectionCard
+        title="Quote section"
+        visible={vis.quote}
+        onVisibleChange={(v) => setVisibility('quote', v)}
+      >
         <Field label="Quote"><Textarea value={cs.quote.text} onChange={(v) => set('quote.text', v)} rows={3} /></Field>
         <Field label="Attribution"><Input value={cs.quote.attribution} onChange={(v) => set('quote.attribution', v)} /></Field>
-      </Card>
+      </SectionCard>
 
-      <Card title="04 — Project walkthrough video">
+      <SectionCard
+        title="04 — Project walkthrough video"
+        visible={vis.walkthrough}
+        onVisibleChange={(v) => setVisibility('walkthrough', v)}
+      >
         <p className="muted">
           Add a product walkthrough video. Upload an MP4/WebM, or paste a YouTube / Vimeo link.
-          Leave empty to hide this section on the live site.
+          Turn off &ldquo;Show on site&rdquo; to hide this section even when a video is set.
         </p>
         <Field label="Section title">
           <Input value={cs.walkthrough?.title || ''} onChange={(v) => set('walkthrough.title', v)} />
@@ -209,29 +257,41 @@ export default function CaseStudyEditor() {
         <Field label="Caption (optional)">
           <Input value={cs.walkthrough?.caption || ''} onChange={(v) => set('walkthrough.caption', v)} />
         </Field>
-      </Card>
+      </SectionCard>
 
-      <Card title="05 — Wireframes (design process)">
-        <p className="muted">Add as many wireframe stages as you want. Visitors can tap each image to inspect it full size.</p>
+      <SectionCard
+        title="05 — Wireframes (design process)"
+        visible={vis.designProcess}
+        onVisibleChange={(v) => setVisibility('designProcess', v)}
+      >
+        <p className="muted">Upload full images and choose the visible area. Visitors tap to see the full file.</p>
         <ListEditor
           items={cs.designProcess.stages}
           onChange={(v) => set('designProcess.stages', v)}
           newItem={{ label: 'Wireframe stage', variant: 'low', imageUrl: '' }}
           fields={SCREEN_FIELDS}
         />
-      </Card>
+      </SectionCard>
 
-      <Card title="06 — Final screens">
-        <p className="muted">Add as many final screens as you want. Visitors can tap each image to inspect it full size.</p>
+      <SectionCard
+        title="06 — Final screens"
+        visible={vis.finalDesign}
+        onVisibleChange={(v) => setVisibility('finalDesign', v)}
+      >
+        <p className="muted">Upload full images and choose the visible area. Visitors tap to see the full file.</p>
         <ListEditor
           items={cs.finalDesign.screens}
           onChange={(v) => set('finalDesign.screens', v)}
           newItem={{ label: 'Final screen', variant: 'home', imageUrl: '' }}
           fields={SCREEN_FIELDS}
         />
-      </Card>
+      </SectionCard>
 
-      <Card title="07 — Outcomes">
+      <SectionCard
+        title="07 — Outcomes"
+        visible={vis.outcomes}
+        onVisibleChange={(v) => setVisibility('outcomes', v)}
+      >
         <ListEditor
           items={cs.outcomes.metrics}
           onChange={(v) => set('outcomes.metrics', v)}
@@ -241,7 +301,7 @@ export default function CaseStudyEditor() {
             { key: 'label', label: 'Label', type: 'textarea' },
           ]}
         />
-      </Card>
+      </SectionCard>
 
       <EditorActions
         draft={draft}
