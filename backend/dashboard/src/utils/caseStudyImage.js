@@ -9,7 +9,6 @@ export function normalizeDisplayCrop(pixelCrop, imageWidth, imageHeight) {
 }
 
 export const DEFAULT_SECTION_VISIBILITY = {
-  heroImage: true,
   heroScreens: true,
   overview: true,
   myRole: true,

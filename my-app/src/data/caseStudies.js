@@ -1,6 +1,23 @@
 import { attachCaseStudyImages } from './caseStudyImages';
 import { mergeSectionVisibility } from '../utils/caseStudyImage';
 
+export function normalizeResearchPersonas(research = {}) {
+  if (Array.isArray(research.personas) && research.personas.length) {
+    return research.personas;
+  }
+  if (research.persona && (
+    research.persona.name
+    || research.persona.role
+    || research.persona.goal
+    || research.persona.painPoint
+    || research.persona.behaviour
+    || research.persona.quote
+  )) {
+    return [research.persona];
+  }
+  return [];
+}
+
 function buildCaseStudy(project) {
   return {
     heroImage: '',
@@ -65,14 +82,16 @@ function buildCaseStudy(project) {
           text: 'People trusted the product more when progress felt visible and reversible — small confirmations reduced anxiety.',
         },
       ],
-      persona: {
-        name: 'Sara M.',
-        role: 'Primary user persona',
-        goal: 'Complete tasks quickly without second-guessing every step',
-        painPoint: 'Confusing flows and inconsistent patterns across screens',
-        behaviour: 'Skims first, reads details only when something feels risky',
-        quote: '"I just want to know I am doing it right before I commit."',
-      },
+      personas: [
+        {
+          name: 'Sara M.',
+          role: 'Primary user persona',
+          goal: 'Complete tasks quickly without second-guessing every step',
+          painPoint: 'Confusing flows and inconsistent patterns across screens',
+          behaviour: 'Skims first, reads details only when something feels risky',
+          quote: '"I just want to know I am doing it right before I commit."',
+        },
+      ],
     },
     quote: {
       text: '"I just want to know I am doing it right before I commit."',
@@ -142,6 +161,10 @@ export function getCaseStudy(project, caseStudies = {}) {
       posterUrl: '',
       caption: '',
       ...(base.walkthrough || {}),
+    },
+    research: {
+      ...(base.research || {}),
+      personas: normalizeResearchPersonas(base.research),
     },
     sectionVisibility: mergeSectionVisibility(base.sectionVisibility),
   };

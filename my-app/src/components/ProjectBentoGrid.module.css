@@ -1,24 +1,14 @@
 .bentoWrap {
   --bento-accent: #ffd5fb;
   width: 100%;
-  max-width: 54rem;
-  margin: 0 auto;
-  padding-top: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .bentoHeader {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.bentoHint {
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--bento-accent);
-  opacity: 0.75;
+  margin-bottom: 0.35rem;
+  padding: 0 0.15rem;
 }
 
 .grip {
@@ -37,104 +27,4 @@
   border-radius: 50%;
   background: var(--bento-accent);
   opacity: 0.9;
-}
-
-/* Simple stable gallery — no overlapping slots */
-.bentoGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.85rem;
-}
-
-.bentoGrid[data-count='1'] {
-  grid-template-columns: minmax(0, 1fr);
-  max-width: 28rem;
-}
-
-.bentoGrid[data-count='3'] .bentoCell:first-child {
-  grid-column: 1 / -1;
-}
-
-.bentoCell {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  min-width: 0;
-}
-
-.bentoFrame {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 0.85rem;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.28);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
-  cursor: zoom-in;
-  aspect-ratio: 3 / 4;
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.bentoGrid[data-count='1'] .bentoFrame,
-.bentoGrid[data-count='3'] .bentoCell:first-child .bentoFrame {
-  aspect-ratio: 16 / 10;
-}
-
-.bentoFrame:hover {
-  transform: scale(1.015);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.bentoFrame:focus-visible {
-  outline: 2px solid var(--bento-accent);
-  outline-offset: 2px;
-}
-
-.bentoImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-}
-
-.bentoMissing {
-  width: 100%;
-  height: 100%;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
-}
-
-.bentoLabel {
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(252, 244, 240, 0.45);
-  padding-left: 0.15rem;
-}
-
-.bentoEmpty {
-  width: 100%;
-  max-width: 54rem;
-  margin: 1.5rem auto 0;
-  font-size: 0.85rem;
-  color: rgba(252, 244, 240, 0.5);
-}
-
-@media (max-width: 720px) {
-  .bentoGrid,
-  .bentoGrid[data-count='3'] {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .bentoGrid[data-count='1'] {
-    grid-template-columns: 1fr;
-  }
-
-  .bentoGrid[data-count='3'] .bentoCell:first-child {
-    grid-column: 1 / -1;
-  }
 }

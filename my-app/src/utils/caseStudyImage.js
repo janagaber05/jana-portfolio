@@ -25,7 +25,6 @@ export function getScreenDisplayCrop(screen) {
 }
 
 export const DEFAULT_SECTION_VISIBILITY = {
-  heroImage: true,
   heroScreens: true,
   overview: true,
   myRole: true,

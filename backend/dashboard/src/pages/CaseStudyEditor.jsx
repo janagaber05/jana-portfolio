@@ -38,10 +38,38 @@ const SCREEN_FIELDS = [
     key: 'imageUrl',
     label: 'Image',
     type: 'framed-image',
-    hint: 'Upload the full image, then choose the visible part. Visitors tap to see the full image.',
-    aspect: 3 / 4,
+    hint: 'Upload the full image, then choose the visible part. Visitors scroll sideways and tap to see the full image.',
+    aspect: 9 / 19.5,
   },
 ];
+
+const PERSONA_FIELDS = [
+  { key: 'name', label: 'Name' },
+  { key: 'role', label: 'Role' },
+  { key: 'goal', label: 'Goal', type: 'textarea' },
+  { key: 'painPoint', label: 'Pain point', type: 'textarea' },
+  { key: 'behaviour', label: 'Behaviour', type: 'textarea' },
+  { key: 'quote', label: 'Quote', type: 'textarea' },
+];
+
+const EMPTY_PERSONA = {
+  name: '',
+  role: '',
+  goal: '',
+  painPoint: '',
+  behaviour: '',
+  quote: '',
+};
+
+function normalizeEditorPersonas(research = {}) {
+  if (Array.isArray(research.personas) && research.personas.length) {
+    return research.personas;
+  }
+  if (research.persona && Object.values(research.persona).some(Boolean)) {
+    return [research.persona];
+  }
+  return [{ ...EMPTY_PERSONA }];
+}
 
 function SectionCard({ title, visible, onVisibleChange, children }) {
   return (
@@ -64,7 +92,7 @@ function ensureCaseStudy(content, slug) {
     facts: { role: project?.role || '', timeline: `6 weeks · ${project?.year || ''}`, tools: (project?.tools || []).join(', '), type: project?.tag || '' },
     overview: { sectionNumber: '01', title: 'The problem and the solution.', highlight: 'problem', problemLabel: 'The problem', problemTitle: 'What was broken', problemText: project?.challenge || '', solutionLabel: 'The solution', solutionTitle: 'What I designed', solutionText: project?.outcome || '' },
     myRole: { sectionNumber: '02', title: 'What I specifically did.', highlight: 'specifically', intro: '', pills: [] },
-    research: { sectionNumber: '03', title: 'What users actually told me.', highlight: 'actually', insights: [], persona: { name: '', role: '', goal: '', painPoint: '', behaviour: '', quote: '' } },
+    research: { sectionNumber: '03', title: 'What users actually told me.', highlight: 'actually', insights: [], personas: [{ ...EMPTY_PERSONA }] },
     quote: { text: '', attribution: '' },
     walkthrough: { ...DEFAULT_WALKTHROUGH },
     heroScreens: [...DEFAULT_BENTO_SCREENS],
@@ -80,6 +108,11 @@ function ensureCaseStudy(content, slug) {
     ...blank,
     ...existing,
     walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
+    research: {
+      ...blank.research,
+      ...(existing.research || {}),
+      personas: normalizeEditorPersonas(existing.research),
+    },
     sectionVisibility: mergeSectionVisibility(existing.sectionVisibility),
   };
 }
@@ -134,26 +167,11 @@ export default function CaseStudyEditor() {
       </header>
 
       <SectionCard
-        title="Page hero image"
-        visible={vis.heroImage}
-        onVisibleChange={(v) => setVisibility('heroImage', v)}
-      >
-        <ImageUpload
-          label="Hero image"
-          hint="Full-width banner at the top of the project page (21:9). Crop it before upload so it fills the screen cleanly."
-          aspect={21 / 9}
-          outputWidth={2400}
-          value={cs.heroImage || ''}
-          onChange={(v) => set('heroImage', v)}
-        />
-      </SectionCard>
-
-      <SectionCard
         title="Overview screens"
         visible={vis.heroScreens}
         onVisibleChange={(v) => setVisibility('heroScreens', v)}
       >
-        <p className="muted">Screens under the hero. Upload the full image, pick what shows in the grid, and visitors tap to see the full file.</p>
+        <p className="muted">Horizontal gallery under the project title. Upload full images, pick the visible part — visitors scroll sideways and tap to see the full file.</p>
         <ListEditor
           items={bentoScreens}
           onChange={(v) => set('heroScreens', v)}
@@ -208,13 +226,14 @@ export default function CaseStudyEditor() {
             { key: 'text', label: 'Text', type: 'textarea' },
           ]}
         />
-        <h4 className="sub-title">Persona</h4>
-        <Field label="Name"><Input value={cs.research.persona.name} onChange={(v) => set('research.persona.name', v)} /></Field>
-        <Field label="Role"><Input value={cs.research.persona.role} onChange={(v) => set('research.persona.role', v)} /></Field>
-        <Field label="Goal"><Textarea value={cs.research.persona.goal} onChange={(v) => set('research.persona.goal', v)} /></Field>
-        <Field label="Pain point"><Textarea value={cs.research.persona.painPoint} onChange={(v) => set('research.persona.painPoint', v)} /></Field>
-        <Field label="Behaviour"><Textarea value={cs.research.persona.behaviour} onChange={(v) => set('research.persona.behaviour', v)} /></Field>
-        <Field label="Quote"><Textarea value={cs.research.persona.quote} onChange={(v) => set('research.persona.quote', v)} /></Field>
+        <h4 className="sub-title">Personas</h4>
+        <p className="muted">Add as many user personas as you need.</p>
+        <ListEditor
+          items={cs.research.personas}
+          onChange={(v) => set('research.personas', v)}
+          newItem={{ ...EMPTY_PERSONA }}
+          fields={PERSONA_FIELDS}
+        />
       </SectionCard>
 
       <SectionCard

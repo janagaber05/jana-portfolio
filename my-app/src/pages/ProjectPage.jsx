@@ -5,9 +5,8 @@ import { getAdjacentProjects, getProjectBySlug } from '../data/featuredWork';
 import { useSiteContent } from '../context/SiteContentContext';
 import { isProjectPublished } from '../utils/publishFilters';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
-import { getResolvedImageSrc, resolveImageSources } from '../utils/resolveImageSources';
+import { getResolvedImageSrc } from '../utils/resolveImageSources';
 import {
-  getScreenDisplayCrop,
   getScreenImageSrc,
   getScreenLightboxSrc,
   getVisibleProgressSections,
@@ -15,7 +14,7 @@ import {
 } from '../utils/caseStudyImage';
 import { resolveWalkthroughVideo } from '../utils/walkthroughVideo';
 import ProjectBentoGrid, { GripIcon } from '../components/ProjectBentoGrid';
-import FramedImage from '../components/FramedImage';
+import CaseStudyScreenGallery from '../components/CaseStudyScreenGallery';
 import ImageLightbox from '../components/ImageLightbox';
 import styles from './ProjectPage.module.css';
 
@@ -35,113 +34,6 @@ function HighlightTitle({ title, highlight, className, highlightClassName }) {
         ),
       )}
     </h2>
-  );
-}
-
-function CaseStudyImage({
-  imageUrl,
-  candidates,
-  fallback,
-  alt,
-  className,
-  displayCrop,
-}) {
-  const sources = resolveImageSources(imageUrl, candidates, fallback);
-  const [sourceIndex, setSourceIndex] = useState(0);
-
-  useEffect(() => {
-    setSourceIndex(0);
-  }, [imageUrl, candidates, fallback]);
-
-  const src = sources[sourceIndex];
-  if (!src) return null;
-
-  if (displayCrop) {
-    return (
-      <FramedImage
-        src={src}
-        crop={displayCrop}
-        alt={alt}
-        className={className}
-      />
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={className}
-      loading="lazy"
-      onError={() => {
-        setSourceIndex((current) => (
-          current < sources.length - 1 ? current + 1 : current
-        ));
-      }}
-    />
-  );
-}
-
-function ProcessImageCard({
-  label,
-  imageUrl,
-  imageCandidates,
-  fallbackImage,
-  alt,
-  displayCrop,
-  onOpen,
-}) {
-  return (
-    <figure className={styles.processCard}>
-      <button
-        type="button"
-        className={styles.inspectButton}
-        onClick={onOpen}
-        aria-label={`View full size: ${label}`}
-      >
-        <CaseStudyImage
-          imageUrl={imageUrl}
-          candidates={imageCandidates}
-          fallback={fallbackImage}
-          alt={alt}
-          displayCrop={displayCrop}
-          className={styles.processImage}
-        />
-      </button>
-      <figcaption className={styles.processLabel}>{label}</figcaption>
-    </figure>
-  );
-}
-
-function FinalImageCard({
-  label,
-  imageUrl,
-  imageCandidates,
-  fallbackImage,
-  alt,
-  wide,
-  displayCrop,
-  onOpen,
-}) {
-  return (
-    <figure className={`${styles.finalCard} ${wide ? styles.finalCardWide : ''}`}>
-      <button
-        type="button"
-        className={styles.inspectButton}
-        onClick={onOpen}
-        aria-label={`View full size: ${label}`}
-      >
-        <CaseStudyImage
-          imageUrl={imageUrl}
-          candidates={imageCandidates}
-          fallback={fallbackImage}
-          alt={alt}
-          displayCrop={displayCrop}
-          className={styles.finalImage}
-        />
-      </button>
-      <figcaption className={styles.finalLabel}>{label}</figcaption>
-    </figure>
   );
 }
 
@@ -325,14 +217,6 @@ export default function ProjectPage() {
 
     const items = [];
 
-    if (caseStudy.heroImage) {
-      items.push({
-        src: caseStudy.heroImage,
-        label: `${project.title} hero`,
-        alt: `${project.title} hero`,
-      });
-    }
-
     heroScreens.forEach((screen, index) => {
       const item = toLightboxItem(
         screen.label || `Screen ${index + 1}`,
@@ -452,36 +336,14 @@ export default function ProjectPage() {
 
       {/* Section 1 — Hero */}
       <section className={styles.hero} aria-label="Project hero">
-        {caseStudy.heroImage && isCaseStudySectionVisible(caseStudy, 'heroImage') ? (
-          <div className={styles.heroBleed}>
-            <Link to="/#work" className={`${styles.heroBack} ${styles.heroBackOverlay}`} onClick={goHome}>
-              ← Back to work
-            </Link>
-            <button
-              type="button"
-              className={styles.inspectButton}
-              onClick={() => openLightboxBySrc(caseStudy.heroImage)}
-              aria-label={`View full size: ${project.title} hero`}
-            >
-              <img
-                src={caseStudy.heroImage}
-                alt={`${project.title} hero`}
-                className={styles.heroBleedImage}
-              />
-            </button>
-          </div>
-        ) : null}
-
         <div className={styles.heroBody}>
           <span className={styles.heroWatermark} aria-hidden="true">
             {caseStudy.abbreviation}
           </span>
 
-          {!caseStudy.heroImage || !isCaseStudySectionVisible(caseStudy, 'heroImage') ? (
-            <Link to="/#work" className={styles.heroBack} onClick={goHome}>
-              ← Back to work
-            </Link>
-          ) : null}
+          <Link to="/#work" className={styles.heroBack} onClick={goHome}>
+            ← Back to work
+          </Link>
 
           <div className={styles.heroInner}>
             <div className={styles.heroContent}>
@@ -514,16 +376,18 @@ export default function ProjectPage() {
                 </div>
               </dl>
             </div>
-
-            {isCaseStudySectionVisible(caseStudy, 'heroScreens') ? (
-              <ProjectBentoGrid
-                screens={heroScreens}
-                accent={project.accent}
-                onInspect={(_index, screen) => openScreenLightbox(screen)}
-              />
-            ) : null}
           </div>
         </div>
+
+        {isCaseStudySectionVisible(caseStudy, 'heroScreens') ? (
+          <div className={styles.sectionBleed}>
+            <ProjectBentoGrid
+              screens={heroScreens}
+              accent={project.accent}
+              onInspect={(_index, screen) => openScreenLightbox(screen)}
+            />
+          </div>
+        ) : null}
       </section>
 
       {isCaseStudySectionVisible(caseStudy, 'overview') ? (
@@ -601,35 +465,60 @@ export default function ProjectPage() {
               </article>
             ))}
           </div>
-
-          <article className={styles.personaCard}>
-            <div className={styles.personaAvatar}>
-              <PersonIcon />
-            </div>
-            <div className={styles.personaContent}>
-              <h3 className={styles.personaName}>{caseStudy.research.persona.name}</h3>
-              <p className={styles.personaRole}>{caseStudy.research.persona.role}</p>
-              <dl className={styles.personaGrid}>
-                <div>
-                  <dt>Goal</dt>
-                  <dd>{caseStudy.research.persona.goal}</dd>
-                </div>
-                <div>
-                  <dt>Pain point</dt>
-                  <dd>{caseStudy.research.persona.painPoint}</dd>
-                </div>
-                <div>
-                  <dt>Behaviour</dt>
-                  <dd>{caseStudy.research.persona.behaviour}</dd>
-                </div>
-                <div>
-                  <dt>Quote</dt>
-                  <dd>{caseStudy.research.persona.quote}</dd>
-                </div>
-              </dl>
-            </div>
-          </article>
         </div>
+
+        {(caseStudy.research.personas || []).filter((persona) => (
+          persona?.name || persona?.role || persona?.goal || persona?.painPoint
+          || persona?.behaviour || persona?.quote
+        )).length ? (
+          <div className={styles.sectionBleed}>
+            <div
+              className={styles.personaStrip}
+              data-single={
+                (caseStudy.research.personas || []).filter((persona) => (
+                  persona?.name || persona?.role || persona?.goal || persona?.painPoint
+                  || persona?.behaviour || persona?.quote
+                )).length === 1 ? 'true' : 'false'
+              }
+            >
+            {(caseStudy.research.personas || []).map((persona, index) => {
+                const hasContent = persona?.name || persona?.role || persona?.goal
+                  || persona?.painPoint || persona?.behaviour || persona?.quote;
+                if (!hasContent) return null;
+
+                return (
+                  <article key={`${persona.name || 'persona'}-${index}`} className={styles.personaCard}>
+                    <div className={styles.personaAvatar}>
+                      <PersonIcon />
+                    </div>
+                    <div className={styles.personaContent}>
+                      <h3 className={styles.personaName}>{persona.name}</h3>
+                      <p className={styles.personaRole}>{persona.role}</p>
+                      <dl className={styles.personaGrid}>
+                        <div>
+                          <dt>Goal</dt>
+                          <dd>{persona.goal}</dd>
+                        </div>
+                        <div>
+                          <dt>Pain point</dt>
+                          <dd>{persona.painPoint}</dd>
+                        </div>
+                        <div>
+                          <dt>Behaviour</dt>
+                          <dd>{persona.behaviour}</dd>
+                        </div>
+                        <div>
+                          <dt>Quote</dt>
+                          <dd>{persona.quote}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </article>
+                );
+            })}
+            </div>
+          </div>
+        ) : null}
       </section>
       ) : null}
 
@@ -701,19 +590,16 @@ export default function ProjectPage() {
             highlightClassName={styles.highlightBurgundy}
           />
 
-          <div className={styles.processGrid}>
-            {caseStudy.designProcess.stages.map((stage) => (
-              <ProcessImageCard
-                key={stage.label}
-                label={stage.label}
-                imageUrl={getScreenImageSrc(stage)}
-                imageCandidates={stage.imageCandidates}
-                fallbackImage={stage.fallbackImage}
-                alt={stage.alt}
-                displayCrop={getScreenDisplayCrop(stage)}
-                onOpen={() => openScreenLightbox(stage)}
-              />
-            ))}
+        </div>
+
+        <div className={styles.sectionBleed}>
+          <div className="screenGalleryLight">
+            <CaseStudyScreenGallery
+              screens={caseStudy.designProcess.stages}
+              onInspect={(_index, stage) => openScreenLightbox(stage)}
+              hint="Scroll sideways · Tap to view full size"
+              variant="board"
+            />
           </div>
         </div>
       </section>
@@ -732,20 +618,16 @@ export default function ProjectPage() {
             highlightClassName={styles.highlightPink}
           />
 
-          <div className={styles.finalGrid}>
-            {caseStudy.finalDesign.screens.map((screen, index) => (
-              <FinalImageCard
-                key={screen.label}
-                label={screen.label}
-                imageUrl={getScreenImageSrc(screen)}
-                imageCandidates={screen.imageCandidates}
-                fallbackImage={screen.fallbackImage}
-                alt={screen.alt}
-                wide={index === 0}
-                displayCrop={getScreenDisplayCrop(screen)}
-                onOpen={() => openScreenLightbox(screen)}
-              />
-            ))}
+        </div>
+
+        <div className={styles.sectionBleed}>
+          <div className="screenGalleryDark">
+            <CaseStudyScreenGallery
+              screens={caseStudy.finalDesign.screens}
+              onInspect={(_index, screen) => openScreenLightbox(screen)}
+              hint="Scroll sideways · Tap to view full size"
+              accent="#FFD5FB"
+            />
           </div>
         </div>
       </section>

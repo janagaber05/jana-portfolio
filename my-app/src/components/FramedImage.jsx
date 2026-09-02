@@ -1,10 +1,16 @@
 import styles from './FramedImage.module.css';
 
 /**
- * Shows a cropped region of a full image inside a fixed frame.
- * crop: { x, y, width, height } normalized 0–1 on the source image.
+ * Shows a cropped region of a full image inside a frame matching the crop aspect
+ * so the visible region is never stretched.
  */
-export default function FramedImage({ src, crop, alt, className = '' }) {
+export default function FramedImage({
+  src,
+  crop,
+  alt,
+  className = '',
+  fit = 'cover',
+}) {
   if (!src) return null;
 
   if (!crop) {
@@ -14,6 +20,13 @@ export default function FramedImage({ src, crop, alt, className = '' }) {
         alt={alt || ''}
         className={className}
         loading="lazy"
+        style={{
+          width: '100%',
+          height: 'auto',
+          display: 'block',
+          objectFit: fit,
+          objectPosition: 'center center',
+        }}
       />
     );
   }
@@ -23,7 +36,10 @@ export default function FramedImage({ src, crop, alt, className = '' }) {
   const safeHeight = height > 0 ? height : 1;
 
   return (
-    <div className={`${styles.frame} ${className}`}>
+    <div
+      className={`${styles.frame} ${className}`}
+      style={{ aspectRatio: `${safeWidth} / ${safeHeight}` }}
+    >
       <img
         src={src}
         alt={alt || ''}
