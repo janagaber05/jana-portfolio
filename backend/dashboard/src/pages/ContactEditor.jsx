@@ -1,6 +1,6 @@
 import { useContentDraft } from '../hooks/useContentDraft';
 import EditorActions from '../components/EditorActions';
-import { Card, Field, ImageUpload, Input, ListEditor, Textarea } from '../components/Form';
+import { Card, Field, ImageUpload, Input, ListEditor, PdfUpload, Textarea } from '../components/Form';
 
 export default function ContactEditor() {
   const {
@@ -53,6 +53,36 @@ export default function ContactEditor() {
         <Field label="Headline accent"><Input value={c.headlineAccent} onChange={(v) => set('headlineAccent', v)} /></Field>
         <Field label="Location"><Input value={c.location} onChange={(v) => set('location', v)} /></Field>
         <Field label="Email"><Input value={c.email} onChange={(v) => set('email', v)} /></Field>
+      </Card>
+
+      <Card title="Resume / CV">
+        <p className="muted">Upload your CV as a PDF. Visitors can download it from this contact section.</p>
+        <Field label="Show download button">
+          <label className="home-pick">
+            <input
+              type="checkbox"
+              checked={Boolean(c.showResume)}
+              onChange={(e) => set('showResume', e.target.checked)}
+            />
+            <span>Display download button on the site</span>
+          </label>
+        </Field>
+        <Field label="Button label">
+          <Input value={c.resumeLabel || 'Download CV'} onChange={(v) => set('resumeLabel', v)} />
+        </Field>
+        <PdfUpload
+          value={c.resumeUrl || ''}
+          onChange={(v) => {
+            updateDraft((prev) => ({
+              ...prev,
+              contact: {
+                ...prev.contact,
+                resumeUrl: v,
+                showResume: v ? true : prev.contact?.showResume,
+              },
+            }));
+          }}
+        />
       </Card>
 
       <Card title="Social links">

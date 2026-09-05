@@ -89,6 +89,7 @@ export default function ContactSection() {
               className={styles.resumeLink}
               target="_blank"
               rel="noreferrer"
+              download
             >
               {contact.resumeLabel || 'Download CV'} ↓
             </a>

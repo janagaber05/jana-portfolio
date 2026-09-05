@@ -6,6 +6,7 @@ import {
   ImageUpload,
   Input,
   ListEditor,
+  PdfUpload,
   Textarea,
 } from '../components/Form';
 import EditorActions from '../components/EditorActions';
@@ -123,6 +124,7 @@ export default function SettingsEditor() {
       </Card>
 
       <Card title="Resume / CV">
+        <p className="muted">Upload a PDF and turn on the download button. It appears in the contact section (and can power the About “Download CV” button).</p>
         <Field label="Show download button">
           <label className="home-pick">
             <input
@@ -133,11 +135,25 @@ export default function SettingsEditor() {
                 contact: { ...prev.contact, showResume: e.target.checked },
               }))}
             />
-            <span>Display resume link in contact section</span>
+            <span>Display resume link on the site</span>
           </label>
         </Field>
-        <Field label="Button label"><Input value={draft.contact?.resumeLabel || 'Download CV'} onChange={(v) => updateDraft((prev) => ({ ...prev, contact: { ...prev.contact, resumeLabel: v } }))} /></Field>
-        <Field label="Resume URL"><Input value={draft.contact?.resumeUrl || ''} onChange={(v) => updateDraft((prev) => ({ ...prev, contact: { ...prev.contact, resumeUrl: v } }))} placeholder="https://... or /uploads/resume.pdf" /></Field>
+        <Field label="Button label">
+          <Input
+            value={draft.contact?.resumeLabel || 'Download CV'}
+            onChange={(v) => updateDraft((prev) => ({
+              ...prev,
+              contact: { ...prev.contact, resumeLabel: v },
+            }))}
+          />
+        </Field>
+        <PdfUpload
+          value={draft.contact?.resumeUrl || ''}
+          onChange={(v) => updateDraft((prev) => ({
+            ...prev,
+            contact: { ...prev.contact, resumeUrl: v, showResume: v ? true : prev.contact?.showResume },
+          }))}
+        />
       </Card>
 
       <Card title="Global SEO">

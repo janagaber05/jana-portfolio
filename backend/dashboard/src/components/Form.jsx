@@ -418,6 +418,110 @@ export function VideoUpload({
   );
 }
 
+export function PdfUpload({
+  value,
+  onChange,
+  label = 'CV / Resume PDF',
+  hint,
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleFile = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (!isPdf) {
+      setError('Please upload a PDF file.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > 12 * 1024 * 1024) {
+      setError('PDF is too large. Keep it under 12MB.');
+      event.target.value = '';
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const result = await api.upload(file);
+      onChange(result.url);
+    } catch (err) {
+      setError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  const previewUrl = mediaUrl(value);
+  const fileName = value
+    ? decodeURIComponent(String(value).split('/').pop()?.split('?')[0] || 'resume.pdf')
+    : '';
+
+  return (
+    <Field
+      label={label}
+      hint={hint || 'Upload your CV as a PDF. Visitors can download it from the contact section.'}
+    >
+      <div className="image-picker">
+        {value ? (
+          <div className="image-picker-preview pdf-picker-preview">
+            <div className="pdf-picker-meta">
+              <span className="pdf-picker-badge" aria-hidden="true">PDF</span>
+              <div>
+                <p className="pdf-picker-name">{fileName}</p>
+                <a href={previewUrl} target="_blank" rel="noreferrer" className="pdf-picker-link">
+                  Preview PDF
+                </a>
+              </div>
+            </div>
+            <div className="image-picker-actions">
+              <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
+                {uploading ? 'Uploading…' : 'Replace PDF'}
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  hidden
+                  onChange={handleFile}
+                  disabled={uploading}
+                />
+              </label>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')}>
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
+            <span className="pdf-picker-badge" aria-hidden="true">PDF</span>
+            <span className="image-picker-text">
+              {uploading ? 'Uploading…' : 'Choose PDF from device'}
+            </span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              hidden
+              onChange={handleFile}
+              disabled={uploading}
+            />
+          </label>
+        )}
+      </div>
+      <Input
+        value={value}
+        onChange={onChange}
+        placeholder="Or paste a public PDF URL"
+      />
+      {error ? <p className="field-error">{error}</p> : null}
+    </Field>
+  );
+}
+
 export function ListEditor({
   items,
   onChange,

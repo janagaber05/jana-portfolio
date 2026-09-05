@@ -11,7 +11,15 @@ gsap.registerPlugin(ScrollTrigger);
 export default function AboutSection() {
   const { content } = useSiteContent();
   const about = content?.about;
+  const contact = content?.contact;
   const aboutRef = useRef(null);
+
+  const resumeHref = contact?.showResume && contact?.resumeUrl
+    ? resolveMediaUrl(contact.resumeUrl)
+    : '';
+  const primaryHref = (!about?.ctaPrimaryHref || about.ctaPrimaryHref === '#') && resumeHref
+    ? resumeHref
+    : about?.ctaPrimaryHref;
 
   useEffect(() => {
     const section = aboutRef.current;
@@ -205,7 +213,13 @@ export default function AboutSection() {
           </div>
 
           <div className={`about-actions ${styles.aboutActions}`}>
-            <a href={about.ctaPrimaryHref} className={styles.aboutCtaPrimary}>
+            <a
+              href={primaryHref}
+              className={styles.aboutCtaPrimary}
+              {...(resumeHref && primaryHref === resumeHref
+                ? { download: true, target: '_blank', rel: 'noreferrer' }
+                : {})}
+            >
               {about.ctaPrimary}
             </a>
             <a href={about.ctaSecondaryHref} className={styles.aboutCtaGhost}>
