@@ -77,7 +77,15 @@ export function mergeSiteContent(loaded) {
       ),
       socials: loaded.settings?.socials || defaultContent.settings?.socials || [],
     },
-    hero: mergeSection(defaultContent.hero, loaded.hero),
+    hero: {
+      ...mergeSection(defaultContent.hero, loaded.hero),
+      roles: Array.isArray(loaded.hero?.roles) && loaded.hero.roles.length
+        ? loaded.hero.roles.map((role) => String(role || '').trim()).filter(Boolean).slice(0, 4)
+        : defaultContent.hero.roles,
+      badgeName: loaded.hero?.badgeName || defaultContent.hero.badgeName,
+      badgeTitle: loaded.hero?.badgeTitle || defaultContent.hero.badgeTitle,
+      badgeTagline: loaded.hero?.badgeTagline || defaultContent.hero.badgeTagline,
+    },
     featuredWork: normalizeFeaturedWork(defaultContent.featuredWork, loaded.featuredWork),
     about: mergeSection(defaultContent.about, loaded.about),
     disciplines: {

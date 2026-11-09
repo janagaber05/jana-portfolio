@@ -124,7 +124,7 @@ export default function SettingsEditor() {
       </Card>
 
       <Card title="Resume / CV">
-        <p className="muted">Upload a PDF and turn on the download button. It appears in the contact section (and can power the About “Download CV” button).</p>
+        <p className="muted">Upload a PDF for the About section “Download CV” button.</p>
         <Field label="Show download button">
           <label className="home-pick">
             <input
@@ -135,17 +135,8 @@ export default function SettingsEditor() {
                 contact: { ...prev.contact, showResume: e.target.checked },
               }))}
             />
-            <span>Display resume link on the site</span>
+            <span>Enable About “Download CV” button</span>
           </label>
-        </Field>
-        <Field label="Button label">
-          <Input
-            value={draft.contact?.resumeLabel || 'Download CV'}
-            onChange={(v) => updateDraft((prev) => ({
-              ...prev,
-              contact: { ...prev.contact, resumeLabel: v },
-            }))}
-          />
         </Field>
         <PdfUpload
           value={draft.contact?.resumeUrl || ''}

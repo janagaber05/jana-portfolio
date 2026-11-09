@@ -1,7 +1,6 @@
 import { useContentDraft } from '../hooks/useContentDraft';
 import EditorActions from '../components/EditorActions';
-import { Card, Field, ImageUpload, Input } from '../components/Form';
-import { ListEditor } from '../components/Form';
+import { Card, Field, ImageUpload, Input, ListEditor } from '../components/Form';
 
 export default function HeroEditor() {
   const {
@@ -19,34 +18,44 @@ export default function HeroEditor() {
     <div className="page">
       <header className="page-header">
         <h1>Hero section</h1>
-        <p>Loading screen, navigation, portrait images, scroll strips, and UI chrome.</p>
+        <p>Badge intro, role words, navigation, and portrait used on the ID card.</p>
       </header>
 
-      <Card title="Loading & background text">
-        <Field label="Load label"><Input value={hero.loadLabel} onChange={(v) => setHero('loadLabel', v)} /></Field>
-        <Field label="Background line 1"><Input value={hero.bgLineOne} onChange={(v) => setHero('bgLineOne', v)} /></Field>
-        <Field label="Background line 2"><Input value={hero.bgLineTwo} onChange={(v) => setHero('bgLineTwo', v)} /></Field>
+      <Card title="ID badge">
+        <p className="muted">This is the hanging badge in the center of the first section.</p>
+        <Field label="Name on badge"><Input value={hero.badgeName || 'JANA'} onChange={(v) => setHero('badgeName', v)} /></Field>
+        <Field label="Title under name"><Input value={hero.badgeTitle || 'UX/UI Designer'} onChange={(v) => setHero('badgeTitle', v)} /></Field>
+        <Field label="Tagline (bottom left)"><Input value={hero.badgeTagline || 'Designing apps people love'} onChange={(v) => setHero('badgeTagline', v)} /></Field>
+        <ImageUpload
+          label="Badge portrait"
+          hint="Shown on the ID badge. Crop tight to the face if you can."
+          value={hero.heroImage}
+          onChange={(v) => setHero('heroImage', v)}
+        />
       </Card>
 
-      <Card title="Scroll strips">
-        <Field label="Strip line 1"><Input value={hero.stripLineOne} onChange={(v) => setHero('stripLineOne', v)} /></Field>
-        <Field label="Strip line 2"><Input value={hero.stripLineTwo} onChange={(v) => setHero('stripLineTwo', v)} /></Field>
-        <Field label="Strip repeat count"><Input type="number" value={hero.stripRepeat} onChange={(v) => setHero('stripRepeat', Number(v))} /></Field>
+      <Card title="Role words">
+        <p className="muted">Four large words around the badge (top-left, top-right, bottom-left, bottom-right). Keep them short.</p>
+        <ListEditor
+          items={hero.roles?.length ? hero.roles.map((label) => ({ label })) : [
+            { label: 'DESIGNER' },
+            { label: 'RESEARCHER' },
+            { label: 'PROTOTYPER' },
+            { label: 'CREATOR' },
+          ]}
+          onChange={(v) => setHero('roles', v.map((item) => String(item.label || '').trim().toUpperCase()).filter(Boolean).slice(0, 4))}
+          newItem={{ label: 'ROLE' }}
+          maxItems={4}
+          addLabel="Add role"
+          itemLabel="Role"
+          fields={[{ key: 'label', label: 'Word' }]}
+        />
       </Card>
 
-      <Card title="Bottom UI">
-        <Field label="Up next label"><Input value={hero.nextLabel} onChange={(v) => setHero('nextLabel', v)} /></Field>
-        <Field label="Up next value"><Input value={hero.nextValue} onChange={(v) => setHero('nextValue', v)} /></Field>
-        <Field label="Lock button (unlocked)"><Input value={hero.lockBtnUnlocked} onChange={(v) => setHero('lockBtnUnlocked', v)} /></Field>
-        <Field label="Lock button (locked)"><Input value={hero.lockBtnLocked} onChange={(v) => setHero('lockBtnLocked', v)} /></Field>
-        <Field label="Scroll cue"><Input value={hero.scrollCue} onChange={(v) => setHero('scrollCue', v)} /></Field>
+      <Card title="Navigation">
         <Field label="Email"><Input value={hero.email} onChange={(v) => setHero('email', v)} /></Field>
         <Field label="Nav button text"><Input value={hero.navCta || 'get in touch'} onChange={(v) => setHero('navCta', v)} /></Field>
-      </Card>
-
-      <Card title="Images">
-        <ImageUpload label="Hero portrait" value={hero.heroImage} onChange={(v) => setHero('heroImage', v)} />
-        <ImageUpload label="Hero animated portrait" value={hero.heroAnimated} onChange={(v) => setHero('heroAnimated', v)} />
+        <Field label="Scroll cue"><Input value={hero.scrollCue || 'scroll'} onChange={(v) => setHero('scrollCue', v)} /></Field>
         <ImageUpload label="Logo" value={hero.logo} onChange={(v) => setHero('logo', v)} />
       </Card>
 

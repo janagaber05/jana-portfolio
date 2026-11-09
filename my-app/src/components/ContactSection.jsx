@@ -83,18 +83,6 @@ export default function ContactSection() {
 
           <ContactForm contact={contact} />
 
-          {contact.showResume && contact.resumeUrl ? (
-            <a
-              href={resolveMediaUrl(contact.resumeUrl)}
-              className={styles.resumeLink}
-              target="_blank"
-              rel="noreferrer"
-              download
-            >
-              {contact.resumeLabel || 'Download CV'} ↓
-            </a>
-          ) : null}
-
           <nav className={styles.socialRow} aria-label="Social links">
             {contact.socials.map((link) => (
               <a

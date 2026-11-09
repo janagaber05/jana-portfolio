@@ -56,19 +56,16 @@ export default function ContactEditor() {
       </Card>
 
       <Card title="Resume / CV">
-        <p className="muted">Upload your CV as a PDF. Visitors can download it from this contact section.</p>
-        <Field label="Show download button">
+        <p className="muted">Upload your CV in <strong>About</strong> — the Download CV button lives there. You can also manage the PDF here.</p>
+        <Field label="Show download on About">
           <label className="home-pick">
             <input
               type="checkbox"
               checked={Boolean(c.showResume)}
               onChange={(e) => set('showResume', e.target.checked)}
             />
-            <span>Display download button on the site</span>
+            <span>Enable About “Download CV” button</span>
           </label>
-        </Field>
-        <Field label="Button label">
-          <Input value={c.resumeLabel || 'Download CV'} onChange={(v) => set('resumeLabel', v)} />
         </Field>
         <PdfUpload
           value={c.resumeUrl || ''}

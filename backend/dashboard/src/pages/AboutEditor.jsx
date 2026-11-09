@@ -1,6 +1,6 @@
 import { useContentDraft } from '../hooks/useContentDraft';
 import EditorActions from '../components/EditorActions';
-import { Card, Field, ImageUpload, Input, ListEditor, Textarea } from '../components/Form';
+import { Card, Field, ImageUpload, Input, ListEditor, PdfUpload, Textarea } from '../components/Form';
 
 export default function AboutEditor() {
   const {
@@ -9,13 +9,18 @@ export default function AboutEditor() {
   if (!ready) return null;
 
   const about = draft.about;
+  const contact = draft.contact || {};
   const set = (key, val) => updateDraft((prev) => ({ ...prev, about: { ...prev.about, [key]: val } }));
+  const setContact = (key, val) => updateDraft((prev) => ({
+    ...prev,
+    contact: { ...prev.contact, [key]: val },
+  }));
 
   return (
     <div className="page">
       <header className="page-header">
         <h1>About section</h1>
-        <p>Headline, bio copy, stats, CTAs, and photo.</p>
+        <p>Headline, bio copy, stats, CTAs, CV download, and photo.</p>
       </header>
 
       <Card title="Headline">
@@ -41,9 +46,39 @@ export default function AboutEditor() {
         />
       </Card>
 
+      <Card title="Download CV">
+        <p className="muted">This powers the red “Download CV” button in the About section.</p>
+        <Field label="Show download button">
+          <label className="home-pick">
+            <input
+              type="checkbox"
+              checked={contact.showResume !== false}
+              onChange={(e) => setContact('showResume', e.target.checked)}
+            />
+            <span>Enable CV download on About</span>
+          </label>
+        </Field>
+        <Field label="Button label">
+          <Input value={about.ctaPrimary || 'Download CV →'} onChange={(v) => set('ctaPrimary', v)} />
+        </Field>
+        <PdfUpload
+          label="CV PDF"
+          hint="Upload your CV as a PDF. Clicking Download CV on the About section will download this file."
+          value={contact.resumeUrl || ''}
+          onChange={(v) => {
+            updateDraft((prev) => ({
+              ...prev,
+              contact: {
+                ...prev.contact,
+                resumeUrl: v,
+                showResume: v ? true : prev.contact?.showResume,
+              },
+            }));
+          }}
+        />
+      </Card>
+
       <Card title="CTAs & badges">
-        <Field label="Primary CTA text"><Input value={about.ctaPrimary} onChange={(v) => set('ctaPrimary', v)} /></Field>
-        <Field label="Primary CTA link"><Input value={about.ctaPrimaryHref} onChange={(v) => set('ctaPrimaryHref', v)} /></Field>
         <Field label="Secondary CTA text"><Input value={about.ctaSecondary} onChange={(v) => set('ctaSecondary', v)} /></Field>
         <Field label="Secondary CTA link"><Input value={about.ctaSecondaryHref} onChange={(v) => set('ctaSecondaryHref', v)} /></Field>
         <Field label="Watermark"><Input value={about.watermark} onChange={(v) => set('watermark', v)} /></Field>

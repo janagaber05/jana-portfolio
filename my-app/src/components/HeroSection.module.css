@@ -1,48 +1,29 @@
-.loadingGate {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  background: #000;
-}
-
 .pageBackdrop {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #FCF4F0;
+  background: #141214;
   pointer-events: none;
 }
 
-.loadLabel {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  letter-spacing: 0.08em;
-  color: #fff;
-  text-transform: uppercase;
-}
-
-.loadPct {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(4rem, 12vw, 9rem);
-  color: #6D0101;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
 .hero {
+  --hero-ink: #fcf4f0;
+  --hero-muted: rgba(252, 244, 240, 0.42);
+  --hero-role: #ffd5fb;
+  --hero-burgundy: #6d0101;
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  background: #FCF4F0;
-  overflow: visible;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 35%, rgba(109, 1, 1, 0.22), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255, 213, 251, 0.06), transparent 65%),
+    #141214;
+  overflow: hidden;
   z-index: 10;
-  transform-origin: center center;
-  will-change: transform;
+  display: grid;
+  place-items: center;
+  padding: 6.5rem 1.25rem 4.5rem;
 }
 
 .siteHeader {
@@ -72,6 +53,30 @@
   transition: background-color 0.3s, color 0.3s;
 }
 
+.navHeroDark .navLinks a,
+.navHeroDark .navSocials a {
+  color: rgba(252, 244, 240, 0.88);
+}
+
+.navHeroDark .navLinks a:hover,
+.navHeroDark .navSocials a:hover {
+  color: #ffd5fb;
+  opacity: 1;
+}
+
+.navHeroDark .navCta {
+  background: #ffd5fb;
+  color: #6d0101;
+}
+
+.navHeroDark .navLogo img {
+  filter: brightness(0) invert(1);
+}
+
+.navHeroDark .navBurger span {
+  background: #fcf4f0;
+}
+
 .navOnDark {
   background: rgba(26, 26, 26, 0.92);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -98,6 +103,10 @@
 .navOnDark .navSocials a:hover {
   color: #ffd5fb;
   opacity: 1;
+}
+
+.navOnDark .navLogo img {
+  filter: brightness(0) invert(1);
 }
 
 .navLogo img {
@@ -328,328 +337,106 @@
   background: #fcf4f0;
 }
 
-.imageWrap {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 3;
-  width: min(38vw, 520px);
-  height: min(78vh, 780px);
-  pointer-events: auto;
-  cursor: pointer;
-  opacity: 0;
-  transform-origin: center center;
-  will-change: transform;
-  overflow: visible;
-}
-
-.imageWrapVisible {
-  opacity: 1;
-}
-
-.imageStack {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  -webkit-mask-image: radial-gradient(
-    ellipse 78% 92% at 50% 44%,
-    #000 42%,
-    rgba(0, 0, 0, 0.92) 62%,
-    rgba(0, 0, 0, 0.55) 80%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 78% 92% at 50% 44%,
-    #000 42%,
-    rgba(0, 0, 0, 0.92) 62%,
-    rgba(0, 0, 0, 0.55) 80%,
-    transparent 100%
-  );
-}
-
-.imageStack::after {
-  content: none;
-}
-
-.blendOverlay {
+.roles {
   position: absolute;
   inset: 0;
-  z-index: 4;
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent 52%,
-    rgba(252, 244, 240, 0.25) 72%,
-    rgba(252, 244, 240, 0.72) 88%,
-    #FCF4F0 100%
-  );
-}
-
-.darkVignette {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(
-      ellipse 72% 88% at 50% 42%,
-      transparent 28%,
-      rgba(26, 26, 26, 0.45) 62%,
-      rgba(26, 26, 26, 0.92) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 45%,
-      rgba(26, 26, 26, 0.55) 75%,
-      #1A1A1A 100%
-    );
-}
-
-.portrait {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center center;
-  display: block;
-}
-
-.portraitBase {
   z-index: 1;
-  filter:
-    brightness(0.72)
-    sepia(0.18)
-    saturate(1.08)
-    contrast(1.08);
 }
 
-.hoverReveal {
+.role {
   position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, #000 68%, transparent 100%);
-  mask-image: radial-gradient(circle 0px at 50% 50%, #000 0%, #000 68%, transparent 100%);
-  will-change: mask-image, -webkit-mask-image;
-}
-
-.portraitHover {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center 46%;
-  display: block;
-  transform: translateY(-2.5%);
-}
-
-.logoOverlay {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 25;
-  width: min(42vw, 480px);
-  height: auto;
-  pointer-events: none;
-  opacity: 0;
-  transform-origin: center center;
-}
-
-.signature {
-  position: absolute;
-  right: 2.5rem;
-  bottom: 28%;
-  z-index: 4;
-  width: clamp(80px, 12vw, 140px);
-  pointer-events: none;
-  opacity: 0;
-}
-
-.signature path {
-  fill: none;
-  stroke: #6D0101;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-
-.nextBlock {
-  position: absolute;
-  left: 5rem;
-  bottom: 2.5rem;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  opacity: 0;
-}
-
-.nextLabel {
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(26, 26, 26, 0.45);
-}
-
-.nextValue {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.35rem;
+  font-size: clamp(2.4rem, 9vw, 6.5rem);
+  line-height: 0.9;
   letter-spacing: 0.04em;
-  color: #1A1A1A;
-}
-
-.lockBtn {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
-  background: none;
-  border: 1px solid rgba(26, 26, 26, 0.2);
-  color: #1A1A1A;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
-  opacity: 0;
-  transition: border-color 0.2s, color 0.2s;
+  color: var(--hero-role);
+  opacity: 0.88;
+  user-select: none;
 }
 
-.lockBtn:hover {
-  border-color: #6D0101;
-  color: #6D0101;
+.roleTL {
+  top: clamp(5.5rem, 12vh, 7.5rem);
+  left: clamp(1rem, 4vw, 3rem);
+}
+
+.roleTR {
+  top: clamp(5.5rem, 12vh, 7.5rem);
+  right: clamp(1rem, 4vw, 3rem);
+  text-align: right;
+}
+
+.roleBL {
+  bottom: clamp(4.5rem, 10vh, 6.5rem);
+  left: clamp(1rem, 4vw, 3rem);
+}
+
+.roleBR {
+  bottom: clamp(4.5rem, 10vh, 6.5rem);
+  right: clamp(1rem, 4vw, 3rem);
+  text-align: right;
+}
+
+.lanyardStage {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 26rem);
+  height: min(78vh, 42rem);
+  margin: 0 auto;
+}
+
+.lanyard {
+  width: 100%;
+  height: 100%;
+}
+
+.lanyardPlaceholder {
+  width: min(100%, 15rem);
+  height: min(70%, 22rem);
+  margin: 10% auto 0;
+  border-radius: 1.15rem;
+  background: rgba(252, 244, 240, 0.08);
+  border: 1px solid rgba(255, 213, 251, 0.18);
+}
+
+.tagline {
+  position: absolute;
+  left: clamp(1.25rem, 4vw, 2.5rem);
+  bottom: clamp(1.5rem, 4vh, 2.5rem);
+  z-index: 3;
+  margin: 0;
+  max-width: 16rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--hero-muted);
 }
 
 .scrollCue {
   position: absolute;
-  bottom: 2.5rem;
-  left: 1.5rem;
-  z-index: 4;
+  right: clamp(1.25rem, 4vw, 2.5rem);
+  bottom: clamp(1.5rem, 4vh, 2.5rem);
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 0.75rem;
-  opacity: 0;
 }
 
 .scrollText {
   font-size: 0.65rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(26, 26, 26, 0.45);
+  color: var(--hero-muted);
   writing-mode: vertical-rl;
+  transform: rotate(180deg);
 }
 
 .scrollLine {
   display: block;
   width: 1px;
   height: 50px;
-  background: linear-gradient(to bottom, #6D0101, transparent);
-}
-
-.heroBgText {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -52%);
-  z-index: 1;
-  width: 100%;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.heroBgLine,
-.heroBgLineWide {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-weight: 700;
-  line-height: 0.92;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: #1A1A1A;
-  opacity: 0.1;
-}
-
-.heroBgLine {
-  font-size: clamp(4.5rem, 15vw, 11rem);
-}
-
-.heroBgLineWide {
-  margin-top: -0.08em;
-  font-size: clamp(5.5rem, 20vw, 14rem);
-}
-
-.scrollStrips {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.scrollStrip {
-  overflow: hidden;
-  padding: 0.35rem 0;
-}
-
-.stripTrack {
-  display: flex;
-  gap: 4rem;
-  width: max-content;
-  animation: stripScrollLeft 140s linear infinite;
-  animation-play-state: paused;
-}
-
-.stripTrackLeft {
-  animation-name: stripScrollLeft;
-}
-
-.stripTrackRight {
-  animation-name: stripScrollRight;
-}
-
-.stripTrack span {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.2rem, 6.5vw, 5.5rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.stripOne span {
-  color: #FFD5FB;
-  opacity: 0.38;
-}
-
-.stripTwo span {
-  color: #6D0101;
-  opacity: 0.42;
-}
-
-@keyframes stripScrollLeft {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@keyframes stripScrollRight {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  background: linear-gradient(to bottom, #ffd5fb, transparent);
 }
 
 @media (max-width: 900px) {
@@ -672,24 +459,53 @@
     display: inline-flex;
   }
 
-  .signature {
-    right: 1.25rem;
-    bottom: 32%;
-    width: 70px;
+  .role {
+    font-size: clamp(1.55rem, 8.5vw, 2.6rem);
   }
 
-  .nextBlock {
-    left: 1.25rem;
+  .roleTL,
+  .roleTR {
+    top: 5.25rem;
+  }
+
+  .roleBL,
+  .roleBR {
     bottom: 5.5rem;
+  }
+
+  .lanyardStage {
+    width: min(100%, 20rem);
+    height: min(70vh, 36rem);
+  }
+
+  .tagline {
+    max-width: 11rem;
+    font-size: 0.72rem;
   }
 
   .scrollCue {
     display: none;
   }
+}
 
-  .imageWrap {
-    width: min(72vw, 400px);
-    height: min(62vh, 560px);
-    top: 54%;
+@media (max-width: 480px) {
+  .hero {
+    padding-top: 5.75rem;
+  }
+
+  .roleTL {
+    left: 0.85rem;
+  }
+
+  .roleTR {
+    right: 0.85rem;
+  }
+
+  .roleBL {
+    left: 0.85rem;
+  }
+
+  .roleBR {
+    right: 0.85rem;
   }
 }

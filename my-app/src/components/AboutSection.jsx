@@ -14,12 +14,12 @@ export default function AboutSection() {
   const contact = content?.contact;
   const aboutRef = useRef(null);
 
-  const resumeHref = contact?.showResume && contact?.resumeUrl
+  const resumeHref = contact?.resumeUrl
     ? resolveMediaUrl(contact.resumeUrl)
     : '';
-  const primaryHref = (!about?.ctaPrimaryHref || about.ctaPrimaryHref === '#') && resumeHref
-    ? resumeHref
-    : about?.ctaPrimaryHref;
+  const canDownloadCv = Boolean(resumeHref && contact?.showResume !== false);
+  const primaryHref = canDownloadCv ? resumeHref : (about?.ctaPrimaryHref || '#');
+  const primaryLabel = about?.ctaPrimary || 'Download CV →';
 
   useEffect(() => {
     const section = aboutRef.current;
@@ -213,15 +213,21 @@ export default function AboutSection() {
           </div>
 
           <div className={`about-actions ${styles.aboutActions}`}>
-            <a
-              href={primaryHref}
-              className={styles.aboutCtaPrimary}
-              {...(resumeHref && primaryHref === resumeHref
-                ? { download: true, target: '_blank', rel: 'noreferrer' }
-                : {})}
-            >
-              {about.ctaPrimary}
-            </a>
+            {canDownloadCv ? (
+              <a
+                href={primaryHref}
+                className={styles.aboutCtaPrimary}
+                download
+                target="_blank"
+                rel="noreferrer"
+              >
+                {primaryLabel}
+              </a>
+            ) : (
+              <a href={primaryHref} className={styles.aboutCtaPrimary}>
+                {primaryLabel}
+              </a>
+            )}
             <a href={about.ctaSecondaryHref} className={styles.aboutCtaGhost}>
               {about.ctaSecondary}
             </a>
