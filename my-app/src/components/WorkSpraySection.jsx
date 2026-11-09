@@ -16,6 +16,7 @@ import {
   useSpring,
 } from 'framer-motion';
 import styles from './WorkSpraySection.module.css';
+import GunErrorBoundary from './GunErrorBoundary';
 
 const PortfolioGun = lazy(() => import('./PortfolioGun'));
 
@@ -612,13 +613,15 @@ export default function WorkSpraySection({
         <div className={styles.right}>
           <div className={styles.gunAnchor}>
             <span className={styles.muzzle} ref={muzzleRef} aria-hidden="true" />
-            <Suspense fallback={<div className={styles.gunCanvas} aria-hidden="true" />}>
-              <PortfolioGun
-                firing={firing}
-                onFire={sprayBurst}
-                disabled={busy}
-              />
-            </Suspense>
+            <GunErrorBoundary onFire={sprayBurst} disabled={busy}>
+              <Suspense fallback={<div className={styles.gunCanvas} aria-hidden="true" />}>
+                <PortfolioGun
+                  firing={firing}
+                  onFire={sprayBurst}
+                  disabled={busy}
+                />
+              </Suspense>
+            </GunErrorBoundary>
           </div>
         </div>
       </div>
