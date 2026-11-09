@@ -17,6 +17,7 @@ import {
 } from 'framer-motion';
 import styles from './WorkSpraySection.module.css';
 import GunErrorBoundary from './GunErrorBoundary';
+import { setProjectTransition } from './fx/transitionStore';
 
 const PortfolioGun = lazy(() => import('./PortfolioGun'));
 
@@ -198,7 +199,19 @@ function ProjectDrawer({ project, onClose }) {
             <Link
               to={project.href || '/work'}
               className={styles.drawerCta}
-              onClick={onClose}
+              onClick={(event) => {
+                const slug = project.project?.slug || String(project.href || '').split('/').pop();
+                if (slug) {
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  setProjectTransition({
+                    slug,
+                    color: project.color || project.project?.accent || '#6D0101',
+                    title: project.title,
+                    rect,
+                  });
+                }
+                onClose();
+              }}
             >
               View case study →
             </Link>
@@ -277,7 +290,19 @@ function LandedSlip({ slip, settle, onProjectClick }) {
         zIndex: 12,
         boxShadow: '0 14px 28px rgba(17,17,17,0.22)',
       }}
-      onClick={() => onProjectClick(slip)}
+      onClick={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const slug = slip.project?.slug || String(slip.href || '').split('/').pop();
+        if (slug) {
+          setProjectTransition({
+            slug,
+            color: slip.color,
+            title: slip.title,
+            rect,
+          });
+        }
+        onProjectClick(slip);
+      }}
     >
       <SlipContent slip={slip} />
     </motion.button>

@@ -333,6 +333,37 @@ a { color: var(--burgundy); }
   background: #fff;
 }
 
+.framed-preview-wrap {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.framed-preview {
+  max-width: 180px;
+  background-color: #f3ebe6;
+}
+
+.framed-preview-badge {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--burgundy);
+  border: 1px solid var(--border);
+}
+
+.framed-preview-badge.is-needed {
+  color: #8a3b00;
+  border-color: #e4b47a;
+  background: #fff4e6;
+}
+
 .image-picker-actions {
   display: flex;
   flex-wrap: wrap;

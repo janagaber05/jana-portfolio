@@ -52,6 +52,26 @@ export default function HeroEditor() {
         />
       </Card>
 
+      <Card title="Marquee strips (under hero)">
+        <p className="muted">
+          Two scrolling ribbons between the hero and work. Separate words with · or commas.
+        </p>
+        <Field label="Top strip">
+          <Input
+            value={hero.stripTop || hero.stripLineTwo || ''}
+            onChange={(v) => setHero('stripTop', v)}
+            placeholder="DESIGN · RESEARCH · WIREFRAME · PROTOTYPE · DELIVER · ITERATE"
+          />
+        </Field>
+        <Field label="Bottom strip">
+          <Input
+            value={hero.stripBottom || ''}
+            onChange={(v) => setHero('stripBottom', v)}
+            placeholder="UX · UI · BRAND · FRONT-END · MOTION"
+          />
+        </Field>
+      </Card>
+
       <Card title="Navigation">
         <Field label="Email"><Input value={hero.email} onChange={(v) => setHero('email', v)} /></Field>
         <Field label="Nav button text"><Input value={hero.navCta || 'get in touch'} onChange={(v) => setHero('navCta', v)} /></Field>

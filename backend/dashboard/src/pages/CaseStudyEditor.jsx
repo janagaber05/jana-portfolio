@@ -99,6 +99,13 @@ function ensureCaseStudy(content, slug) {
     designProcess: { sectionNumber: '05', title: 'From sketch to final screen.', highlight: 'sketch', stages: [{ label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' }, { label: 'Mid fidelity', variant: 'mid', imageUrl: '' }, { label: 'High fidelity', variant: 'high', imageUrl: '' }] },
     finalDesign: { sectionNumber: '06', title: 'The final screens.', highlight: 'final', screens: [{ label: 'Home screen', variant: 'home', imageUrl: '' }, { label: 'Detail screen', variant: 'detail', imageUrl: '' }, { label: 'Checkout screen', variant: 'checkout', imageUrl: '' }] },
     outcomes: { sectionNumber: '07', title: 'The proof it worked.', highlight: 'proof', metrics: [] },
+    beforeAfter: { before: '', after: '', caption: '' },
+    reflection: { title: "What I'd do differently", text: '' },
+    strips: {
+      top: (project?.tools || []).join(' · ') || 'DESIGN · RESEARCH · PROTOTYPE · DELIVER',
+      bottom: 'UX · UI · RESEARCH · PROTOTYPE · MOTION',
+    },
+    coverImage: '',
     sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
   };
 
@@ -111,6 +118,10 @@ function ensureCaseStudy(content, slug) {
   return {
     ...blank,
     ...existing,
+    coverImage: existing.coverImage || '',
+    beforeAfter: { ...blank.beforeAfter, ...(existing.beforeAfter || {}) },
+    reflection: { ...blank.reflection, ...(existing.reflection || {}) },
+    strips: { ...blank.strips, ...(existing.strips || {}) },
     walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
     research: {
       ...blank.research,
@@ -193,6 +204,27 @@ export default function CaseStudyEditor() {
         <Field label="Timeline"><Input value={cs.facts.timeline} onChange={(v) => set('facts.timeline', v)} /></Field>
         <Field label="Tools"><Input value={cs.facts.tools} onChange={(v) => set('facts.tools', v)} /></Field>
         <Field label="Type"><Input value={cs.facts.type} onChange={(v) => set('facts.type', v)} /></Field>
+      </Card>
+
+      <Card title="Marquee strips">
+        <p className="muted">
+          Two scrolling ribbons between the screens gallery and the story.
+          Separate words with a middle dot (·), comma, or slash — e.g. FIGMA · RESEARCH · PROTOTYPE.
+        </p>
+        <Field label="Top strip (burgundy)">
+          <Input
+            value={cs.strips?.top || ''}
+            onChange={(v) => set('strips.top', v)}
+            placeholder="FIGMA · RESEARCH · PROTOTYPE · DELIVER"
+          />
+        </Field>
+        <Field label="Bottom strip (pink)">
+          <Input
+            value={cs.strips?.bottom || ''}
+            onChange={(v) => set('strips.bottom', v)}
+            placeholder="UX · UI · RESEARCH · PROTOTYPE · MOTION"
+          />
+        </Field>
       </Card>
 
       <SectionCard
@@ -320,15 +352,64 @@ export default function CaseStudyEditor() {
         visible={vis.outcomes}
         onVisibleChange={(v) => setVisibility('outcomes', v)}
       >
+        <p className="muted">Use a short stat for Value (e.g. 89% or 4.7). Put the longer explanation in Label — long Values used to overlap on the site.</p>
         <ListEditor
           items={cs.outcomes.metrics}
           onChange={(v) => set('outcomes.metrics', v)}
           newItem={{ value: '0%', label: 'Metric description' }}
           fields={[
-            { key: 'value', label: 'Value' },
-            { key: 'label', label: 'Label', type: 'textarea' },
+            { key: 'value', label: 'Value (short, e.g. 89%)' },
+            { key: 'label', label: 'Label / explanation', type: 'textarea' },
           ]}
         />
+      </SectionCard>
+
+      <SectionCard
+        title="Before / After (optional)"
+        visible={vis.beforeAfter !== false}
+        onVisibleChange={(v) => setVisibility('beforeAfter', v)}
+      >
+        <p className="muted">Optional comparison slider. Both images required to show on the site.</p>
+        <Field label="Cover image (optional — falls back to hero / first screen)">
+          <ImageUpload
+            aspect={9 / 16}
+            outputWidth={1200}
+            value={cs.coverImage || ''}
+            onChange={(v) => set('coverImage', v)}
+          />
+        </Field>
+        <Field label="Before image">
+          <ImageUpload
+            aspect={9 / 16}
+            outputWidth={1400}
+            value={cs.beforeAfter?.before || ''}
+            onChange={(v) => set('beforeAfter.before', v)}
+          />
+        </Field>
+        <Field label="After image">
+          <ImageUpload
+            aspect={9 / 16}
+            outputWidth={1400}
+            value={cs.beforeAfter?.after || ''}
+            onChange={(v) => set('beforeAfter.after', v)}
+          />
+        </Field>
+        <Field label="Caption">
+          <Input value={cs.beforeAfter?.caption || ''} onChange={(v) => set('beforeAfter.caption', v)} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard
+        title="Reflection (optional)"
+        visible={vis.reflection !== false}
+        onVisibleChange={(v) => setVisibility('reflection', v)}
+      >
+        <Field label="Title">
+          <Input value={cs.reflection?.title || ''} onChange={(v) => set('reflection.title', v)} />
+        </Field>
+        <Field label="Text">
+          <Textarea value={cs.reflection?.text || ''} onChange={(v) => set('reflection.text', v)} rows={4} />
+        </Field>
       </SectionCard>
 
       <EditorActions

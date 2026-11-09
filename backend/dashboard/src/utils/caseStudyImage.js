@@ -14,10 +14,12 @@ export const DEFAULT_SECTION_VISIBILITY = {
   myRole: true,
   research: true,
   quote: true,
+  beforeAfter: true,
   walkthrough: true,
   designProcess: true,
   finalDesign: true,
   outcomes: true,
+  reflection: true,
 };
 
 export function mergeSectionVisibility(visibility = {}) {

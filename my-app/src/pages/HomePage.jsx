@@ -33,9 +33,14 @@ export default function HomePage() {
   const location = useLocation();
   const { loading, content } = useSiteContent();
   const restoredRef = useRef(false);
-  const stripText = content?.hero?.stripLineTwo
+  const stripTop = content?.hero?.stripTop
+    || content?.hero?.stripLineTwo
+    || defaultContent.hero?.stripTop
     || defaultContent.hero?.stripLineTwo
     || 'DESIGN · RESEARCH · WIREFRAME · PROTOTYPE · DELIVER · ITERATE';
+  const stripBottom = content?.hero?.stripBottom
+    || defaultContent.hero?.stripBottom
+    || 'UX · UI · BRAND · FRONT-END · MOTION';
 
   useLayoutEffect(() => {
     const hasHash = window.location.hash;
@@ -210,7 +215,7 @@ export default function HomePage() {
     <>
       <Preloader />
       <HeroSection />
-      <VelocityTapes text={stripText} from="#141214" to="#F2F1EE" />
+      <VelocityTapes text={stripTop} altText={stripBottom} from="#141214" to="#F2F1EE" />
       <PortfolioSections />
     </>
   );

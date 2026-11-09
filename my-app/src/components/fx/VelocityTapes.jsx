@@ -7,19 +7,30 @@ function prefersReducedMotion() {
 
 function parseWords(text) {
   return String(text || '')
-    .split(/\s*[·•|]\s*/)
+    .split(/\s*[·•|,/]+\s*/)
     .map((w) => w.trim())
     .filter(Boolean);
 }
 
+/** Repeat words until the marquee is wide enough to scroll seamlessly. */
+function fillWords(words, minCount = 8) {
+  const base = words.length ? words : ['DESIGN', 'RESEARCH', 'PROTOTYPE'];
+  const out = [];
+  while (out.length < minCount) {
+    out.push(...base);
+  }
+  return out;
+}
+
 function TapeTrack({ words, className }) {
+  const filled = fillWords(words);
   const chunk = (
     <span className="fx-tape-chunk">
-      {words.map((word, index) => (
+      {filled.map((word, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <span key={`${word}-${index}`}>
+        <span key={`${word}-${index}`} className="fx-tape-item">
           {word}
-          <span className="fx-tape-spin" aria-hidden="true"> ✺ </span>
+          <span className="fx-tape-spin" aria-hidden="true">✺</span>
         </span>
       ))}
     </span>
@@ -49,6 +60,9 @@ export default function VelocityTapes({
     [altText, text],
   );
 
+  const tapeAWords = wordsA;
+  const tapeBWords = wordsB.length ? wordsB : wordsA;
+
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
@@ -64,7 +78,6 @@ export default function VelocityTapes({
     let offsetA = 0;
     let offsetB = 0;
     let velocity = 0;
-    let skew = 0;
     let lastScroll = window.scrollY || 0;
     let dir = 1;
 
@@ -87,10 +100,10 @@ export default function VelocityTapes({
 
       const dt = Math.min(2.2, Math.max(0.5, gsap.ticker.deltaRatio()));
       velocity *= 0.9;
-      const speed = (1.1 + Math.min(Math.abs(velocity), 28)) * dir * dt;
+      const speed = (1.05 + Math.min(Math.abs(velocity), 24)) * dir * dt;
 
       offsetA -= speed;
-      offsetB += speed * 0.92;
+      offsetB += speed * 0.9;
 
       const halfA = tracks[0].scrollWidth / 2 || 1;
       const halfB = tracks[1].scrollWidth / 2 || 1;
@@ -99,11 +112,8 @@ export default function VelocityTapes({
       if (offsetB <= -halfB) offsetB += halfB;
       if (offsetB > 0) offsetB -= halfB;
 
-      const targetSkew = Math.max(-14, Math.min(14, -velocity * 0.35));
-      skew += (targetSkew - skew) * 0.12;
-
-      tracks[0].style.transform = `translate3d(${offsetA.toFixed(2)}px,0,0) skewX(${skew.toFixed(2)}deg)`;
-      tracks[1].style.transform = `translate3d(${offsetB.toFixed(2)}px,0,0) skewX(${(-skew).toFixed(2)}deg)`;
+      tracks[0].style.transform = `translate3d(${offsetA.toFixed(2)}px,0,0)`;
+      tracks[1].style.transform = `translate3d(${offsetB.toFixed(2)}px,0,0)`;
     };
 
     gsap.ticker.add(tick);
@@ -124,9 +134,9 @@ export default function VelocityTapes({
         track.style.transform = '';
       });
     };
-  }, []);
+  }, [tapeAWords, tapeBWords]);
 
-  if (!wordsA.length) return null;
+  if (!tapeAWords.length && !tapeBWords.length) return null;
 
   return (
     <div
@@ -139,8 +149,8 @@ export default function VelocityTapes({
         <span />
         <span />
       </div>
-      <TapeTrack words={wordsA} className="fx-tape-a" />
-      <TapeTrack words={wordsB.length ? wordsB : wordsA} className="fx-tape-b" />
+      <TapeTrack words={tapeAWords.length ? tapeAWords : tapeBWords} className="fx-tape-a" />
+      <TapeTrack words={tapeBWords.length ? tapeBWords : tapeAWords} className="fx-tape-b" />
     </div>
   );
 }

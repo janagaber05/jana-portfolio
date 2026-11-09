@@ -178,6 +178,38 @@ export function ImageUpload({
   );
 }
 
+function framedPreviewStyle(src, aspect, displayCrop) {
+  const base = {
+    aspectRatio: aspect,
+    backgroundImage: `url(${src})`,
+    backgroundRepeat: 'no-repeat',
+  };
+
+  if (displayCrop?.width > 0 && displayCrop?.height > 0) {
+    return {
+      ...base,
+      backgroundPosition: `${-(displayCrop.x / displayCrop.width) * 100}% ${-(displayCrop.y / displayCrop.height) * 100}%`,
+      backgroundSize: `${(1 / displayCrop.width) * 100}% ${(1 / displayCrop.height) * 100}%`,
+    };
+  }
+
+  return {
+    ...base,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center top',
+  };
+}
+
+function cropToPercentages(displayCrop) {
+  if (!displayCrop?.width || !displayCrop?.height) return undefined;
+  return {
+    x: displayCrop.x * 100,
+    y: displayCrop.y * 100,
+    width: displayCrop.width * 100,
+    height: displayCrop.height * 100,
+  };
+}
+
 export function FramedImageUpload({
   imageUrl = '',
   fullImageUrl = '',
@@ -194,6 +226,8 @@ export function FramedImageUpload({
   const [pendingFullUrl, setPendingFullUrl] = useState('');
 
   const src = fullImageUrl || imageUrl;
+  const previewSrc = src ? mediaUrl(src) : '';
+  const hasCrop = Boolean(displayCrop?.width && displayCrop?.height);
 
   const openCrop = (url, name = 'image.jpg', fullUrl = url) => {
     setPendingName(name);
@@ -245,37 +279,44 @@ export function FramedImageUpload({
     <div className="image-upload-block">
       <Field
         label={label}
-        hint={hint || 'Upload the full image, then choose which part shows on the page. Visitors tap to see the full image.'}
+        hint={hint || 'Upload the full image, then choose which part shows in the frame. Visitors tap to open the full image.'}
       >
         <div className="image-picker">
           {src ? (
             <div className="image-picker-preview">
-              <img
-                src={mediaUrl(src)}
-                alt=""
-                className="image-picker-img"
-                style={{ aspectRatio: aspect }}
-              />
+              <div className="framed-preview-wrap">
+                <div
+                  className="image-picker-img framed-preview"
+                  style={framedPreviewStyle(previewSrc, aspect, displayCrop)}
+                  role="img"
+                  aria-label={hasCrop ? 'Visible area preview' : 'Image preview — set visible area'}
+                />
+                <span className={`framed-preview-badge ${hasCrop ? 'is-set' : 'is-needed'}`}>
+                  {hasCrop ? 'Visible area' : 'Needs visible area'}
+                </span>
+              </div>
               <div className="image-picker-actions">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${hasCrop ? 'btn-secondary' : 'btn-primary'}`}
+                  onClick={() => openCrop(previewSrc, 'image.jpg', src)}
+                  disabled={uploading}
+                >
+                  {hasCrop ? 'Adjust visible area' : 'Set visible area'}
+                </button>
                 <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
                   {uploading ? 'Uploading…' : 'Replace image'}
                   <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
                 </label>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => openCrop(mediaUrl(src), 'image.jpg', src)}
-                  disabled={uploading}
-                >
-                  Adjust visible area
-                </button>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={clearImage}>
                   Remove
                 </button>
               </div>
-              {displayCrop ? (
-                <p className="field-hint">Visible area set — tap opens full image.</p>
-              ) : null}
+              <p className="field-hint">
+                {hasCrop
+                  ? 'Preview matches the site frame. Tap on the site opens the full image.'
+                  : 'Pick the part that should show first — the full file stays available on tap.'}
+              </p>
             </div>
           ) : (
             <label className={`image-picker-dropzone ${uploading ? 'upload-btn-loading' : ''}`}>
@@ -295,8 +336,9 @@ export function FramedImageUpload({
           imageSrc={cropSrc}
           fileName={pendingName}
           initialAspect={aspect}
-          lockAspect={false}
+          lockAspect
           metadataOnly
+          initialCroppedAreaPercentages={cropToPercentages(displayCrop)}
           onCancel={closeCrop}
           onConfirmMetadata={confirmMetadata}
         />

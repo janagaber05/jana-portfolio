@@ -45,6 +45,26 @@ export default function ContactEditor() {
         <Field label="Marquee repeat"><Input type="number" value={c.marqueeRepeat} onChange={(v) => set('marqueeRepeat', Number(v))} /></Field>
       </Card>
 
+      <Card title="Strips above contact">
+        <p className="muted">
+          Two scrolling ribbons between Process and Contact. Separate words with · or commas.
+        </p>
+        <Field label="Top strip">
+          <Input
+            value={c.stripTop || ''}
+            onChange={(v) => set('stripTop', v)}
+            placeholder="LET'S TALK · OPEN FOR WORK · SAY HI · CAIRO → ANYWHERE"
+          />
+        </Field>
+        <Field label="Bottom strip">
+          <Input
+            value={c.stripBottom || ''}
+            onChange={(v) => set('stripBottom', v)}
+            placeholder="UX · UI · BRAND · FRONT-END · MOTION"
+          />
+        </Field>
+      </Card>
+
       <Card title="Main content">
         <Field label="Top label"><Input value={c.topLabel} onChange={(v) => set('topLabel', v)} /></Field>
         <Field label="Available badge"><Input value={c.availableBadge} onChange={(v) => set('availableBadge', v)} /></Field>

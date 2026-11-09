@@ -152,6 +152,20 @@ function buildCaseStudy(project) {
         },
       ],
     },
+    beforeAfter: {
+      before: '',
+      after: '',
+      caption: '',
+    },
+    reflection: {
+      title: "What I'd do differently",
+      text: '',
+    },
+    strips: {
+      top: '',
+      bottom: '',
+    },
+    coverImage: '',
     sectionVisibility: mergeSectionVisibility(),
   };
 }
@@ -161,6 +175,23 @@ export function getCaseStudy(project, caseStudies = {}) {
   const base = caseStudies[project.slug] || buildCaseStudy(project);
   const withWalkthrough = {
     ...base,
+    coverImage: base.coverImage || '',
+    beforeAfter: {
+      before: '',
+      after: '',
+      caption: '',
+      ...(base.beforeAfter || {}),
+    },
+    reflection: {
+      title: "What I'd do differently",
+      text: '',
+      ...(base.reflection || {}),
+    },
+    strips: {
+      top: '',
+      bottom: '',
+      ...(base.strips || {}),
+    },
     walkthrough: {
       sectionNumber: '04',
       title: 'Project walkthrough.',

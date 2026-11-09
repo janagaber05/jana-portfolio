@@ -1,0 +1,1045 @@
+/* Case-study exhibit — global helpers scoped with cs- prefix */
+
+.cs-page {
+  background: var(--cream, #fcf4f0);
+  color: var(--ink, #141214);
+  overflow-x: clip;
+}
+
+.cs-kicker {
+  margin: 0 0 0.85rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(20, 18, 20, 0.45);
+}
+
+.cs-kicker-light {
+  color: rgba(252, 244, 240, 0.55);
+}
+
+.cs-hl {
+  color: var(--accent, #6d0101);
+}
+
+.cs-body {
+  max-width: 62ch;
+  line-height: 1.65;
+}
+
+.cs-chapter-title {
+  margin: 0 0 1.5rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.cs-chapter-title-light {
+  color: #fcf4f0;
+}
+
+.cs-section {
+  padding: clamp(4rem, 10vh, 7rem) clamp(1.25rem, 4vw, 3rem);
+}
+
+/* Progress dots */
+.cs-progress {
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  z-index: 40;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.cs-progress-dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(20, 18, 20, 0.22);
+  cursor: pointer;
+}
+
+.cs-progress-dot.is-active {
+  background: var(--accent, #6d0101);
+  transform: scale(1.25);
+}
+
+.cs-progress-tip {
+  position: absolute;
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: #141214;
+  color: #fcf4f0;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.cs-progress-dot:hover .cs-progress-tip,
+.cs-progress-dot:focus-visible .cs-progress-tip {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .cs-progress { display: none; }
+}
+
+/* Hero */
+.cs-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6.5rem clamp(1.25rem, 4vw, 3rem) 2rem;
+  background: var(--accent, #6d0101);
+  color: var(--on-accent, #fcf4f0);
+  overflow: hidden;
+}
+
+.cs-hero-watermark {
+  position: absolute;
+  left: 4%;
+  top: 18%;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(8rem, 28vw, 22rem);
+  line-height: 0.8;
+  letter-spacing: 0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(252, 244, 240, 0.18);
+  pointer-events: none;
+  user-select: none;
+}
+
+.cs-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+
+.cs-hero-title {
+  margin: 0 0 1rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(4rem, 12vw, 11rem);
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+}
+
+.cs-hero-title span {
+  display: inline-block;
+}
+
+.cs-hero-summary {
+  margin: 0 0 1.5rem;
+  max-width: 36ch;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  opacity: 0.88;
+}
+
+.cs-back {
+  display: inline-flex;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 0.15rem;
+}
+
+.cs-hero-media {
+  display: grid;
+  place-items: center;
+}
+
+.cs-ticket {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 1rem 1.1rem;
+  border: 1.5px dashed rgba(252, 244, 240, 0.35);
+  border-radius: 1rem;
+  background: rgba(20, 18, 20, 0.12);
+}
+
+.cs-ticket-label {
+  display: block;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 0.25rem;
+}
+
+.cs-ticket-value {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+}
+
+.cs-ticket-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.35rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  opacity: 0.7;
+}
+
+.cs-ticket-barcode {
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.cs-scroll-cue {
+  position: absolute;
+  right: clamp(1.25rem, 4vw, 3rem);
+  bottom: 1.25rem;
+  margin: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+@media (max-width: 900px) {
+  .cs-hero-grid { grid-template-columns: 1fr; }
+  .cs-ticket { grid-template-columns: 1fr 1fr; }
+  .cs-ticket-meta { align-items: flex-start; grid-column: 1 / -1; }
+}
+
+/* TL;DR */
+.cs-tldr {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 2rem;
+  padding: clamp(2.5rem, 6vh, 4rem) clamp(1.25rem, 4vw, 3rem);
+  background: #141214;
+  color: #fcf4f0;
+}
+
+.cs-tldr-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.cs-tldr-card {
+  min-width: 0;
+  padding: 1rem 0.75rem;
+  border-top: 1px solid rgba(255, 213, 251, 0.25);
+  overflow: hidden;
+}
+
+.cs-metric-value {
+  margin: 0;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  line-height: 0.95;
+  color: #ffd5fb;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.cs-metric-value.is-text {
+  font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.cs-metric-label {
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.72;
+  overflow-wrap: anywhere;
+}
+
+.cs-tldr-copy {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  min-width: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.cs-tldr-copy p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.cs-tldr-copy strong {
+  color: #ffd5fb;
+}
+
+@media (max-width: 1100px) {
+  .cs-tldr { grid-template-columns: 1fr; }
+  .cs-tldr-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .cs-tldr-metrics { grid-template-columns: 1fr; }
+}
+
+/* Device frames */
+.cs-device {
+  width: min(100%, 280px);
+  filter: drop-shadow(0 28px 50px rgba(0, 0, 0, 0.35));
+}
+
+.cs-device-laptop { width: min(100%, 420px); }
+
+.cs-device-bezel {
+  border-radius: 2rem;
+  padding: 0.7rem;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cs-device-laptop .cs-device-bezel {
+  border-radius: 1rem 1rem 0.4rem 0.4rem;
+  padding: 0.85rem 0.85rem 0.55rem;
+}
+
+.cs-device-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  background: #0d0d0d;
+  aspect-ratio: 9 / 19.5;
+}
+
+.cs-device-laptop .cs-device-screen {
+  border-radius: 0.45rem;
+  aspect-ratio: 16 / 10;
+}
+
+.cs-device-hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.cs-device-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+
+.cs-device-preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cs-device-base {
+  height: 0.85rem;
+  margin: 0 auto;
+  width: 108%;
+  margin-left: -4%;
+  border-radius: 0 0 0.75rem 0.75rem;
+  background: linear-gradient(180deg, #2a2a2a, #151515);
+}
+
+.cs-device-camera {
+  display: block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin: 0 auto 0.45rem;
+  border-radius: 50%;
+  background: #444;
+}
+
+/* Gallery */
+.cs-gallery {
+  position: relative;
+  padding: 4rem 0 3rem;
+  background: #141214;
+  color: #fcf4f0;
+  overflow: hidden;
+}
+
+.cs-gallery-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  padding: 0 clamp(1.25rem, 4vw, 3rem) 1rem;
+}
+
+.cs-gallery-count {
+  margin: 0;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  color: #ffd5fb;
+}
+
+.cs-gallery-progress {
+  height: 2px;
+  margin: 0 clamp(1.25rem, 4vw, 3rem) 1.5rem;
+  background: rgba(252, 244, 240, 0.15);
+  overflow: hidden;
+}
+
+.cs-gallery-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: 0 50%;
+  background: #ffd5fb;
+}
+
+.cs-gallery-track {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  width: max-content;
+  will-change: transform;
+}
+
+.cs-gallery-item {
+  margin: 0;
+  width: min(72vw, 320px);
+}
+
+.cs-gallery-item figcaption {
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.cs-gallery.is-snap .cs-gallery-track {
+  width: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+
+.cs-gallery.is-snap .cs-gallery-item {
+  scroll-snap-align: center;
+  flex: 0 0 min(78vw, 300px);
+}
+
+/* Story */
+.cs-story {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 2rem;
+  padding: clamp(4rem, 9vh, 6.5rem) clamp(1.25rem, 4vw, 3rem);
+}
+
+.cs-story-index {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+}
+
+.cs-story-index ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cs-story-index button {
+  display: flex;
+  gap: 0.65rem;
+  align-items: baseline;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: rgba(20, 18, 20, 0.4);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cs-story-index button span {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1rem;
+}
+
+.cs-story-index button.is-active {
+  color: var(--accent, #6d0101);
+}
+
+.cs-chapter + .cs-chapter {
+  margin-top: 4.5rem;
+}
+
+.cs-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.cs-card {
+  padding: 1.4rem 1.3rem;
+  border-radius: 1.1rem;
+  background: #fff;
+  border: 1px solid rgba(20, 18, 20, 0.08);
+}
+
+.cs-card-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent, #6d0101);
+}
+
+.cs-card h3 {
+  margin: 0 0 0.75rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: 0.02em;
+}
+
+.cs-card p {
+  margin: 0;
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
+.cs-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-pills li {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(109, 1, 1, 0.08);
+  color: var(--accent, #6d0101);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.cs-flip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.cs-flip {
+  position: relative;
+  min-height: 220px;
+  border: 0;
+  padding: 0;
+  background: none;
+  perspective: 1000px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cs-flip-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.55s ease;
+}
+
+.cs-flip.is-flipped .cs-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.cs-flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 1.1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cs-flip-front {
+  background: #fff;
+  border: 1px solid rgba(20, 18, 20, 0.08);
+}
+
+.cs-flip-back {
+  background: var(--accent, #6d0101);
+  color: var(--on-accent, #fcf4f0);
+  transform: rotateY(180deg);
+}
+
+.cs-flip-number {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 2rem;
+  color: var(--accent, #6d0101);
+}
+
+.cs-flip-title {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.cs-flip-hint {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.45;
+}
+
+.cs-flip-back-text {
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.cs-persona-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.cs-persona {
+  background: #fcf4f0;
+  border-radius: 1.15rem;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(20, 18, 20, 0.12);
+  transition: transform 0.35s ease;
+}
+
+.cs-persona:hover {
+  transform: rotate(-1.5deg) translateY(-4px);
+}
+
+.cs-persona-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #6d0101;
+  color: #ffd5fb;
+}
+
+.cs-persona-tag {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cs-persona-barcode {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.cs-persona-body { padding: 1.15rem 1.1rem 1.35rem; }
+
+.cs-persona-name {
+  margin: 0;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 1.8rem;
+}
+
+.cs-persona-role {
+  margin: 0.2rem 0 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.cs-persona-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.cs-persona-grid dt {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6d0101;
+}
+
+.cs-persona-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cs-persona-quote {
+  margin: 1rem 0 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .cs-story { grid-template-columns: 1fr; }
+  .cs-story-index { position: static; }
+  .cs-two, .cs-flip-grid { grid-template-columns: 1fr; }
+}
+
+/* Quote */
+.cs-quote {
+  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3rem);
+  background: var(--accent, #6d0101);
+  color: var(--on-accent, #fcf4f0);
+}
+
+.cs-quote blockquote {
+  margin: 0 auto;
+  max-width: 18ch;
+  text-align: center;
+}
+
+.cs-quote p {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(2rem, 5.5vw, 4rem);
+  line-height: 1.15;
+}
+
+.cs-quote cite {
+  display: block;
+  margin-top: 1.5rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-style: normal;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+/* Before / after */
+.cs-ba-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  aspect-ratio: 16 / 10;
+  background: #111;
+  touch-action: none;
+  user-select: none;
+}
+
+.cs-ba-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cs-ba-after {
+  position: absolute;
+  inset: 0;
+}
+
+.cs-ba-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ffd5fb;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.cs-ba-handle span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #ffd5fb;
+  background: rgba(20, 18, 20, 0.55);
+  transform: translate(-50%, -50%);
+}
+
+.cs-ba-range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.cs-ba-caption {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+/* Process morph */
+.cs-process {
+  min-height: 100vh;
+  background: #fff;
+  padding: 5rem clamp(1.25rem, 4vw, 3rem);
+}
+
+.cs-process-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.cs-process-step {
+  margin: 0 0 0.5rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  color: var(--accent, #6d0101);
+  letter-spacing: 0.08em;
+}
+
+.cs-process-title {
+  margin: 0 0 0.85rem;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  line-height: 0.95;
+}
+
+.cs-process-desc {
+  margin: 0;
+  max-width: 42ch;
+  line-height: 1.65;
+}
+
+.cs-process-dots {
+  display: flex;
+  gap: 0.45rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-process-dots li {
+  width: 2rem;
+  height: 3px;
+  background: rgba(20, 18, 20, 0.15);
+}
+
+.cs-process-dots li.is-active {
+  background: var(--accent, #6d0101);
+}
+
+.cs-process-frame {
+  position: relative;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+}
+
+.cs-process-layer {
+  position: absolute;
+  inset: auto;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+.cs-process-layer.is-active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+  .cs-process-inner { grid-template-columns: 1fr; }
+  .cs-process-layer { position: relative; opacity: 1; transform: none; }
+  .cs-process-layer + .cs-process-layer { display: none; }
+}
+
+/* Walkthrough */
+.cs-walk-frame {
+  margin-top: 1.5rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #111;
+  aspect-ratio: 16 / 9;
+}
+
+.cs-walk-frame iframe,
+.cs-walk-frame video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Outcomes */
+.cs-outcomes {
+  padding: clamp(4rem, 10vh, 7rem) clamp(1.25rem, 4vw, 3rem);
+  background: var(--accent, #6d0101);
+  color: var(--on-accent, #fcf4f0);
+}
+
+.cs-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cs-outcome-card {
+  min-width: 0;
+  padding: 1.4rem 1.1rem;
+  border-radius: 1.1rem;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 213, 251, 0.18);
+  overflow: hidden;
+}
+
+.cs-outcome-card .cs-metric-value.is-text {
+  color: inherit;
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .cs-outcome-grid { grid-template-columns: 1fr; }
+}
+
+/* Reflection */
+.cs-reflection {
+  padding: clamp(4rem, 10vh, 7rem) clamp(1.25rem, 4vw, 3rem);
+  background: #fcf4f0;
+}
+
+.cs-reflection h2 {
+  margin: 0 0 1rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.cs-reflection p {
+  margin: 0;
+  max-width: 62ch;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+/* Next */
+.cs-next {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 48vh;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fcf4f0;
+  background: #141214;
+}
+
+.cs-next-preview {
+  position: absolute;
+  inset: -8%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  filter: saturate(0.9);
+}
+
+.cs-next:hover .cs-next-preview {
+  opacity: 0.45;
+}
+
+.cs-next-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+}
+
+.cs-next-label {
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #ffd5fb;
+}
+
+.cs-next-title {
+  margin: 0;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  line-height: 0.9;
+}
+
+.cs-next-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Slip FLIP overlay */
+.cs-slip-flip {
+  position: fixed;
+  z-index: 12000;
+  display: none;
+  place-items: center;
+  color: #fcf4f0;
+  pointer-events: none;
+}
+
+.cs-flip-label {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  letter-spacing: 0.03em;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+/* Focus */
+.cs-page a:focus-visible,
+.cs-page button:focus-visible,
+.cs-page input:focus-visible {
+  outline: 2px solid #ffd5fb;
+  outline-offset: 3px;
+}

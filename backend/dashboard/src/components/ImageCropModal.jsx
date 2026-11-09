@@ -76,6 +76,7 @@ export default function ImageCropModal({
   outputWidth = 2400,
   lockAspect = false,
   metadataOnly = false,
+  initialCroppedAreaPercentages,
   onCancel,
   onConfirm,
   onConfirmMetadata,
@@ -83,12 +84,16 @@ export default function ImageCropModal({
   const initialPreset = findAspectPreset(initialAspect);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [aspectId, setAspectId] = useState(() => initialPreset?.id || 'card');
+  const [aspectId, setAspectId] = useState(() => (
+    lockAspect ? (initialPreset?.id || 'screen') : (initialPreset?.id || 'card')
+  ));
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const aspect = ASPECT_PRESETS.find((preset) => preset.id === aspectId)?.value ?? null;
+  const aspect = lockAspect
+    ? (initialAspect || ASPECT_PRESETS.find((preset) => preset.id === 'screen')?.value)
+    : (ASPECT_PRESETS.find((preset) => preset.id === aspectId)?.value ?? null);
 
   const onCropComplete = useCallback((_area, pixels) => {
     setCroppedAreaPixels(pixels);
@@ -152,7 +157,11 @@ export default function ImageCropModal({
             ))}
           </div>
         ) : (
-          <p className="crop-locked-aspect muted">Crop frame matches the project card on your site.</p>
+          <p className="crop-locked-aspect muted">
+            {metadataOnly
+              ? 'Frame matches how the image shows on the site before visitors tap to open the full picture.'
+              : 'Crop frame matches the project card on your site.'}
+          </p>
         )}
 
         <div className="crop-stage">
@@ -164,6 +173,7 @@ export default function ImageCropModal({
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
+            initialCroppedAreaPercentages={initialCroppedAreaPercentages}
             showGrid
           />
         </div>

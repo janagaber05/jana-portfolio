@@ -250,10 +250,12 @@ html.fx-scroll-lock body {
   transform-origin: top center;
 }
 
-/* Velocity tapes */
+/* Velocity tapes — two parallel tilted ribbons, never stacked on each other */
 .fx-tapes {
   position: relative;
-  height: clamp(8rem, 14vw, 11rem);
+  z-index: 1;
+  isolation: isolate;
+  height: clamp(11rem, 18vw, 14rem);
   overflow: hidden;
   width: 100%;
 }
@@ -264,6 +266,7 @@ html.fx-scroll-lock body {
   display: grid;
   grid-template-rows: 1fr 1fr;
   pointer-events: none;
+  z-index: 0;
 }
 
 .fx-tapes-split span:first-child {
@@ -276,30 +279,33 @@ html.fx-scroll-lock body {
 
 .fx-tape {
   position: absolute;
-  left: -8%;
-  width: 116%;
-  top: 50%;
+  left: -12%;
+  width: 124%;
   display: flex;
+  align-items: center;
   white-space: nowrap;
   font-family: 'Bebas Neue', Impact, sans-serif;
-  font-size: clamp(1.6rem, 3.6vw, 3rem);
-  letter-spacing: 0.04em;
+  font-size: clamp(1.35rem, 2.5vw, 2.15rem);
+  letter-spacing: 0.06em;
   line-height: 1;
-  padding: 0.85rem 0;
-  will-change: transform;
+  padding: 0.62rem 0;
   pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
 }
 
 .fx-tape-a {
+  top: 26%;
   background: #6d0101;
   color: #ffd5fb;
-  transform: translateY(-58%) rotate(-3.2deg);
+  transform: translateY(-50%) rotate(-2deg);
 }
 
 .fx-tape-b {
+  top: 74%;
   background: #ffd5fb;
   color: #6d0101;
-  transform: translateY(-42%) rotate(2.4deg);
+  transform: translateY(-50%) rotate(-2deg);
 }
 
 .fx-tapes.is-dark .fx-tape-a {
@@ -316,12 +322,19 @@ html.fx-scroll-lock body {
 .fx-tape-chunk {
   display: inline-flex;
   align-items: center;
-  gap: 0.85rem;
-  padding-right: 0.85rem;
+  gap: 1.1rem;
+  padding-right: 1.1rem;
+}
+
+.fx-tape-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.1rem;
 }
 
 .fx-tape-spin {
   display: inline-block;
+  font-size: 0.72em;
   animation: fx-tape-spin 4s linear infinite;
 }
 

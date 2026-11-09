@@ -12,12 +12,17 @@ import styles from './PortfolioSections.module.css';
 export default function PortfolioSections() {
   const { content } = useSiteContent();
   const featuredWork = content?.featuredWork || defaultContent.featuredWork;
+  const contact = content?.contact || defaultContent.contact;
   const homeLimit = featuredWork?.homeLimit ?? HOME_WORK_LIMIT;
   const homeProjects = getHomeProjects(
     featuredWork?.projects,
     featuredWork?.homeProjectSlugs,
     homeLimit,
   );
+  const contactStripTop = contact?.stripTop
+    || "LET'S TALK · OPEN FOR WORK · SAY HI · CAIRO → ANYWHERE";
+  const contactStripBottom = contact?.stripBottom
+    || 'UX · UI · BRAND · FRONT-END · MOTION';
   useScrollAnimations(Boolean(homeProjects.length));
 
   if (!homeProjects.length) return null;
@@ -34,8 +39,8 @@ export default function PortfolioSections() {
       <ProcessSection />
 
       <VelocityTapes
-        text="LET'S TALK · OPEN FOR WORK · SAY HI · CAIRO → ANYWHERE"
-        altText="UX · UI · BRAND · FRONT-END · MOTION"
+        text={contactStripTop}
+        altText={contactStripBottom}
         from="#FCF4F0"
         to="#6D0101"
         dark
