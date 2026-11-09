@@ -14,6 +14,9 @@ import {
   saveHomeScrollPosition,
   shouldSkipHomeIntro,
 } from '../utils/visitState';
+import InkTrail from './fx/InkTrail';
+import { hasRevealed, REVEAL_EVENT } from './fx/Preloader';
+import { splitRoleChars, useKineticRoles } from './fx/KineticRoles';
 import LanyardBadge from './ui/lanyard-badge';
 import { IdCardBack, IdCardFront } from './ui/IdCardFaces';
 import styles from './HeroSection.module.css';
@@ -81,12 +84,21 @@ export default function HeroSection() {
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)) });
     lenisRef.current = lenis;
+    window.__janaLenis = lenis;
 
+    if (!hasRevealed()) {
+      lenis.stop();
+      const onReveal = () => lenis.start();
+      window.addEventListener(REVEAL_EVENT, onReveal, { once: true });
+      lenisRef.current._fxRevealHandler = onReveal;
+    }
+
+    let rafId = 0;
     function raf(time) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     lenis.on('scroll', () => {
       saveHomeScrollPosition(window.scrollY);
@@ -105,6 +117,13 @@ export default function HeroSection() {
     }
 
     return () => {
+      if (lenisRef.current?._fxRevealHandler) {
+        window.removeEventListener(REVEAL_EVENT, lenisRef.current._fxRevealHandler);
+      }
+      window.cancelAnimationFrame(rafId);
+      if (window.__janaLenis === lenis) {
+        window.__janaLenis = undefined;
+      }
       lenis.destroy();
       lenisRef.current = null;
     };
@@ -151,8 +170,11 @@ export default function HeroSection() {
       if (!nav) return;
       nav.classList.toggle(styles.navOnDark, active);
     };
+    const setNavLight = (active) => {
+      document.documentElement.classList.toggle('fx-nav-light', active);
+    };
 
-    const triggers = ['#contact'].map((selector) => {
+    const darkTriggers = ['#contact'].map((selector) => {
       const section = document.querySelector(selector);
       if (!section) return null;
       return ScrollTrigger.create({
@@ -166,17 +188,45 @@ export default function HeroSection() {
       });
     }).filter(Boolean);
 
+    const lightTriggers = ['#work', '#process'].map((selector) => {
+      const section = document.querySelector(selector);
+      if (!section) return null;
+      return ScrollTrigger.create({
+        trigger: section,
+        start: 'top 72px',
+        end: 'bottom 72px',
+        onEnter: () => setNavLight(true),
+        onLeave: () => setNavLight(false),
+        onEnterBack: () => setNavLight(true),
+        onLeaveBack: () => setNavLight(false),
+      });
+    }).filter(Boolean);
+
     ScrollTrigger.refresh();
 
     return () => {
       motionInitRef.current = false;
-      triggers.forEach((t) => t.kill());
+      darkTriggers.forEach((t) => t.kill());
+      lightTriggers.forEach((t) => t.kill());
+      document.documentElement.classList.remove('fx-nav-light');
       ctx.revert();
     };
   }, [hero]);
 
+  const rolesKey = roles.join('|');
+  useKineticRoles(rolesRef, rolesKey);
+
   const navLinks = filterNavLinks(hero.navLinks);
   const [roleTL, roleTR, roleBL, roleBR] = roles;
+
+  const renderRole = (text) => (
+    splitRoleChars(text).map((char, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <span key={`${char}-${index}`} className="fx-role-char" data-final={char}>
+        {char}
+      </span>
+    ))
+  );
 
   return (
     <>
@@ -268,11 +318,20 @@ export default function HeroSection() {
       </header>
 
       <section className={styles.hero} id="home" ref={heroRef} aria-label="Introduction">
+        <InkTrail />
         <div className={styles.roles} ref={rolesRef} aria-hidden="true">
-          <span className={`${styles.role} ${styles.roleTL}`} data-role>{roleTL}</span>
-          <span className={`${styles.role} ${styles.roleTR}`} data-role>{roleTR}</span>
-          <span className={`${styles.role} ${styles.roleBL}`} data-role>{roleBL}</span>
-          <span className={`${styles.role} ${styles.roleBR}`} data-role>{roleBR}</span>
+          <span className={`${styles.role} ${styles.roleTL} fx-role-hover`} data-role data-role-pos="top">
+            {renderRole(roleTL)}
+          </span>
+          <span className={`${styles.role} ${styles.roleTR} fx-role-hover`} data-role data-role-pos="top">
+            {renderRole(roleTR)}
+          </span>
+          <span className={`${styles.role} ${styles.roleBL} fx-role-hover`} data-role data-role-pos="bottom">
+            {renderRole(roleBL)}
+          </span>
+          <span className={`${styles.role} ${styles.roleBR} fx-role-hover`} data-role data-role-pos="bottom">
+            {renderRole(roleBR)}
+          </span>
         </div>
 
         <div className={styles.lanyardStage}>

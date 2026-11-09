@@ -4,6 +4,7 @@ import { useSiteContent } from '../context/SiteContentContext';
 import useScrollAnimations from '../hooks/useScrollAnimations';
 import AboutSection from './AboutSection';
 import ContactSection from './ContactSection';
+import VelocityTapes from './fx/VelocityTapes';
 import ProcessSection from './ProcessSection';
 import WorkSpraySection from './WorkSpraySection';
 import styles from './PortfolioSections.module.css';
@@ -31,6 +32,14 @@ export default function PortfolioSections() {
       <AboutSection />
 
       <ProcessSection />
+
+      <VelocityTapes
+        text="LET'S TALK · OPEN FOR WORK · SAY HI · CAIRO → ANYWHERE"
+        altText="UX · UI · BRAND · FRONT-END · MOTION"
+        from="#FCF4F0"
+        to="#6D0101"
+        dark
+      />
 
       <ContactSection />
     </main>

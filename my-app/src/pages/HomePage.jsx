@@ -4,7 +4,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroSection from '../components/HeroSection';
 import PortfolioSections from '../components/PortfolioSections';
+import Preloader from '../components/fx/Preloader';
+import VelocityTapes from '../components/fx/VelocityTapes';
 import { useSiteContent } from '../context/SiteContentContext';
+import defaultContent from '../data/defaultContent.json';
 import {
   HOME_SECTIONS,
   peekHomeSection,
@@ -28,8 +31,11 @@ function getRestoreTarget(locationHash) {
 
 export default function HomePage() {
   const location = useLocation();
-  const { loading } = useSiteContent();
+  const { loading, content } = useSiteContent();
   const restoredRef = useRef(false);
+  const stripText = content?.hero?.stripLineTwo
+    || defaultContent.hero?.stripLineTwo
+    || 'DESIGN · RESEARCH · WIREFRAME · PROTOTYPE · DELIVER · ITERATE';
 
   useLayoutEffect(() => {
     const hasHash = window.location.hash;
@@ -202,7 +208,9 @@ export default function HomePage() {
 
   return (
     <>
+      <Preloader />
       <HeroSection />
+      <VelocityTapes text={stripText} from="#141214" to="#F2F1EE" />
       <PortfolioSections />
     </>
   );

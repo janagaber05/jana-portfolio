@@ -359,6 +359,46 @@ function LanyardBadge({
       const r = root.getBoundingClientRect();
       return [e.clientX - r.left, e.clientY - r.top];
     };
+    /**
+     * Soft bounds only — allow big side swings for play, but keep enough of
+     * the card on-screen so overflow never swallows it entirely.
+     */
+    const cardBounds = () => {
+      const visible = cw * 0.28; // keep ~28% of the card in view at extremes
+      const padY = 8;
+      return {
+        minX: visible,
+        maxX: Math.max(visible, W - visible),
+        minY: ringR + padY,
+        maxY: Math.max(ringR + padY, H - ch * 0.25),
+        maxSwing: Math.min(W * 0.48, cw * 2.2),
+      };
+    };
+    const clampPoint = (p, minX, maxX, minY, maxY) => {
+      const nx = Math.min(maxX, Math.max(minX, p.x));
+      const ny = Math.min(maxY, Math.max(minY, p.y));
+      if (nx !== p.x) {
+        p.x = nx;
+        p.px = nx;
+      }
+      if (ny !== p.y) {
+        p.y = ny;
+        p.py = ny;
+      }
+    };
+    const keepCardInView = () => {
+      const { minX, maxX, minY, maxY, maxSwing } = cardBounds();
+      const sidePad = Math.max(24, cw * 0.2);
+      const T = pts[iT];
+      const C = pts[iC];
+      clampPoint(T, minX, maxX, minY, maxY);
+      const cx = Math.min(T.x + maxSwing, Math.max(T.x - maxSwing, C.x));
+      if (cx !== C.x) {
+        C.x = cx;
+        C.px = cx;
+      }
+      clampPoint(C, sidePad, W - sidePad, T.y + arm * 0.25, H + ch * 0.2);
+    };
     const flip = () => {
       spinTarget = spinTarget === 0 ? Math.PI : 0;
       setShowBack(spinTarget !== 0);
@@ -376,8 +416,9 @@ function LanyardBadge({
     const onMove = (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       const [x, y] = local(e);
-      drag.tx = x + drag.ox;
-      drag.ty = y + drag.oy;
+      const { minX, maxX, minY, maxY } = cardBounds();
+      drag.tx = Math.min(maxX, Math.max(minX, x + drag.ox));
+      drag.ty = Math.min(maxY, Math.max(minY, y + drag.oy));
       if (Math.hypot(x - drag.sx, y - drag.sy) > 5) drag.moved = true;
     };
     const onUp = (e) => {
@@ -416,6 +457,7 @@ function LanyardBadge({
         }
         integrate(pts, STEP, GRAVITY, 0.992);
         solve(pts, links, ITER);
+        keepCardInView();
         const vx = (C.x - C.px) / STEP;
         spinStep(spin, spinTarget, STEP, vx * 0.03 + (reduced ? 0 : 0.6 * Math.sin(t * 0.5)));
       }
@@ -508,7 +550,7 @@ function LanyardBadge({
     "section",
     {
       ref: rootRef,
-      className: "relative w-full overflow-hidden select-none " + className,
+      className: "relative w-full overflow-visible select-none " + className,
       style: { height },
       children: [
         /* @__PURE__ */ jsx(

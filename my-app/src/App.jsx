@@ -1,5 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AnalyticsTracker from './components/AnalyticsTracker';
+import MotionFX from './components/fx/MotionFX';
+import './components/fx/fx.css';
 import RouteChangeHandler from './components/RouteChangeHandler';
 import SeoHead from './components/SeoHead';
 import { useSiteContent } from './context/SiteContentContext';
@@ -49,6 +51,7 @@ export default function App() {
       <BrowserRouter>
         <SiteContentProvider>
           <PreviewBanner />
+          <MotionFX />
           <AnalyticsTracker />
           <SeoHead />
           <RouteChangeHandler>

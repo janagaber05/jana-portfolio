@@ -381,14 +381,20 @@
 .lanyardStage {
   position: relative;
   z-index: 2;
-  width: min(100%, 26rem);
+  /* Full hero width so the badge can swing to the sides without clipping. */
+  width: 100%;
+  max-width: none;
   height: min(78vh, 42rem);
   margin: 0 auto;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .lanyard {
   width: 100%;
   height: 100%;
+  overflow: visible;
+  pointer-events: auto;
 }
 
 .lanyardPlaceholder {

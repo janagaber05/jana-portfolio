@@ -259,6 +259,9 @@ function LandedSlip({ slip, settle, onProjectClick }) {
     <motion.button
       type="button"
       className={styles.slip}
+      data-cursor="view"
+      data-cursor-label="view"
+      data-no-magnet
       style={{ background: slip.color, color: textColor }}
       initial={false}
       animate={{

@@ -1,0 +1,384 @@
+/* Motion FX — all classes prefixed with fx- to avoid CSS Module collisions */
+
+html.fx-cursor-on,
+html.fx-cursor-on * {
+  cursor: none !important;
+}
+
+html.fx-scroll-lock,
+html.fx-scroll-lock body {
+  overflow: hidden !important;
+}
+
+.fx-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  width: 100%;
+  height: 3px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, #6d0101 0%, #e0306b 55%, #ffd5fb 100%);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.fx-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fx-grain {
+    animation: fx-grain-jitter 0.35s steps(2) infinite;
+  }
+}
+
+@keyframes fx-grain-jitter {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1.5%, 1%); }
+  50% { transform: translate(1%, -1.5%); }
+  75% { transform: translate(-1%, 0.5%); }
+  100% { transform: translate(0.5%, -1%); }
+}
+
+.fx-cursor-dot,
+.fx-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10050;
+  pointer-events: none;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.fx-cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: #ffd5fb;
+}
+
+.fx-cursor-ring {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 1.5px solid #fcf4f0;
+  display: grid;
+  place-items: center;
+  color: #6d0101;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.fx-cursor-ring.is-hover {
+  background: rgba(252, 244, 240, 0.92);
+  border-color: transparent;
+}
+
+.fx-cursor-ring.is-view {
+  background: #ffd5fb;
+  border-color: transparent;
+  color: #6d0101;
+}
+
+.fx-cursor-ring.is-down {
+  background: rgba(255, 213, 251, 0.35);
+}
+
+.fx-cursor-hidden {
+  opacity: 0 !important;
+}
+
+.fx-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.75rem;
+  z-index: 10060;
+  transform: translateX(-50%);
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  background: #ffd5fb;
+  color: #6d0101;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 12px 32px rgba(20, 18, 20, 0.28);
+  pointer-events: none;
+}
+
+.fx-confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10055;
+  pointer-events: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #ffd5fb;
+  will-change: transform, opacity;
+}
+
+/* Preloader */
+.fx-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  background: #141214;
+  color: #fcf4f0;
+  overflow: hidden;
+}
+
+.fx-preloader-half {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #141214;
+  z-index: 2;
+}
+
+.fx-preloader-half-top {
+  top: 0;
+}
+
+.fx-preloader-half-bottom {
+  bottom: 0;
+}
+
+.fx-preloader-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #6d0101;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+.fx-preloader-word {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  gap: 0.02em;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(4rem, 28vw, 18rem);
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.fx-preloader-letter {
+  position: relative;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 213, 251, 0.35);
+  text-stroke: 1.5px rgba(255, 213, 251, 0.35);
+}
+
+.fx-preloader-letter::after {
+  content: attr(data-char);
+  position: absolute;
+  inset: 0;
+  color: #ffd5fb;
+  -webkit-text-stroke: 0;
+  text-stroke: 0;
+  clip-path: inset(var(--fill, 100%) 0 0 0);
+  will-change: clip-path;
+}
+
+.fx-preloader-meta {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(252, 244, 240, 0.7);
+}
+
+.fx-preloader-count {
+  font-variant-numeric: tabular-nums;
+  color: #ffd5fb;
+}
+
+/* Hero ink trail */
+.fx-ink {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Kinetic role letters */
+.fx-role-hover {
+  pointer-events: auto;
+  cursor: default;
+}
+
+.fx-role-char {
+  display: inline-block;
+  will-change: transform, color, text-shadow;
+  transform-origin: bottom center;
+}
+
+.fx-role-hover[data-role-pos='bottom'] .fx-role-char {
+  transform-origin: top center;
+}
+
+/* Velocity tapes */
+.fx-tapes {
+  position: relative;
+  height: clamp(8rem, 14vw, 11rem);
+  overflow: hidden;
+  width: 100%;
+}
+
+.fx-tapes-split {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  pointer-events: none;
+}
+
+.fx-tapes-split span:first-child {
+  background: var(--fx-tape-from, #141214);
+}
+
+.fx-tapes-split span:last-child {
+  background: var(--fx-tape-to, #f2f1ee);
+}
+
+.fx-tape {
+  position: absolute;
+  left: -8%;
+  width: 116%;
+  top: 50%;
+  display: flex;
+  white-space: nowrap;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(1.6rem, 3.6vw, 3rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 0.85rem 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.fx-tape-a {
+  background: #6d0101;
+  color: #ffd5fb;
+  transform: translateY(-58%) rotate(-3.2deg);
+}
+
+.fx-tape-b {
+  background: #ffd5fb;
+  color: #6d0101;
+  transform: translateY(-42%) rotate(2.4deg);
+}
+
+.fx-tapes.is-dark .fx-tape-a {
+  background: #141214;
+  color: #ffd5fb;
+}
+
+.fx-tape-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.fx-tape-chunk {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-right: 0.85rem;
+}
+
+.fx-tape-spin {
+  display: inline-block;
+  animation: fx-tape-spin 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-tape-spin {
+    animation: none;
+  }
+}
+
+@keyframes fx-tape-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Nav readable over light sections (#work, #process) — attribute selectors survive CSS Modules */
+html.fx-nav-light header nav > a img,
+html.fx-nav-light header nav a[aria-label='Home'] img {
+  filter: none !important;
+  transition: filter 0.35s ease;
+}
+
+html.fx-nav-light header nav a:not([href^='mailto']) {
+  color: #141214 !important;
+  transition: color 0.35s ease;
+}
+
+html.fx-nav-light header nav a[href^='mailto'] {
+  background: #6d0101 !important;
+  color: #ffd5fb !important;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+html.fx-nav-light header nav button span {
+  background: #141214 !important;
+  transition: background 0.35s ease;
+}
+
+/* Contact spotlight */
+#contact {
+  position: relative;
+  --mx: 50%;
+  --my: 40%;
+}
+
+#contact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    560px circle at var(--mx) var(--my),
+    rgba(255, 213, 251, 0.16),
+    transparent 55%
+  );
+}
+
+#contact > * {
+  position: relative;
+  z-index: 1;
+}
