@@ -166,6 +166,7 @@ function buildCaseStudy(project) {
       bottom: '',
     },
     coverImage: '',
+    coverDisplayCrop: null,
     sectionVisibility: mergeSectionVisibility(),
   };
 }
@@ -175,7 +176,8 @@ export function getCaseStudy(project, caseStudies = {}) {
   const base = caseStudies[project.slug] || buildCaseStudy(project);
   const withWalkthrough = {
     ...base,
-    coverImage: base.coverImage || '',
+    coverImage: base.coverImage || base.heroImage || '',
+    coverDisplayCrop: base.coverDisplayCrop || null,
     beforeAfter: {
       before: '',
       after: '',

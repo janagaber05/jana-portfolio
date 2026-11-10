@@ -37,6 +37,21 @@ export function getCoverImage(caseStudy, project) {
   );
 }
 
+/** Crop for the hero phone frame — explicit cover crop, else first final screen crop. */
+export function getCoverDisplayCrop(caseStudy) {
+  const coverCrop = caseStudy?.coverDisplayCrop;
+  if (coverCrop?.width > 0 && coverCrop?.height > 0) return coverCrop;
+
+  if (caseStudy?.coverImage || caseStudy?.heroImage) return null;
+
+  const first = (caseStudy?.finalDesign?.screens || []).find(
+    (s) => s?.fullImageUrl || s?.imageUrl,
+  );
+  const crop = first?.displayCrop;
+  if (crop?.width > 0 && crop?.height > 0) return crop;
+  return null;
+}
+
 export function parseMetricValue(raw) {
   const text = String(raw || '').trim();
   const match = text.match(/^([^0-9+-]*)([+-]?\d+(?:\.\d+)?)(.*)$/);

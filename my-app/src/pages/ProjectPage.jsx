@@ -15,6 +15,7 @@ import {
 } from '../utils/caseStudyImage';
 import { resolveWalkthroughVideo } from '../utils/walkthroughVideo';
 import {
+  getCoverDisplayCrop,
   getCoverImage,
   getProjectTheme,
   truncateText,
@@ -108,6 +109,7 @@ export default function ProjectPage() {
   const scrollKey = `jana:projectScroll:${slug}`;
   const theme = getProjectTheme(project?.accent);
   const cover = getCoverImage(caseStudy, project);
+  const coverCrop = getCoverDisplayCrop(caseStudy);
 
   const showOverview = shouldRenderCaseStudySection(caseStudy, 'overview');
   const showRole = shouldRenderCaseStudySection(caseStudy, 'myRole');
@@ -254,13 +256,16 @@ export default function ProjectPage() {
   const lightboxItems = useMemo(() => {
     if (!caseStudy) return [];
     const items = [];
+    const coverSrc = getCoverImage(caseStudy, project);
+    const coverItem = toLightboxItem(`${project?.title || 'Project'} cover`, coverSrc);
+    if (coverItem) items.push(coverItem);
     (caseStudy.finalDesign?.screens || []).forEach((screen, index) => {
       const item = toLightboxItem(
         screen.label || `Screen ${index + 1}`,
         getScreenLightboxSrc(screen),
         screen.alt,
       );
-      if (item) items.push(item);
+      if (item && item.src !== coverSrc) items.push(item);
     });
     (caseStudy.designProcess?.stages || []).forEach((stage, index) => {
       const item = toLightboxItem(
@@ -271,7 +276,7 @@ export default function ProjectPage() {
       if (item) items.push(item);
     });
     return items;
-  }, [caseStudy]);
+  }, [caseStudy, project]);
 
   const openScreenLightbox = (screen) => {
     const src = getScreenLightboxSrc(screen);
@@ -364,12 +369,13 @@ export default function ProjectPage() {
               <DeviceFrame
                 src={cover}
                 alt={`${project.title} cover`}
+                crop={coverCrop}
                 priority
                 tilt
                 bob
                 onClick={() => {
-                  const first = caseStudy.finalDesign?.screens?.find((s) => getScreenImageSrc(s));
-                  if (first) openScreenLightbox(first);
+                  const index = lightboxItems.findIndex((item) => item.src === cover);
+                  if (index >= 0) setLightboxIndex(index);
                 }}
               />
             ) : null}

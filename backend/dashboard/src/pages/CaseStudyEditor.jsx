@@ -4,6 +4,7 @@ import EditorActions from '../components/EditorActions';
 import {
   Card,
   Field,
+  FramedImageUpload,
   ImageUpload,
   Input,
   ListEditor,
@@ -12,13 +13,6 @@ import {
   VideoUpload,
 } from '../components/Form';
 import { DEFAULT_SECTION_VISIBILITY, mergeSectionVisibility } from '../utils/caseStudyImage';
-
-const DEFAULT_BENTO_SCREENS = [
-  { label: 'Screen 1', imageUrl: '' },
-  { label: 'Screen 2', imageUrl: '' },
-  { label: 'Screen 3', imageUrl: '' },
-  { label: 'Screen 4', imageUrl: '' },
-];
 
 const DEFAULT_WALKTHROUGH = {
   sectionNumber: '04',
@@ -32,14 +26,23 @@ const DEFAULT_WALKTHROUGH = {
 const SCREEN_FIELDS = [
   {
     key: 'label',
-    label: 'Name',
+    label: 'Name (caption on site)',
   },
   {
     key: 'imageUrl',
     label: 'Image',
     type: 'framed-image',
-    hint: 'Upload the full image, then choose the visible part. Visitors scroll sideways and tap to see the full image.',
+    hint: 'Upload the full image, then choose the visible part. Visitors tap to see the full image.',
     aspect: 9 / 19.5,
+  },
+];
+
+const PROCESS_FIELDS = [
+  ...SCREEN_FIELDS,
+  {
+    key: 'description',
+    label: 'Short description (optional)',
+    type: 'textarea',
   },
 ];
 
@@ -71,13 +74,14 @@ function normalizeEditorPersonas(research = {}) {
   return [{ ...EMPTY_PERSONA }];
 }
 
-function SectionCard({ title, visible, onVisibleChange, children }) {
+function SectionCard({ title, visible, onVisibleChange, children, hint }) {
   return (
     <section className="card">
       <div className="card-header-row">
         <h3 className="card-title">{title}</h3>
         <SectionVisibilityToggle checked={visible} onChange={onVisibleChange} />
       </div>
+      {hint ? <p className="muted">{hint}</p> : null}
       {children}
     </section>
   );
@@ -89,16 +93,66 @@ function ensureCaseStudy(content, slug) {
   const blank = {
     heroImage: '',
     abbreviation: project?.title?.split(' ').map((w) => w[0]).join('').slice(0, 3).toUpperCase() || 'PRJ',
-    facts: { role: project?.role || '', timeline: `6 weeks · ${project?.year || ''}`, tools: (project?.tools || []).join(', '), type: project?.tag || '' },
-    overview: { sectionNumber: '01', title: 'The problem and the solution.', highlight: 'problem', problemLabel: 'The problem', problemTitle: 'What was broken', problemText: project?.challenge || '', solutionLabel: 'The solution', solutionTitle: 'What I designed', solutionText: project?.outcome || '' },
-    myRole: { sectionNumber: '02', title: 'What I specifically did.', highlight: 'specifically', intro: '', pills: [] },
-    research: { sectionNumber: '03', title: 'What users actually told me.', highlight: 'actually', insights: [], personas: [{ ...EMPTY_PERSONA }] },
+    facts: {
+      role: project?.role || '',
+      timeline: `6 weeks · ${project?.year || ''}`,
+      tools: (project?.tools || []).join(', '),
+      type: project?.tag || '',
+    },
+    overview: {
+      sectionNumber: '01',
+      title: 'The problem and the solution.',
+      highlight: 'problem',
+      problemLabel: 'The problem',
+      problemTitle: 'What was broken',
+      problemText: project?.challenge || '',
+      solutionLabel: 'The solution',
+      solutionTitle: 'What I designed',
+      solutionText: project?.outcome || '',
+    },
+    myRole: {
+      sectionNumber: '02',
+      title: 'What I specifically did.',
+      highlight: 'specifically',
+      intro: '',
+      pills: [],
+    },
+    research: {
+      sectionNumber: '03',
+      title: 'What users actually told me.',
+      highlight: 'actually',
+      insights: [],
+      personas: [{ ...EMPTY_PERSONA }],
+    },
     quote: { text: '', attribution: '' },
     walkthrough: { ...DEFAULT_WALKTHROUGH },
-    heroScreens: [...DEFAULT_BENTO_SCREENS],
-    designProcess: { sectionNumber: '05', title: 'From sketch to final screen.', highlight: 'sketch', stages: [{ label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' }, { label: 'Mid fidelity', variant: 'mid', imageUrl: '' }, { label: 'High fidelity', variant: 'high', imageUrl: '' }] },
-    finalDesign: { sectionNumber: '06', title: 'The final screens.', highlight: 'final', screens: [{ label: 'Home screen', variant: 'home', imageUrl: '' }, { label: 'Detail screen', variant: 'detail', imageUrl: '' }, { label: 'Checkout screen', variant: 'checkout', imageUrl: '' }] },
-    outcomes: { sectionNumber: '07', title: 'The proof it worked.', highlight: 'proof', metrics: [] },
+    heroScreens: [],
+    designProcess: {
+      sectionNumber: '05',
+      title: 'From sketch to final screen.',
+      highlight: 'sketch',
+      stages: [
+        { label: 'Low fidelity wireframe', variant: 'low', imageUrl: '' },
+        { label: 'Mid fidelity', variant: 'mid', imageUrl: '' },
+        { label: 'High fidelity', variant: 'high', imageUrl: '' },
+      ],
+    },
+    finalDesign: {
+      sectionNumber: '06',
+      title: 'The final screens.',
+      highlight: 'final',
+      screens: [
+        { label: 'Home screen', variant: 'home', imageUrl: '' },
+        { label: 'Detail screen', variant: 'detail', imageUrl: '' },
+        { label: 'Checkout screen', variant: 'checkout', imageUrl: '' },
+      ],
+    },
+    outcomes: {
+      sectionNumber: '07',
+      title: 'The proof it worked.',
+      highlight: 'proof',
+      metrics: [],
+    },
     beforeAfter: { before: '', after: '', caption: '' },
     reflection: { title: "What I'd do differently", text: '' },
     strips: {
@@ -106,6 +160,7 @@ function ensureCaseStudy(content, slug) {
       bottom: 'UX · UI · RESEARCH · PROTOTYPE · MOTION',
     },
     coverImage: '',
+    coverDisplayCrop: null,
     sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
   };
 
@@ -118,10 +173,16 @@ function ensureCaseStudy(content, slug) {
   return {
     ...blank,
     ...existing,
-    coverImage: existing.coverImage || '',
+    coverImage: existing.coverImage || existing.heroImage || '',
+    coverDisplayCrop: existing.coverDisplayCrop || null,
     beforeAfter: { ...blank.beforeAfter, ...(existing.beforeAfter || {}) },
     reflection: { ...blank.reflection, ...(existing.reflection || {}) },
     strips: { ...blank.strips, ...(existing.strips || {}) },
+    overview: { ...blank.overview, ...(existing.overview || {}) },
+    myRole: { ...blank.myRole, ...(existing.myRole || {}) },
+    outcomes: { ...blank.outcomes, ...(existing.outcomes || {}) },
+    designProcess: { ...blank.designProcess, ...(existing.designProcess || {}) },
+    finalDesign: { ...blank.finalDesign, ...(existing.finalDesign || {}) },
     walkthrough: { ...DEFAULT_WALKTHROUGH, ...(existing.walkthrough || {}) },
     research: {
       ...blank.research,
@@ -153,7 +214,12 @@ export default function CaseStudyEditor() {
     const next = structuredClone(cs);
     const keys = path.split('.');
     let ref = next;
-    for (let i = 0; i < keys.length - 1; i += 1) ref = ref[keys[i]];
+    for (let i = 0; i < keys.length - 1; i += 1) {
+      if (ref[keys[i]] == null || typeof ref[keys[i]] !== 'object') {
+        ref[keys[i]] = {};
+      }
+      ref = ref[keys[i]];
+    }
     ref[keys[keys.length - 1]] = val;
     if (path === 'research.personas' && next.research) {
       delete next.research.persona;
@@ -174,42 +240,63 @@ export default function CaseStudyEditor() {
   };
 
   const vis = cs.sectionVisibility;
-  const bentoScreens = cs.heroScreens?.length ? cs.heroScreens : DEFAULT_BENTO_SCREENS;
 
   return (
     <div className="page">
       <header className="page-header">
         <p className="eyebrow"><Link to={`/work/project/${slug}`}>← {project.title}</Link></p>
         <h1>Case study — {project.title}</h1>
-        <p className="muted">Turn sections on or off with &ldquo;Show on site&rdquo;. Upload full images, then choose the visible part — visitors tap to see the full image.</p>
+        <p className="muted">
+          Fields follow the live exhibit order. Use &ldquo;Show on site&rdquo; to hide empty sections.
+          Project title / summary / accent live on the project page.
+        </p>
       </header>
 
-      <SectionCard
-        title="Overview screens"
-        visible={vis.heroScreens}
-        onVisibleChange={(v) => setVisibility('heroScreens', v)}
-      >
-        <p className="muted">Horizontal gallery under the project title. Upload full images, pick the visible part — visitors scroll sideways and tap to see the full file.</p>
-        <ListEditor
-          items={bentoScreens}
-          onChange={(v) => set('heroScreens', v)}
-          newItem={{ label: `Screen ${bentoScreens.length + 1}`, imageUrl: '' }}
-          fields={SCREEN_FIELDS}
+      <Card title="Hero — cover phone + facts">
+        <p className="muted">
+          Cover image sits in the phone frame next to the title. Ticket facts show under the hero.
+        </p>
+        <FramedImageUpload
+          label="Cover image"
+          hint="Upload full image, then set the visible area for the phone frame."
+          imageUrl={cs.coverImage || ''}
+          fullImageUrl={cs.coverImage || ''}
+          displayCrop={cs.coverDisplayCrop}
+          aspect={9 / 19.5}
+          onChange={(data) => {
+            const next = structuredClone(cs);
+            next.coverImage = data.fullImageUrl || data.imageUrl || '';
+            next.heroImage = next.coverImage;
+            next.coverDisplayCrop = data.displayCrop || null;
+            setCs(next);
+          }}
         />
-      </SectionCard>
-
-      <Card title="Hero facts">
-        <Field label="Watermark abbreviation"><Input value={cs.abbreviation} onChange={(v) => set('abbreviation', v)} /></Field>
+        <Field label="Watermark abbreviation">
+          <Input value={cs.abbreviation} onChange={(v) => set('abbreviation', v)} />
+        </Field>
         <Field label="Role"><Input value={cs.facts.role} onChange={(v) => set('facts.role', v)} /></Field>
         <Field label="Timeline"><Input value={cs.facts.timeline} onChange={(v) => set('facts.timeline', v)} /></Field>
         <Field label="Tools"><Input value={cs.facts.tools} onChange={(v) => set('facts.tools', v)} /></Field>
         <Field label="Type"><Input value={cs.facts.type} onChange={(v) => set('facts.type', v)} /></Field>
       </Card>
 
+      <SectionCard
+        title="Final screens gallery"
+        visible={vis.finalDesign !== false}
+        onVisibleChange={(v) => setVisibility('finalDesign', v)}
+        hint="Pinned horizontal gallery near the top of the case study (after results). This is what visitors scroll sideways."
+      >
+        <ListEditor
+          items={cs.finalDesign.screens}
+          onChange={(v) => set('finalDesign.screens', v)}
+          newItem={{ label: 'Final screen', variant: 'home', imageUrl: '' }}
+          fields={SCREEN_FIELDS}
+        />
+      </SectionCard>
+
       <Card title="Marquee strips">
         <p className="muted">
-          Two scrolling ribbons between the screens gallery and the story.
-          Separate words with a middle dot (·), comma, or slash — e.g. FIGMA · RESEARCH · PROTOTYPE.
+          Two scrolling ribbons between the gallery and the story. Separate words with · or commas.
         </p>
         <Field label="Top strip (burgundy)">
           <Input
@@ -228,33 +315,44 @@ export default function CaseStudyEditor() {
       </Card>
 
       <SectionCard
-        title="01 — Overview"
-        visible={vis.overview}
+        title="01 — Overview (problem / solution)"
+        visible={vis.overview !== false}
         onVisibleChange={(v) => setVisibility('overview', v)}
       >
-        <Field label="Title"><Input value={cs.overview.title} onChange={(v) => set('overview.title', v)} /></Field>
+        <Field label="Section title"><Input value={cs.overview.title} onChange={(v) => set('overview.title', v)} /></Field>
         <Field label="Highlight word"><Input value={cs.overview.highlight} onChange={(v) => set('overview.highlight', v)} /></Field>
+        <Field label="Problem card label"><Input value={cs.overview.problemLabel || ''} onChange={(v) => set('overview.problemLabel', v)} /></Field>
+        <Field label="Problem card title"><Input value={cs.overview.problemTitle || ''} onChange={(v) => set('overview.problemTitle', v)} /></Field>
         <Field label="Problem text"><Textarea value={cs.overview.problemText} onChange={(v) => set('overview.problemText', v)} rows={4} /></Field>
+        <Field label="Solution card label"><Input value={cs.overview.solutionLabel || ''} onChange={(v) => set('overview.solutionLabel', v)} /></Field>
+        <Field label="Solution card title"><Input value={cs.overview.solutionTitle || ''} onChange={(v) => set('overview.solutionTitle', v)} /></Field>
         <Field label="Solution text"><Textarea value={cs.overview.solutionText} onChange={(v) => set('overview.solutionText', v)} rows={4} /></Field>
       </SectionCard>
 
       <SectionCard
         title="02 — My role"
-        visible={vis.myRole}
+        visible={vis.myRole !== false}
         onVisibleChange={(v) => setVisibility('myRole', v)}
       >
-        <Field label="Title"><Input value={cs.myRole.title} onChange={(v) => set('myRole.title', v)} /></Field>
+        <Field label="Section title"><Input value={cs.myRole.title} onChange={(v) => set('myRole.title', v)} /></Field>
+        <Field label="Highlight word"><Input value={cs.myRole.highlight || ''} onChange={(v) => set('myRole.highlight', v)} /></Field>
         <Field label="Intro"><Textarea value={cs.myRole.intro} onChange={(v) => set('myRole.intro', v)} rows={4} /></Field>
         <Field label="Pills (comma separated)">
-          <Input value={(cs.myRole.pills || []).join(', ')} onChange={(v) => set('myRole.pills', v.split(',').map((s) => s.trim()).filter(Boolean))} />
+          <Input
+            value={(cs.myRole.pills || []).join(', ')}
+            onChange={(v) => set('myRole.pills', v.split(',').map((s) => s.trim()).filter(Boolean))}
+          />
         </Field>
       </SectionCard>
 
       <SectionCard
-        title="03 — Research insights"
-        visible={vis.research}
+        title="03 — Research"
+        visible={vis.research !== false}
         onVisibleChange={(v) => setVisibility('research', v)}
       >
+        <Field label="Section title"><Input value={cs.research.title || ''} onChange={(v) => set('research.title', v)} /></Field>
+        <Field label="Highlight word"><Input value={cs.research.highlight || ''} onChange={(v) => set('research.highlight', v)} /></Field>
+        <h4 className="sub-title">Insights</h4>
         <ListEditor
           items={cs.research.insights}
           onChange={(v) => set('research.insights', v)}
@@ -266,7 +364,6 @@ export default function CaseStudyEditor() {
           ]}
         />
         <h4 className="sub-title">Personas</h4>
-        <p className="muted">Add as many user personas as you need.</p>
         <ListEditor
           items={cs.research.personas}
           onChange={(v) => set('research.personas', v)}
@@ -278,8 +375,8 @@ export default function CaseStudyEditor() {
       </SectionCard>
 
       <SectionCard
-        title="Quote section"
-        visible={vis.quote}
+        title="Quote"
+        visible={vis.quote !== false}
         onVisibleChange={(v) => setVisibility('quote', v)}
       >
         <Field label="Quote"><Textarea value={cs.quote.text} onChange={(v) => set('quote.text', v)} rows={3} /></Field>
@@ -287,14 +384,51 @@ export default function CaseStudyEditor() {
       </SectionCard>
 
       <SectionCard
-        title="04 — Project walkthrough video"
-        visible={vis.walkthrough}
+        title="Before / After"
+        visible={vis.beforeAfter !== false}
+        onVisibleChange={(v) => setVisibility('beforeAfter', v)}
+        hint="Optional comparison slider. Both images required to show on the site."
+      >
+        <Field label="Before image">
+          <ImageUpload
+            aspect={9 / 16}
+            outputWidth={1400}
+            value={cs.beforeAfter?.before || ''}
+            onChange={(v) => set('beforeAfter.before', v)}
+          />
+        </Field>
+        <Field label="After image">
+          <ImageUpload
+            aspect={9 / 16}
+            outputWidth={1400}
+            value={cs.beforeAfter?.after || ''}
+            onChange={(v) => set('beforeAfter.after', v)}
+          />
+        </Field>
+        <Field label="Caption">
+          <Input value={cs.beforeAfter?.caption || ''} onChange={(v) => set('beforeAfter.caption', v)} />
+        </Field>
+      </SectionCard>
+
+      <SectionCard
+        title="05 — Design process"
+        visible={vis.designProcess !== false}
+        onVisibleChange={(v) => setVisibility('designProcess', v)}
+        hint="Pinned morphing wireframe stages."
+      >
+        <ListEditor
+          items={cs.designProcess.stages}
+          onChange={(v) => set('designProcess.stages', v)}
+          newItem={{ label: 'Wireframe stage', variant: 'low', imageUrl: '', description: '' }}
+          fields={PROCESS_FIELDS}
+        />
+      </SectionCard>
+
+      <SectionCard
+        title="04 — Walkthrough video"
+        visible={vis.walkthrough !== false}
         onVisibleChange={(v) => setVisibility('walkthrough', v)}
       >
-        <p className="muted">
-          Add a product walkthrough video. Upload an MP4/WebM, or paste a YouTube / Vimeo link.
-          Turn off &ldquo;Show on site&rdquo; to hide this section even when a video is set.
-        </p>
         <Field label="Section title">
           <Input value={cs.walkthrough?.title || ''} onChange={(v) => set('walkthrough.title', v)} />
         </Field>
@@ -320,39 +454,13 @@ export default function CaseStudyEditor() {
       </SectionCard>
 
       <SectionCard
-        title="05 — Wireframes (design process)"
-        visible={vis.designProcess}
-        onVisibleChange={(v) => setVisibility('designProcess', v)}
-      >
-        <p className="muted">Upload full images and choose the visible area. Visitors tap to see the full file.</p>
-        <ListEditor
-          items={cs.designProcess.stages}
-          onChange={(v) => set('designProcess.stages', v)}
-          newItem={{ label: 'Wireframe stage', variant: 'low', imageUrl: '' }}
-          fields={SCREEN_FIELDS}
-        />
-      </SectionCard>
-
-      <SectionCard
-        title="06 — Final screens"
-        visible={vis.finalDesign}
-        onVisibleChange={(v) => setVisibility('finalDesign', v)}
-      >
-        <p className="muted">Upload full images and choose the visible area. Visitors tap to see the full file.</p>
-        <ListEditor
-          items={cs.finalDesign.screens}
-          onChange={(v) => set('finalDesign.screens', v)}
-          newItem={{ label: 'Final screen', variant: 'home', imageUrl: '' }}
-          fields={SCREEN_FIELDS}
-        />
-      </SectionCard>
-
-      <SectionCard
         title="07 — Outcomes"
-        visible={vis.outcomes}
+        visible={vis.outcomes !== false}
         onVisibleChange={(v) => setVisibility('outcomes', v)}
+        hint="Also feeds the dark “results at a glance” strip under the hero. Keep Value short (89%, 4.7)."
       >
-        <p className="muted">Use a short stat for Value (e.g. 89% or 4.7). Put the longer explanation in Label — long Values used to overlap on the site.</p>
+        <Field label="Section title"><Input value={cs.outcomes.title || ''} onChange={(v) => set('outcomes.title', v)} /></Field>
+        <Field label="Highlight word"><Input value={cs.outcomes.highlight || ''} onChange={(v) => set('outcomes.highlight', v)} /></Field>
         <ListEditor
           items={cs.outcomes.metrics}
           onChange={(v) => set('outcomes.metrics', v)}
@@ -365,42 +473,7 @@ export default function CaseStudyEditor() {
       </SectionCard>
 
       <SectionCard
-        title="Before / After (optional)"
-        visible={vis.beforeAfter !== false}
-        onVisibleChange={(v) => setVisibility('beforeAfter', v)}
-      >
-        <p className="muted">Optional comparison slider. Both images required to show on the site.</p>
-        <Field label="Cover image (optional — falls back to hero / first screen)">
-          <ImageUpload
-            aspect={9 / 16}
-            outputWidth={1200}
-            value={cs.coverImage || ''}
-            onChange={(v) => set('coverImage', v)}
-          />
-        </Field>
-        <Field label="Before image">
-          <ImageUpload
-            aspect={9 / 16}
-            outputWidth={1400}
-            value={cs.beforeAfter?.before || ''}
-            onChange={(v) => set('beforeAfter.before', v)}
-          />
-        </Field>
-        <Field label="After image">
-          <ImageUpload
-            aspect={9 / 16}
-            outputWidth={1400}
-            value={cs.beforeAfter?.after || ''}
-            onChange={(v) => set('beforeAfter.after', v)}
-          />
-        </Field>
-        <Field label="Caption">
-          <Input value={cs.beforeAfter?.caption || ''} onChange={(v) => set('beforeAfter.caption', v)} />
-        </Field>
-      </SectionCard>
-
-      <SectionCard
-        title="Reflection (optional)"
+        title="Reflection"
         visible={vis.reflection !== false}
         onVisibleChange={(v) => setVisibility('reflection', v)}
       >
