@@ -225,9 +225,82 @@
 }
 
 @media (max-width: 900px) {
-  .cs-hero-grid { grid-template-columns: 1fr; }
-  .cs-ticket { grid-template-columns: 1fr 1fr; }
-  .cs-ticket-meta { align-items: flex-start; grid-column: 1 / -1; }
+  /* Keep the desktop composition: copy + phone side by side */
+  .cs-hero {
+    min-height: auto;
+    padding: 5.25rem 1.15rem 1.35rem;
+  }
+
+  .cs-hero-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 0.85rem;
+    align-items: end;
+  }
+
+  .cs-hero-title {
+    font-size: clamp(2.35rem, 9.5vw, 3.4rem);
+    margin-bottom: 0.65rem;
+  }
+
+  .cs-hero-summary {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    max-width: none;
+  }
+
+  .cs-hero-watermark {
+    font-size: clamp(4.5rem, 20vw, 8rem);
+    top: 14%;
+    left: 3%;
+  }
+
+  .cs-hero-media .cs-device {
+    width: min(100%, 148px);
+    filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.35));
+  }
+
+  .cs-ticket {
+    grid-template-columns: 1fr 1fr;
+    margin-top: 1.15rem;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .cs-ticket-value { font-size: 1rem; }
+
+  .cs-ticket-meta {
+    align-items: flex-start;
+    grid-column: 1 / -1;
+  }
+
+  .cs-scroll-cue { display: none; }
+
+  .cs-device {
+    width: min(100%, 210px);
+  }
+
+  .cs-gallery-item {
+    width: min(58vw, 210px);
+  }
+}
+
+@media (max-width: 420px) {
+  .cs-hero-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 0.55rem;
+  }
+
+  .cs-hero-media .cs-device {
+    width: min(100%, 118px);
+  }
+
+  .cs-hero-title {
+    font-size: clamp(2.1rem, 9vw, 2.75rem);
+  }
+
+  .cs-back {
+    font-size: 0.68rem;
+  }
 }
 
 /* TL;DR */
@@ -714,9 +787,48 @@
 }
 
 @media (max-width: 900px) {
-  .cs-story { grid-template-columns: 1fr; }
-  .cs-story-index { position: static; }
-  .cs-two, .cs-flip-grid { grid-template-columns: 1fr; }
+  .cs-story {
+    grid-template-columns: 1fr;
+    padding-top: clamp(2.5rem, 6vh, 4rem);
+  }
+
+  .cs-story-index {
+    position: static;
+    display: flex;
+    gap: 0.35rem 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cs-story-index ol {
+    display: flex;
+    flex-direction: row;
+    gap: 0.35rem 1.1rem;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cs-story-index button {
+    white-space: nowrap;
+  }
+
+  .cs-two,
+  .cs-flip-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-process-inner {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .cs-process-frame .cs-device {
+    width: min(100%, 200px);
+    margin-inline: auto;
+  }
 }
 
 /* Quote */

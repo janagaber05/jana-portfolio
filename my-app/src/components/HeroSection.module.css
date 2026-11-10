@@ -480,8 +480,8 @@
   }
 
   .lanyardStage {
-    width: min(100%, 20rem);
-    height: min(70vh, 36rem);
+    width: min(100%, 18rem);
+    height: min(62vh, 32rem);
   }
 
   .tagline {
@@ -497,6 +497,26 @@
 @media (max-width: 480px) {
   .hero {
     padding-top: 5.75rem;
+  }
+
+  /* Keep the desktop role-word framing, just tighter */
+  .role {
+    font-size: clamp(1.35rem, 7.2vw, 2rem);
+  }
+
+  .roleTL,
+  .roleTR {
+    top: 5rem;
+  }
+
+  .roleBL,
+  .roleBR {
+    bottom: 4.75rem;
+  }
+
+  .lanyardStage {
+    width: min(100%, 15.5rem);
+    height: min(58vh, 28rem);
   }
 
   .roleTL {

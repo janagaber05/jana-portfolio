@@ -176,9 +176,8 @@
 .pile {
   position: relative;
   z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   width: 100%;
   margin-top: 0.85rem;
@@ -196,9 +195,9 @@
 
 .slipSlot {
   position: relative;
-  flex: 0 0 auto;
-  width: 200px;
-  height: 118px;
+  width: 100%;
+  aspect-ratio: 200 / 118;
+  min-width: 0;
 }
 
 .slipGhost {
@@ -212,8 +211,8 @@
   appearance: none;
   border: none;
   margin: 0;
-  width: 200px;
-  height: 118px;
+  width: 100%;
+  height: 100%;
   padding: 0.65rem 0.75rem;
   border-radius: 0.7rem;
   box-shadow: 0 6px 16px rgba(17, 17, 17, 0.14);
@@ -231,6 +230,7 @@
   top: 0;
   overflow: hidden;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .flightLayer {
@@ -526,28 +526,36 @@
 }
 
 @media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
+  /* Keep copy + gun on one row like desktop */
+  .section {
+    padding: 3.25rem 1rem 2.25rem;
     min-height: auto;
-    gap: 1.25rem;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    min-height: auto;
+    gap: 0.75rem;
+    align-items: center;
   }
 
   .right {
-    order: -1;
-    min-height: auto;
-    padding-block: 0.75rem 0.35rem;
+    order: 0;
+    min-height: 0;
+    padding-block: 0;
+    align-self: center;
   }
 
   .gunAnchor {
-    width: min(98%, 34rem);
-    max-width: 34rem;
-    margin-inline: auto;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
   }
 
   .gunCanvas {
     aspect-ratio: 5 / 4;
-    min-height: 20rem;
-    max-height: 28rem;
+    min-height: 10rem;
+    max-height: 16rem;
   }
 
   .left {
@@ -555,28 +563,75 @@
   }
 
   .title {
-    font-size: clamp(2.8rem, 12vw, 3.8rem);
+    font-size: clamp(2rem, 8vw, 2.85rem);
+  }
+
+  .lede {
+    font-size: 0.82rem;
+    max-width: none;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.55rem;
+    font-size: 0.55rem;
   }
 
   .pile {
     max-height: none;
-  }
-
-  .slipSlot,
-  .slip {
-    width: 168px;
-    height: 108px;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .slip {
-    padding: 0.6rem 0.7rem;
+    padding: 0.55rem 0.6rem;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* Phone: title only — details live in the drawer / desktop */
+  .slipTop,
+  .slipTag,
+  .slipMeta,
+  .slipBlurb {
+    display: none;
   }
 
   .slipTitle {
-    font-size: 1.05rem;
-    max-height: 2.1em;
+    font-size: clamp(0.95rem, 3.6vw, 1.15rem);
+    max-height: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
   }
 }
+
+@media (max-width: 420px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 0.45rem;
+  }
+
+  .title {
+    font-size: clamp(1.7rem, 8.5vw, 2.25rem);
+  }
+
+  .gunCanvas {
+    min-height: 8.5rem;
+    max-height: 13rem;
+  }
+
+  .slip {
+    padding: 0.45rem 0.5rem;
+  }
+
+  .slipTitle {
+    font-size: clamp(0.85rem, 3.8vw, 1.05rem);
+    -webkit-line-clamp: 2;
+  }
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   .gunButton {

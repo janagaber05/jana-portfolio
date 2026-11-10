@@ -238,7 +238,12 @@ function FlyingSlip({ flight, slip, onLand }) {
   return (
     <motion.div
       className={`${styles.slip} ${styles.slipFlying}`}
-      style={{ background: slip.color, color: textColor }}
+      style={{
+        background: slip.color,
+        color: textColor,
+        width: SLIP_W,
+        height: SLIP_H,
+      }}
       initial={{
         x: flight.fromX,
         y: flight.fromY,
@@ -616,7 +621,6 @@ export default function WorkSpraySection({
                         ? { duration: 0 }
                         : { type: 'spring', stiffness: 380, damping: 26 }
                     }
-                    style={{ width: SLIP_W, height: SLIP_H }}
                   >
                     {item.status === 'landed' ? (
                       <LandedSlip
@@ -627,7 +631,6 @@ export default function WorkSpraySection({
                     ) : (
                       <div
                         className={styles.slipGhost}
-                        style={{ width: SLIP_W, height: SLIP_H }}
                         aria-hidden="true"
                       />
                     )}
