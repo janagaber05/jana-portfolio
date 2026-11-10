@@ -721,14 +721,14 @@
 
 /* Quote */
 .cs-quote {
-  padding: clamp(4.5rem, 12vh, 8rem) clamp(1.25rem, 4vw, 3rem);
+  padding: clamp(3rem, 8vh, 5.5rem) clamp(1.25rem, 4vw, 3rem);
   background: var(--accent, #6d0101);
   color: var(--on-accent, #fcf4f0);
 }
 
 .cs-quote blockquote {
   margin: 0 auto;
-  max-width: 18ch;
+  max-width: min(36rem, 92%);
   text-align: center;
 }
 
@@ -736,16 +736,17 @@
   margin: 0;
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
-  font-size: clamp(2rem, 5.5vw, 4rem);
-  line-height: 1.15;
+  font-size: clamp(1.25rem, 2.4vw, 1.85rem);
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
 .cs-quote cite {
   display: block;
-  margin-top: 1.5rem;
+  margin-top: 1.15rem;
   font-family: Inter, system-ui, sans-serif;
   font-style: normal;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0.65;
