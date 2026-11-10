@@ -12,6 +12,9 @@
   background: #ffffff;
   color: var(--id-ink);
   font-family: Inter, system-ui, sans-serif;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .content {

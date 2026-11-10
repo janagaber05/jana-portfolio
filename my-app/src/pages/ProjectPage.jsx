@@ -8,7 +8,6 @@ import { useSiteContent } from '../context/SiteContentContext';
 import { isProjectPublished } from '../utils/publishFilters';
 import { cleanupScrollEffects } from '../utils/scrollCleanup';
 import {
-  getScreenImageSrc,
   getScreenLightboxSrc,
   getVisibleProgressSections,
   shouldRenderCaseStudySection,

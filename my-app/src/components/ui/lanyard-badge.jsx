@@ -349,7 +349,8 @@ function LanyardBadge({
       const C = pts[iC];
       const swing = swingAngle(T, C);
       card.style.transform = "translate3d(" + (T.x - cw / 2).toFixed(2) + "px," + (T.y + ringR).toFixed(2) + "px,0) rotate(" + (-swing).toFixed(4) + "rad)";
-      inner.style.transform = "perspective(1100px) rotateY(" + spin.a.toFixed(4) + "rad)";
+      // rotateY only — perspective lives on the parent so backface-visibility works
+      inner.style.transform = "rotateY(" + spin.a.toFixed(4) + "rad)";
       const edge = 1 - Math.abs(Math.cos(spin.a));
       inner.style.setProperty("--lyd-dim", (edge * 0.5).toFixed(3));
       inner.style.setProperty("--lyd-shine", (50 + Math.sin(spin.a) * 70 + swing * 90).toFixed(1) + "%");
@@ -492,7 +493,14 @@ function LanyardBadge({
     overflow: "hidden",
     backfaceVisibility: "hidden",
     WebkitBackfaceVisibility: "hidden",
+    transformStyle: "preserve-3d",
+    // Force a 3D rendering plane so the mirrored front never shows through
+    transform: "rotateY(0deg) translateZ(0.5px)",
     boxShadow: "0 18px 40px -12px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.2)"
+  };
+  const faceBack = {
+    ...face,
+    transform: "rotateY(180deg) translateZ(0.5px)",
   };
   const shade = /* @__PURE__ */ jsx(
     "div",
@@ -596,23 +604,43 @@ function LanyardBadge({
                   }
                 }
               ),
-              /* @__PURE__ */ jsxs(
+              /* @__PURE__ */ jsx(
                 "div",
                 {
-                  ref: innerRef,
-                  style: { position: "absolute", left: 0, right: 0, top: ringR + clipH * 0.6, height: ch, transformStyle: "preserve-3d" },
-                  children: [
-                    /* @__PURE__ */ jsxs("div", { style: face, children: [
-                      front ?? defaultFront,
-                      slot,
-                      shade
-                    ] }),
-                    /* @__PURE__ */ jsxs("div", { style: { ...face, transform: "rotateY(180deg)" }, children: [
-                      back ?? defaultBack,
-                      slot,
-                      shade
-                    ] })
-                  ]
+                  style: {
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: ringR + clipH * 0.6,
+                    height: ch,
+                    perspective: 1100,
+                    WebkitPerspective: 1100,
+                  },
+                  children: /* @__PURE__ */ jsxs(
+                    "div",
+                    {
+                      ref: innerRef,
+                      style: {
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                        transformStyle: "preserve-3d",
+                        WebkitTransformStyle: "preserve-3d",
+                      },
+                      children: [
+                        /* @__PURE__ */ jsxs("div", { style: face, children: [
+                          front ?? defaultFront,
+                          slot,
+                          shade
+                        ] }),
+                        /* @__PURE__ */ jsxs("div", { style: faceBack, children: [
+                          back ?? defaultBack,
+                          slot,
+                          shade
+                        ] })
+                      ]
+                    }
+                  )
                 }
               )
             ]
