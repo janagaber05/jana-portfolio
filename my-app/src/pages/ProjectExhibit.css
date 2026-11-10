@@ -1019,7 +1019,9 @@
 
 .cs-process-layer {
   position: absolute;
-  inset: auto;
+  inset: 0;
+  display: grid;
+  place-items: center;
   opacity: 0;
   transform: scale(0.96);
   transition: opacity 0.35s ease, transform 0.35s ease;
@@ -1034,55 +1036,31 @@
 
 @media (max-width: 900px) {
   .cs-process {
-    min-height: 0;
-    padding: 3rem 0 2.5rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 4.5rem clamp(1rem, 4vw, 1.5rem) 2.5rem;
   }
 
   .cs-process-inner {
     grid-template-columns: 1fr;
-    min-height: 0;
+    min-height: calc(100vh - 7rem);
+    min-height: calc(100dvh - 7rem);
     gap: 1.25rem;
+    align-content: center;
   }
 
-  .cs-process-copy {
-    padding: 0 clamp(1.25rem, 4vw, 3rem);
+  .cs-process-title {
+    font-size: clamp(1.85rem, 8vw, 2.6rem);
   }
-}
 
-/* Phone: swipeable process screens (replaces pin scrub) */
-.cs-process.is-snap .cs-process-frame {
-  display: none;
-}
+  .cs-process-frame {
+    min-height: min(58vh, 28rem);
+    width: 100%;
+  }
 
-.cs-process-track {
-  display: flex;
-  gap: 1rem;
-  padding: 0 clamp(1.25rem, 4vw, 3rem);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  touch-action: pan-x;
-  scrollbar-width: none;
-}
-
-.cs-process-track::-webkit-scrollbar {
-  display: none;
-}
-
-.cs-process-slide {
-  margin: 0;
-  flex: 0 0 min(72vw, 280px);
-  scroll-snap-align: center;
-}
-
-.cs-process-slide .cs-device {
-  width: 100%;
-}
-
-.cs-process.is-snap .cs-device-hit {
-  touch-action: pan-x;
+  .cs-process-frame .cs-device {
+    width: min(100%, 260px);
+  }
 }
 
 /* Walkthrough */
