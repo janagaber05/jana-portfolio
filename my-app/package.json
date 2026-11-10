@@ -24,7 +24,7 @@
     "start:web": "BROWSER=none craco start",
     "backend": "npm start --prefix ../backend",
     "cms": "npm run dashboard:dev --prefix ../backend",
-    "build": "craco build",
+    "build": "GENERATE_SOURCEMAP=false craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

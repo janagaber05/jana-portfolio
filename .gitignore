@@ -3,6 +3,8 @@ node_modules/
 
 # Secrets
 .env
+.env.local
+.env.*.local
 .env.*
 !.env.example
 
@@ -10,9 +12,10 @@ node_modules/
 my-app/build/
 backend/dashboard/dist/
 
-# Local uploads (use Supabase Storage in production)
+# Local runtime data / uploads (use Supabase in production)
 backend/uploads/*
 !backend/uploads/.gitkeep
+backend/data/site.json
 
 # OS & logs
 .DS_Store

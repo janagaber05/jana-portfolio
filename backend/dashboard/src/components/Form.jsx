@@ -143,7 +143,7 @@ export function ImageUpload({
               <div className="image-picker-actions">
                 <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
                   {uploading ? 'Uploading…' : 'Change image'}
-                  <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,.png,.jpg,.jpeg,.webp,.gif,.avif" hidden onChange={handleFile} disabled={uploading} />
                 </label>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange('')}>
                   Remove
@@ -156,7 +156,7 @@ export function ImageUpload({
               <span className="image-picker-text">
                 {uploading ? 'Uploading…' : 'Choose image from device'}
               </span>
-              <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,.png,.jpg,.jpeg,.webp,.gif,.avif" hidden onChange={handleFile} disabled={uploading} />
             </label>
           )}
         </div>
@@ -306,7 +306,7 @@ export function FramedImageUpload({
                 </button>
                 <label className={`btn btn-secondary btn-sm ${uploading ? 'upload-btn-loading' : ''}`}>
                   {uploading ? 'Uploading…' : 'Replace image'}
-                  <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,.png,.jpg,.jpeg,.webp,.gif,.avif" hidden onChange={handleFile} disabled={uploading} />
                 </label>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={clearImage}>
                   Remove
@@ -324,7 +324,7 @@ export function FramedImageUpload({
               <span className="image-picker-text">
                 {uploading ? 'Uploading…' : 'Choose full image from device'}
               </span>
-              <input type="file" accept="image/*" hidden onChange={handleFile} disabled={uploading} />
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,.png,.jpg,.jpeg,.webp,.gif,.avif" hidden onChange={handleFile} disabled={uploading} />
             </label>
           )}
         </div>
@@ -423,7 +423,7 @@ export function VideoUpload({
                 {uploading ? 'Uploading…' : 'Change video file'}
                 <input
                   type="file"
-                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  accept="video/mp4,video/webm,.mp4,.webm"
                   hidden
                   onChange={handleFile}
                   disabled={uploading}
@@ -442,7 +442,7 @@ export function VideoUpload({
             </span>
             <input
               type="file"
-              accept="video/mp4,video/webm,video/quicktime,video/*"
+              accept="video/mp4,video/webm,.mp4,.webm"
               hidden
               onChange={handleFile}
               disabled={uploading}

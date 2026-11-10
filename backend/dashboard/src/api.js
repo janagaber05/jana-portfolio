@@ -1,4 +1,5 @@
 import { STORAGE_BUCKET, hasSupabaseConfig, supabase } from './lib/supabase';
+import { assertSafeUpload, safeMediaSrc } from './utils/safeUrl';
 
 const REQUEST_TIMEOUT_MS = 12000;
 const DRAFT_ID = 'draft';
@@ -57,11 +58,18 @@ export const api = {
         email: email.trim(),
         password,
       }),
-      'Login timed out. Check your Supabase settings and network connection.',
+      'Login timed out. Please try again.',
     );
 
-    if (error) throw new Error(error.message);
-    if (!data.session) throw new Error('Login failed');
+    if (error || !data.session) {
+      throw new Error('Invalid email or password');
+    }
+
+    const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+    if (adminError || isAdmin !== true) {
+      await supabase.auth.signOut().catch(() => {});
+      throw new Error('Not authorized');
+    }
 
     return data;
   },
@@ -119,7 +127,7 @@ export const api = {
       created_by: userId,
     });
 
-    if (revisionError) {
+    if (revisionError && import.meta.env.DEV) {
       console.warn('Could not save revision:', revisionError.message);
     }
 
@@ -218,14 +226,18 @@ export const api = {
   },
 
   upload: async (file) => {
-    const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
-    const path = `${Date.now()}-${safe}`;
+    const ext = assertSafeUpload(file);
+    const path = `${crypto.randomUUID()}.${ext}`;
 
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { cacheControl: '3600', upsert: false });
+      .upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type,
+      });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error('Upload failed');
 
     const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     return { url: data.publicUrl, filename: path };
@@ -263,6 +275,7 @@ export const api = {
 
 export function mediaUrl(path) {
   if (!path) return '';
-  if (path.startsWith('http')) return path;
-  return path.startsWith('/') ? path : `/${path}`;
+  if (path.startsWith('http')) return safeMediaSrc(path);
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return safeMediaSrc(normalized);
 }

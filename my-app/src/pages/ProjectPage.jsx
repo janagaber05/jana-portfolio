@@ -144,10 +144,18 @@ export default function ProjectPage() {
       document.documentElement.scrollTop = y;
       document.body.scrollTop = y;
     };
+    const refreshPins = () => {
+      // Let pin/scrub sections re-measure after scroll restoration.
+      ScrollTrigger.refresh();
+    };
     if (saved > 0) {
       apply(saved);
       const t1 = window.setTimeout(() => { if (!cancelled) apply(saved); }, 50);
-      const t2 = window.setTimeout(() => { if (!cancelled) apply(saved); }, 250);
+      const t2 = window.setTimeout(() => {
+        if (cancelled) return;
+        apply(saved);
+        refreshPins();
+      }, 280);
       return () => {
         cancelled = true;
         window.clearTimeout(t1);
@@ -155,7 +163,8 @@ export default function ProjectPage() {
       };
     }
     apply(0);
-    return undefined;
+    const t = window.setTimeout(refreshPins, 100);
+    return () => window.clearTimeout(t);
   }, [loading, project, scrollKey, slug]);
 
   useEffect(() => {

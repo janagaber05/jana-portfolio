@@ -23,7 +23,14 @@ export function getScreenLightboxSrc(screen) {
 
 export function getScreenDisplayCrop(screen) {
   const crop = screen?.displayCrop;
-  if (!crop || crop.width <= 0 || crop.height <= 0) return null;
+  if (!crop || !(crop.width > 0) || !(crop.height > 0)) return null;
+  // Normalized crops only — pixel leftovers from older CMS saves break framing.
+  if (crop.width > 1.05 || crop.height > 1.05) return null;
+  if (crop.x < -0.02 || crop.y < -0.02) return null;
+  if (crop.x + crop.width > 1.05 || crop.y + crop.height > 1.05) return null;
+  // Full-width + short-height crops on already-tall phone screenshots just zoom
+  // into a random band (blank Membership, mid-scroll Payment History, etc.).
+  if (crop.width >= 0.9 && crop.height < 0.85) return null;
   return crop;
 }
 

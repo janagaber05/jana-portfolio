@@ -7,6 +7,7 @@ import logo from '../assets/logo/Asset 3.png';
 import defaultContent from '../data/defaultContent.json';
 import { useSiteContent } from '../context/SiteContentContext';
 import { resolveMediaUrl } from '../utils/mediaUrl';
+import { safeHref } from '../utils/safeUrl';
 import { filterNavLinks, scrollToNavTarget } from '../utils/navScroll';
 import {
   markHomeIntroPlayed,
@@ -246,7 +247,7 @@ export default function HeroSection() {
             {navLinks.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={safeHref(link.href)}
                 onClick={(event) => handleNavClick(event, link.href)}
               >
                 {link.label}
@@ -254,12 +255,12 @@ export default function HeroSection() {
             ))}
           </div>
           <div className={styles.navRight}>
-            <a href={`mailto:${hero.email}`} className={styles.navCta}>
+            <a href={safeHref(`mailto:${hero.email}`)} className={styles.navCta}>
               {hero.navCta || 'get in touch'}
             </a>
             <div className={styles.navSocials}>
               {(hero.navSocials || []).map((link) => (
-                <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                <a key={link.href} href={safeHref(link.href)} target="_blank" rel="noopener noreferrer">
                   {link.label}
                 </a>
               ))}
@@ -287,7 +288,7 @@ export default function HeroSection() {
             {navLinks.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={safeHref(link.href)}
                 onClick={(event) => handleNavClick(event, link.href)}
               >
                 {link.label}
@@ -295,7 +296,7 @@ export default function HeroSection() {
             ))}
           </nav>
           <a
-            href={`mailto:${hero.email}`}
+            href={safeHref(`mailto:${hero.email}`)}
             className={styles.mobileMenuCta}
             onClick={closeMenu}
           >
@@ -305,9 +306,9 @@ export default function HeroSection() {
             {(hero.navSocials || []).map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={safeHref(link.href)}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 onClick={closeMenu}
               >
                 {link.label}

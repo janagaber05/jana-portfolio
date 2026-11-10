@@ -17,7 +17,12 @@ export default function Login() {
       await api.login(email.trim(), password);
       navigate('/');
     } catch (err) {
-      setError(err.message);
+      const message = String(err?.message || '');
+      setError(
+        message === 'Not authorized'
+          ? 'Not authorized'
+          : 'Invalid email or password',
+      );
     } finally {
       setLoading(false);
     }

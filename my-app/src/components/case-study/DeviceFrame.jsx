@@ -103,31 +103,28 @@ export default function DeviceFrame({
               data-cursor={onClick ? 'view' : undefined}
               aria-label={alt || 'View screen'}
             >
-              <span
-                className="cs-device-img"
-                style={displayCrop ? {
-                  backgroundImage: `url(${imageSrc})`,
-                  backgroundPosition: `${-(displayCrop.x / displayCrop.width) * 100}% ${-(displayCrop.y / displayCrop.height) * 100}%`,
-                  backgroundSize: `${(1 / displayCrop.width) * 100}% ${(1 / displayCrop.height) * 100}%`,
-                } : {
-                  backgroundImage: `url(${imageSrc})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center top',
-                }}
-                role="img"
-                aria-label={alt}
-              />
-              {priority ? (
+              {/*
+                Use positioned <img> crop math (same as FramedImage), not
+                background-position %, which resolves differently and can
+                leave screens looking blank/shifted.
+              */}
+              <span className="cs-device-img" role="img" aria-label={alt}>
                 <img
                   src={imageSrc}
                   alt=""
-                  fetchPriority="high"
                   decoding="async"
+                  fetchPriority={priority ? 'high' : undefined}
                   width={390}
                   height={844}
-                  className="cs-device-preload"
+                  className={displayCrop ? 'cs-device-img-crop' : 'cs-device-img-cover'}
+                  style={displayCrop ? {
+                    width: `${(1 / displayCrop.width) * 100}%`,
+                    height: `${(1 / displayCrop.height) * 100}%`,
+                    left: `${-(displayCrop.x / displayCrop.width) * 100}%`,
+                    top: `${-(displayCrop.y / displayCrop.height) * 100}%`,
+                  } : undefined}
                 />
-              ) : null}
+              </span>
             </button>
           ) : children}
         </div>

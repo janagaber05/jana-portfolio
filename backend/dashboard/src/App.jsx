@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ContentProvider } from './context/ContentContext';
 import Layout from './components/Layout';
@@ -15,7 +15,7 @@ import ContactEditor from './pages/ContactEditor';
 import SettingsEditor from './pages/SettingsEditor';
 import InboxEditor from './pages/InboxEditor';
 import MediaLibrary from './pages/MediaLibrary';
-import { getSession } from './api';
+import { api, getSession } from './api';
 import { supabase } from './lib/supabase';
 
 const SESSION_TIMEOUT_MS = 12000;
@@ -35,7 +35,7 @@ function getConfigError() {
 
   if (missing.length === 0) return '';
 
-  return `Missing Supabase settings in backend/dashboard/.env: ${missing.join(', ')}. Get both values from Supabase → Project Settings → API, then restart npm start.`;
+  return 'Missing Supabase settings for the CMS. Add them in backend/dashboard/.env, then restart.';
 }
 
 function ConfigError({ message }) {
@@ -50,9 +50,32 @@ function ConfigError({ message }) {
   );
 }
 
+function NotAuthorized({ onSignOut }) {
+  return (
+    <div className="login-page">
+      <div className="login-card">
+        <p className="eyebrow">Jana CMS</p>
+        <h1>Not authorized</h1>
+        <p className="muted">This account does not have admin access.</p>
+        <button type="button" className="btn btn-primary" onClick={onSignOut}>
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+async function sessionIsAdmin(session) {
+  if (!session?.access_token) return false;
+  const { data, error } = await supabase.rpc('is_admin');
+  if (error) return false;
+  return data === true;
+}
+
 function RequireAuth({ children }) {
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
+  const [denied, setDenied] = useState(false);
   const configError = getConfigError();
 
   useEffect(() => {
@@ -64,11 +87,31 @@ function RequireAuth({ children }) {
     let active = true;
     let settled = false;
 
-    const settle = (session) => {
+    const settle = async (session) => {
       if (!active || settled) return;
       settled = true;
       window.clearTimeout(timeoutId);
-      setAuthed(!!session);
+
+      if (!session) {
+        setAuthed(false);
+        setDenied(false);
+        setChecking(false);
+        return;
+      }
+
+      const ok = await sessionIsAdmin(session);
+      if (!active) return;
+
+      if (!ok) {
+        await api.logout().catch(() => {});
+        setAuthed(false);
+        setDenied(true);
+        setChecking(false);
+        return;
+      }
+
+      setDenied(false);
+      setAuthed(true);
       setChecking(false);
     };
 
@@ -83,8 +126,6 @@ function RequireAuth({ children }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
-
-      // Initial load is handled by getSession above.
       if (event === 'INITIAL_SESSION') return;
 
       if (event === 'SIGNED_OUT') {
@@ -94,8 +135,8 @@ function RequireAuth({ children }) {
       }
 
       if (session) {
-        setAuthed(true);
-        setChecking(false);
+        settled = false;
+        settle(session);
       }
     });
 
@@ -112,6 +153,18 @@ function RequireAuth({ children }) {
       <div className="login-page">
         <p className="muted">Checking session…</p>
       </div>
+    );
+  }
+
+  if (denied) {
+    return (
+      <NotAuthorized
+        onSignOut={async () => {
+          await api.logout().catch(() => {});
+          setDenied(false);
+          window.location.assign(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/login`);
+        }}
+      />
     );
   }
 

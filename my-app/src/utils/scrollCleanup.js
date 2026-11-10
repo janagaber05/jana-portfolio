@@ -9,30 +9,19 @@ export function cleanupScrollEffects() {
     trigger.kill(true);
   });
 
-  ScrollTrigger.scrollerProxy(document.documentElement, {
-    scrollTop(value) {
-      if (arguments.length) {
-        window.scrollTo(0, value);
-      }
-      return window.scrollY || document.documentElement.scrollTop;
-    },
-    getBoundingClientRect() {
-      return {
-        top: 0,
-        left: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-    },
-  });
-
   if (typeof ScrollTrigger.clearScrollMemory === 'function') {
     ScrollTrigger.clearScrollMemory();
   }
 
+  if (typeof ScrollTrigger.refresh === 'function') {
+    ScrollTrigger.refresh();
+  }
+
   gsap.killTweensOf([document.body, document.documentElement]);
-  gsap.set([document.body, document.documentElement], { clearProps: 'backgroundColor' });
+  gsap.set([document.body, document.documentElement], { clearProps: 'backgroundColor,transform' });
   document.body.style.overflow = '';
+  document.documentElement.classList.remove('fx-scroll-lock');
+  document.documentElement.style.overflow = '';
 }
 
 export function scrollToTop() {

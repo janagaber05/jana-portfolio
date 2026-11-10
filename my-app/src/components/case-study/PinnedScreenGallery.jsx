@@ -1,18 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScreenInFrame } from './DeviceFrame';
 import { getScreenImageSrc } from '../../utils/caseStudyImage';
-
-gsap.registerPlugin(ScrollTrigger);
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+function runwayMultiplier(count, width) {
+  if (width < 900) return Math.max(1.5, count * 0.65);
+  return Math.max(1.2, count * 0.4);
+}
+
 export default function PinnedScreenGallery({ screens = [], onInspect }) {
+  const runwayRef = useRef(null);
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
+  const indexRef = useRef(0);
   const [index, setIndex] = useState(0);
   const [snapFallback, setSnapFallback] = useState(() => (
     typeof window !== 'undefined' && prefersReducedMotion()
@@ -32,61 +35,70 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
     return () => mq.removeEventListener?.('change', sync);
   }, []);
 
-  /* Phone + desktop: vertical scroll pins the gallery and scrubs images sideways */
+  /* Vertical scroll → sticky section + sideways scrub (no GSAP pin). */
   useEffect(() => {
+    const runway = runwayRef.current;
     const section = sectionRef.current;
     const track = trackRef.current;
-    if (!section || !track || items.length < 2 || snapFallback) return undefined;
+    if (!runway || !section || !track || items.length < 2 || snapFallback) return undefined;
 
-    const ctx = gsap.context(() => {
-      const getOverflow = () => Math.max(0, track.scrollWidth - section.clientWidth + 48);
+    const syncRunwayHeight = () => {
+      const overflow = Math.max(0, track.scrollWidth - section.clientWidth + 48);
+      const minTravel = window.innerHeight * runwayMultiplier(items.length, window.innerWidth);
+      const travel = Math.max(overflow * 1.15, minTravel);
+      runway.style.height = `${section.offsetHeight + travel}px`;
+    };
 
-      const tween = gsap.to(track, {
-        x: () => -getOverflow(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: () => {
-            const overflow = getOverflow();
-            // Give phones enough scroll distance to scrub through every screen.
-            const minTravel = window.innerWidth < 900
-              ? window.innerHeight * Math.max(1.4, items.length * 0.55)
-              : window.innerHeight;
-            return `+=${Math.max(overflow * 1.2, minTravel)}`;
-          },
-          pin: true,
-          scrub: 0.65,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const next = Math.min(
-              items.length - 1,
-              Math.floor(self.progress * items.length),
-            );
-            setIndex(next);
-          },
-        },
-      });
+    const apply = () => {
+      const total = Math.max(1, runway.offsetHeight - window.innerHeight);
+      const scrolled = Math.min(total, Math.max(0, -runway.getBoundingClientRect().top));
+      const progress = scrolled / total;
+      const overflow = Math.max(0, track.scrollWidth - section.clientWidth + 48);
+      track.style.transform = `translate3d(${-overflow * progress}px, 0, 0)`;
 
-      const refresh = () => ScrollTrigger.refresh();
-      window.addEventListener('load', refresh);
-      window.addEventListener('resize', refresh);
-      const images = [...track.querySelectorAll('img, .cs-device-img')];
-      images.forEach((img) => img.addEventListener?.('load', refresh));
-      const t = window.setTimeout(refresh, 400);
+      const next = Math.min(
+        items.length - 1,
+        Math.max(0, Math.floor(progress * items.length - 1e-6)),
+      );
+      if (next !== indexRef.current) {
+        indexRef.current = next;
+        setIndex(next);
+      }
+    };
 
-      return () => {
-        window.clearTimeout(t);
-        window.removeEventListener('load', refresh);
-        window.removeEventListener('resize', refresh);
-        images.forEach((img) => img.removeEventListener?.('load', refresh));
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      };
-    }, section);
+    syncRunwayHeight();
+    apply();
 
-    return () => ctx.revert();
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(apply);
+    };
+    const onResize = () => {
+      syncRunwayHeight();
+      apply();
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    window.addEventListener('load', onResize);
+    const images = [...track.querySelectorAll('img')];
+    images.forEach((img) => {
+      if (!img.complete) img.addEventListener('load', onResize, { once: true });
+    });
+    const t1 = window.setTimeout(onResize, 200);
+    const t2 = window.setTimeout(onResize, 800);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('load', onResize);
+      track.style.transform = '';
+      runway.style.height = '';
+    };
   }, [items.length, snapFallback]);
 
   /* Reduced-motion fallback: native horizontal snap */
@@ -120,10 +132,10 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
 
   if (!items.length) return null;
 
-  return (
+  const gallery = (
     <section
       id="section-final"
-      className={`cs-gallery${snapFallback ? ' is-snap' : ''}`}
+      className={`cs-gallery${snapFallback ? ' is-snap' : ' is-sticky'}`}
       ref={sectionRef}
       aria-label="Final screens"
     >
@@ -150,5 +162,13 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
         ))}
       </div>
     </section>
+  );
+
+  if (snapFallback) return gallery;
+
+  return (
+    <div className="cs-gallery-runway" ref={runwayRef}>
+      {gallery}
+    </div>
   );
 }

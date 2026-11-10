@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useSiteContent } from '../context/SiteContentContext';
+import { safeHref } from '../utils/safeUrl';
 import styles from './DisciplinesSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -44,7 +45,7 @@ function DisciplinePanel({
               </li>
             ))}
           </ul>
-          <a href={panel.linkHref} className={linkClassName}>
+          <a href={safeHref(panel.linkHref)} className={linkClassName}>
             <span className={arrowClassName} aria-hidden="true">
               →
             </span>

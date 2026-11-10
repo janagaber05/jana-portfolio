@@ -25,13 +25,19 @@ function getSessionId() {
   return getOrCreateId(sessionStorage, SESSION_KEY);
 }
 
+function sanitizePath(path) {
+  let next = String(path || '/').trim().slice(0, 300);
+  if (!next.startsWith('/')) next = `/${next}`;
+  return next;
+}
+
 async function updatePresence(path) {
   if (!supabase) return;
 
   await supabase.from('analytics_presence').upsert({
     session_id: getSessionId(),
     visitor_id: getVisitorId(),
-    path,
+    path: sanitizePath(path),
     last_seen: new Date().toISOString(),
   });
 }
@@ -41,13 +47,14 @@ export async function trackPageView(path) {
 
   const sessionId = getSessionId();
   const viewedKey = `${VIEWED_PREFIX}${sessionId}`;
+  const cleanPath = sanitizePath(path);
 
   try {
     if (!sessionStorage.getItem(viewedKey)) {
       const { error } = await supabase.from('analytics_page_views').insert({
         visitor_id: getVisitorId(),
         session_id: sessionId,
-        path,
+        path: cleanPath,
       });
 
       if (!error) {
@@ -59,7 +66,7 @@ export async function trackPageView(path) {
   }
 
   try {
-    await updatePresence(path);
+    await updatePresence(cleanPath);
   } catch {
     // ignore
   }

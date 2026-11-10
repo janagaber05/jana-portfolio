@@ -49,7 +49,9 @@ export function SiteContentProvider({ children }) {
     fetchSiteContent()
       .then((data) => finish(data))
       .catch((error) => {
-        console.warn('[Portfolio] Could not load site content:', error.message);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[Portfolio] Could not load site content:', error.message);
+        }
         finish(defaultContent);
       });
 

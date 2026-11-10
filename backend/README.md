@@ -22,7 +22,7 @@ npm run backend
 
 - **API:** http://localhost:5001/api/content
 - **Dashboard:** http://localhost:5001/admin
-- **Default password:** `jana-admin-2026` (set `ADMIN_PASSWORD` in `.env`)
+- **Auth:** Supabase email/password. The user must exist in `public.admins` (see `supabase/10_security_hardening.sql`).
 
 ## Frontend
 

@@ -4,17 +4,19 @@ import { useSiteContent } from '../context/SiteContentContext';
 import { getAvailabilityLabel } from '../utils/publishFilters';
 import { scrollToNavTarget } from '../utils/navScroll';
 import { resolveMediaUrl } from '../utils/mediaUrl';
+import { safeHref } from '../utils/safeUrl';
 import styles from './ContactSection.module.css';
 
 function FooterNavLink({ link }) {
+  const href = safeHref(link.href);
   const handleClick = (event) => {
-    if (!link.href?.startsWith('#')) return;
+    if (!href?.startsWith('#')) return;
     event.preventDefault();
-    scrollToNavTarget(link.href);
+    scrollToNavTarget(href);
   };
 
   return (
-    <a href={link.href} className={styles.footerLink} onClick={handleClick}>
+    <a href={href} className={styles.footerLink} onClick={handleClick}>
       {link.label}
     </a>
   );
@@ -77,7 +79,7 @@ export default function ContactSection() {
             <span className={styles.locationDot} aria-hidden="true" />
           </p>
 
-          <a href={`mailto:${contact.email}`} className={styles.emailLink}>
+          <a href={safeHref(`mailto:${contact.email}`)} className={styles.emailLink}>
             {contact.email}
           </a>
 
@@ -87,10 +89,10 @@ export default function ContactSection() {
             {contact.socials.map((link) => (
               <a
                 key={link.label}
-                href={link.href}
+                href={safeHref(link.href)}
                 className={styles.socialPill}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 <span className={styles.socialLabel}>{link.label}</span>
                 <span className={styles.socialArrow} aria-hidden="true">

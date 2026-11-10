@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import heroImage from '../assets/jana hero.png';
 import { useSiteContent } from '../context/SiteContentContext';
 import { resolveMediaUrl } from '../utils/mediaUrl';
+import { safeHref } from '../utils/safeUrl';
 import styles from './AboutSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,8 +19,9 @@ export default function AboutSection() {
     ? resolveMediaUrl(contact.resumeUrl)
     : '';
   const canDownloadCv = Boolean(resumeHref && contact?.showResume !== false);
-  const primaryHref = canDownloadCv ? resumeHref : (about?.ctaPrimaryHref || '#');
+  const primaryHref = safeHref(canDownloadCv ? resumeHref : (about?.ctaPrimaryHref || '#'));
   const primaryLabel = about?.ctaPrimary || 'Download CV →';
+  const secondaryHref = safeHref(about?.ctaSecondaryHref || '#');
 
   useEffect(() => {
     const section = aboutRef.current;
@@ -219,7 +221,7 @@ export default function AboutSection() {
                 className={styles.aboutCtaPrimary}
                 download
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 {primaryLabel}
               </a>
@@ -228,7 +230,7 @@ export default function AboutSection() {
                 {primaryLabel}
               </a>
             )}
-            <a href={about.ctaSecondaryHref} className={styles.aboutCtaGhost}>
+            <a href={secondaryHref} className={styles.aboutCtaGhost}>
               {about.ctaSecondary}
             </a>
           </div>

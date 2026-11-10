@@ -3,7 +3,8 @@
 .cs-page {
   background: var(--cream, #fcf4f0);
   color: var(--ink, #141214);
-  overflow-x: clip;
+  /* Do not clip/hide overflow here — it desyncs GSAP pin + scrub on Final design. */
+  overflow-x: visible;
 }
 
 .cs-kicker {
@@ -423,17 +424,27 @@
 }
 
 .cs-device-img {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
+  overflow: hidden;
+  background: #0d0d0d;
 }
 
-.cs-device-preload {
+.cs-device-img-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.cs-device-img-crop {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+  display: block;
+  max-width: none;
+  max-height: none;
   pointer-events: none;
 }
 
@@ -456,12 +467,23 @@
 }
 
 /* Gallery */
+.cs-gallery-runway {
+  position: relative;
+  display: block;
+}
+
 .cs-gallery {
   position: relative;
   padding: 4rem 0 3rem;
   background: #141214;
   color: #fcf4f0;
   overflow: hidden;
+}
+
+.cs-gallery.is-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .cs-gallery-head {
@@ -958,10 +980,21 @@
 }
 
 /* Process morph */
+.cs-process-runway {
+  position: relative;
+  display: block;
+}
+
 .cs-process {
   min-height: 100vh;
   background: #fff;
   padding: 5rem clamp(1.25rem, 4vw, 3rem);
+}
+
+.cs-process.is-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .cs-process-inner {

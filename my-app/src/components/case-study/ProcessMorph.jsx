@@ -1,72 +1,82 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScreenInFrame } from './DeviceFrame';
 import { getScreenImageSrc } from '../../utils/caseStudyImage';
-
-gsap.registerPlugin(ScrollTrigger);
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 export default function ProcessMorph({ stages = [], onInspect }) {
+  const runwayRef = useRef(null);
   const sectionRef = useRef(null);
+  const indexRef = useRef(0);
   const items = useMemo(
     () => (stages || []).filter((s) => Boolean(getScreenImageSrc(s))),
     [stages],
   );
   const [index, setIndex] = useState(0);
+  const reduced = typeof window !== 'undefined' && prefersReducedMotion();
 
-  /* Phone + desktop: pin and scrub through wireframe / process screens */
+  /* Sticky runway: scroll progress steps through wireframe / process screens */
   useEffect(() => {
+    const runway = runwayRef.current;
     const section = sectionRef.current;
-    if (!section || items.length < 2 || prefersReducedMotion()) return undefined;
+    if (!runway || !section || items.length < 2 || reduced) return undefined;
 
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: () => {
-          const perStage = window.innerWidth < 900 ? 0.95 : 0.85;
-          return `+=${window.innerHeight * Math.max(1.35, items.length * perStage)}`;
-        },
-        pin: true,
-        scrub: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const next = Math.min(
-            items.length - 1,
-            Math.floor(self.progress * items.length),
-          );
-          setIndex(next);
-        },
-      });
+    const syncRunwayHeight = () => {
+      const perStage = window.innerWidth < 900 ? 0.95 : 0.85;
+      const travel = window.innerHeight * Math.max(1.35, items.length * perStage);
+      runway.style.height = `${section.offsetHeight + travel}px`;
+    };
 
-      const refresh = () => ScrollTrigger.refresh();
-      window.addEventListener('load', refresh);
-      window.addEventListener('resize', refresh);
-      const t = window.setTimeout(refresh, 400);
+    const apply = () => {
+      const total = Math.max(1, runway.offsetHeight - window.innerHeight);
+      const scrolled = Math.min(total, Math.max(0, -runway.getBoundingClientRect().top));
+      const progress = scrolled / total;
+      const next = Math.min(
+        items.length - 1,
+        Math.max(0, Math.floor(progress * items.length - 1e-6)),
+      );
+      if (next !== indexRef.current) {
+        indexRef.current = next;
+        setIndex(next);
+      }
+    };
 
-      return () => {
-        window.clearTimeout(t);
-        window.removeEventListener('load', refresh);
-        window.removeEventListener('resize', refresh);
-      };
-    }, section);
+    syncRunwayHeight();
+    apply();
 
-    return () => ctx.revert();
-  }, [items.length]);
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(apply);
+    };
+    const onResize = () => {
+      syncRunwayHeight();
+      apply();
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    const t = window.setTimeout(onResize, 300);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(t);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      runway.style.height = '';
+    };
+  }, [items.length, reduced]);
 
   if (!items.length) return null;
 
   const current = items[index] || items[0];
 
-  return (
+  const section = (
     <section
       id="section-process"
-      className="cs-process"
+      className={`cs-process${reduced ? '' : ' is-sticky'}`}
       ref={sectionRef}
       aria-label="Design process"
     >
@@ -102,5 +112,13 @@ export default function ProcessMorph({ stages = [], onInspect }) {
         </div>
       </div>
     </section>
+  );
+
+  if (reduced) return section;
+
+  return (
+    <div className="cs-process-runway" ref={runwayRef}>
+      {section}
+    </div>
   );
 }

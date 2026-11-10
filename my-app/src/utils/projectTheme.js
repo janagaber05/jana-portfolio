@@ -39,17 +39,26 @@ export function getCoverImage(caseStudy, project) {
 
 /** Crop for the hero phone frame — explicit cover crop, else first final screen crop. */
 export function getCoverDisplayCrop(caseStudy) {
-  const coverCrop = caseStudy?.coverDisplayCrop;
-  if (coverCrop?.width > 0 && coverCrop?.height > 0) return coverCrop;
+  // Lazy require avoided — duplicate the sanity checks from getScreenDisplayCrop
+  // so full-width band crops don't blank the hero phone.
+  const sane = (crop) => {
+    if (!crop || !(crop.width > 0) || !(crop.height > 0)) return null;
+    if (crop.width > 1.05 || crop.height > 1.05) return null;
+    if (crop.x < -0.02 || crop.y < -0.02) return null;
+    if (crop.x + crop.width > 1.05 || crop.y + crop.height > 1.05) return null;
+    if (crop.width >= 0.9 && crop.height < 0.85) return null;
+    return crop;
+  };
+
+  const coverCrop = sane(caseStudy?.coverDisplayCrop);
+  if (coverCrop) return coverCrop;
 
   if (caseStudy?.coverImage || caseStudy?.heroImage) return null;
 
   const first = (caseStudy?.finalDesign?.screens || []).find(
     (s) => s?.fullImageUrl || s?.imageUrl,
   );
-  const crop = first?.displayCrop;
-  if (crop?.width > 0 && crop?.height > 0) return crop;
-  return null;
+  return sane(first?.displayCrop);
 }
 
 export function parseMetricValue(raw) {
