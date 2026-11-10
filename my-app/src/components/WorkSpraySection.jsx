@@ -7,7 +7,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AnimatePresence,
   motion,
@@ -18,6 +19,12 @@ import {
 import styles from './WorkSpraySection.module.css';
 import GunErrorBoundary from './GunErrorBoundary';
 import { setProjectTransition } from './fx/transitionStore';
+import { cleanupScrollEffects } from '../utils/scrollCleanup';
+
+function prefersTouchUi() {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(hover: none), (pointer: coarse), (max-width: 900px)').matches;
+}
 
 const PortfolioGun = lazy(() => import('./PortfolioGun'));
 
@@ -152,7 +159,47 @@ function SlipContent({ slip }) {
 }
 
 function ProjectDrawer({ project, onClose }) {
-  return (
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!project) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('fx-scroll-lock');
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.documentElement.classList.remove('fx-scroll-lock');
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [project, onClose]);
+
+  if (typeof document === 'undefined') return null;
+
+  const openCaseStudy = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const href = project?.href || '/work';
+    const slug = project?.project?.slug || String(href).split('/').filter(Boolean).pop();
+    if (slug) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setProjectTransition({
+        slug,
+        color: project.color || project.project?.accent || '#6D0101',
+        title: project.title,
+        rect,
+      });
+    }
+    cleanupScrollEffects();
+    // Navigate before unmounting the drawer so the click isn't lost.
+    navigate(href);
+    onClose();
+  };
+
+  return createPortal(
     <AnimatePresence>
       {project ? (
         <>
@@ -174,17 +221,23 @@ function ProjectDrawer({ project, onClose }) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            onClick={(event) => event.stopPropagation()}
           >
             <button type="button" className={styles.drawerClose} onClick={onClose}>
               Close
             </button>
-            <div className={styles.drawerCover}>
+            <button
+              type="button"
+              className={styles.drawerCover}
+              onClick={openCaseStudy}
+              aria-label={`Open ${project.title} case study`}
+            >
               {project.thumbnail ? (
                 <img src={project.thumbnail} alt="" />
               ) : (
                 <span style={{ background: project.color }}>{project.title}</span>
               )}
-            </div>
+            </button>
             <h3 className={styles.drawerTitle}>{project.title}</h3>
             <p className={styles.drawerDesc}>
               {project.description || project.tag}
@@ -196,29 +249,18 @@ function ProjectDrawer({ project, onClose }) {
                 ))}
               </ul>
             ) : null}
-            <Link
-              to={project.href || '/work'}
+            <button
+              type="button"
               className={styles.drawerCta}
-              onClick={(event) => {
-                const slug = project.project?.slug || String(project.href || '').split('/').pop();
-                if (slug) {
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setProjectTransition({
-                    slug,
-                    color: project.color || project.project?.accent || '#6D0101',
-                    title: project.title,
-                    rect,
-                  });
-                }
-                onClose();
-              }}
+              onClick={openCaseStudy}
             >
               View case study →
-            </Link>
+            </button>
           </motion.aside>
         </>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 
@@ -272,6 +314,7 @@ function FlyingSlip({ flight, slip, onLand }) {
 
 function LandedSlip({ slip, settle, onProjectClick }) {
   const textColor = isLightColor(slip.color) ? BRAND.burgundy : BRAND.cream;
+  const touchUi = useMemo(() => prefersTouchUi(), []);
 
   return (
     <motion.button
@@ -288,7 +331,7 @@ function LandedSlip({ slip, settle, onProjectClick }) {
         rotate: settle.rot,
       }}
       transition={{ type: 'spring', stiffness: 380, damping: 24 }}
-      whileHover={{
+      whileHover={touchUi ? undefined : {
         y: settle.oy - 5,
         rotate: settle.rot * 0.15,
         scale: 1.03,
@@ -306,7 +349,7 @@ function LandedSlip({ slip, settle, onProjectClick }) {
             rect,
           });
         }
-        onProjectClick(slip);
+        onProjectClick(slip, event);
       }}
     >
       <SlipContent slip={slip} />
@@ -318,6 +361,7 @@ export default function WorkSpraySection({
   projects = [],
   moreWorkLabel = 'View more',
 }) {
+  const navigate = useNavigate();
   const reducedMotion = useReducedMotion();
   const sectionRef = useRef(null);
   const pileRef = useRef(null);
@@ -340,6 +384,17 @@ export default function WorkSpraySection({
   const [busy, setBusy] = useState(false);
   const [firing, setFiring] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  const openProject = useCallback((slip) => {
+    // Phone / coarse pointer: skip the drawer so taps aren't eaten by later
+    // sections that sit above Work's stacking context.
+    if (prefersTouchUi() && slip?.href) {
+      cleanupScrollEffects();
+      navigate(slip.href);
+      return;
+    }
+    setSelected(slip);
+  }, [navigate]);
 
   itemsRef.current = items;
   flightsRef.current = flights;
@@ -626,7 +681,7 @@ export default function WorkSpraySection({
                       <LandedSlip
                         slip={slip}
                         settle={item.settle}
-                        onProjectClick={setSelected}
+                        onProjectClick={openProject}
                       />
                     ) : (
                       <div

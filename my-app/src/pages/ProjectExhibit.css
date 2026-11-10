@@ -505,6 +505,7 @@
 .cs-gallery-item {
   margin: 0;
   width: min(72vw, 320px);
+  flex: 0 0 auto;
 }
 
 .cs-gallery-item figcaption {
@@ -515,18 +516,48 @@
   opacity: 0.65;
 }
 
+@media (max-width: 900px) {
+  .cs-gallery {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .cs-gallery-item {
+    width: min(78vw, 300px);
+  }
+
+  .cs-gallery-item .cs-device {
+    width: min(100%, 260px);
+  }
+}
+
+.cs-gallery.is-snap {
+  overflow: visible;
+}
+
 .cs-gallery.is-snap .cs-gallery-track {
   width: auto;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
   padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.cs-gallery.is-snap .cs-gallery-track::-webkit-scrollbar {
+  display: none;
 }
 
 .cs-gallery.is-snap .cs-gallery-item {
   scroll-snap-align: center;
   flex: 0 0 min(78vw, 300px);
+}
+
+.cs-gallery.is-snap .cs-device-hit {
+  touch-action: pan-x;
 }
 
 /* Story */
@@ -1002,9 +1033,56 @@
 }
 
 @media (max-width: 900px) {
-  .cs-process-inner { grid-template-columns: 1fr; }
-  .cs-process-layer { position: relative; opacity: 1; transform: none; }
-  .cs-process-layer + .cs-process-layer { display: none; }
+  .cs-process {
+    min-height: 0;
+    padding: 3rem 0 2.5rem;
+  }
+
+  .cs-process-inner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 1.25rem;
+  }
+
+  .cs-process-copy {
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+  }
+}
+
+/* Phone: swipeable process screens (replaces pin scrub) */
+.cs-process.is-snap .cs-process-frame {
+  display: none;
+}
+
+.cs-process-track {
+  display: flex;
+  gap: 1rem;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
+.cs-process-track::-webkit-scrollbar {
+  display: none;
+}
+
+.cs-process-slide {
+  margin: 0;
+  flex: 0 0 min(72vw, 280px);
+  scroll-snap-align: center;
+}
+
+.cs-process-slide .cs-device {
+  width: 100%;
+}
+
+.cs-process.is-snap .cs-device-hit {
+  touch-action: pan-x;
 }
 
 /* Walkthrough */

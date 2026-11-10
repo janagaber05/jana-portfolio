@@ -14,6 +14,9 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const [index, setIndex] = useState(0);
+  const [snapFallback, setSnapFallback] = useState(() => (
+    typeof window !== 'undefined' && prefersReducedMotion()
+  ));
 
   const items = useMemo(
     () => (screens || []).filter((s) => Boolean(getScreenImageSrc(s))),
@@ -21,10 +24,19 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
   );
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setSnapFallback(mq.matches);
+    sync();
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  }, []);
+
+  /* Phone + desktop: vertical scroll pins the gallery and scrubs images sideways */
+  useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
-    if (!section || !track || items.length < 2) return undefined;
-    if (prefersReducedMotion() || window.innerWidth < 768) return undefined;
+    if (!section || !track || items.length < 2 || snapFallback) return undefined;
 
     const ctx = gsap.context(() => {
       const getOverflow = () => Math.max(0, track.scrollWidth - section.clientWidth + 48);
@@ -35,7 +47,14 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: () => `+=${Math.max(getOverflow() * 1.15, window.innerHeight)}`,
+          end: () => {
+            const overflow = getOverflow();
+            // Give phones enough scroll distance to scrub through every screen.
+            const minTravel = window.innerWidth < 900
+              ? window.innerHeight * Math.max(1.4, items.length * 0.55)
+              : window.innerHeight;
+            return `+=${Math.max(overflow * 1.2, minTravel)}`;
+          },
           pin: true,
           scrub: 0.65,
           anticipatePin: 1,
@@ -50,29 +69,61 @@ export default function PinnedScreenGallery({ screens = [], onInspect }) {
         },
       });
 
-      const onLoad = () => ScrollTrigger.refresh();
-      window.addEventListener('load', onLoad);
-      const t = window.setTimeout(onLoad, 400);
+      const refresh = () => ScrollTrigger.refresh();
+      window.addEventListener('load', refresh);
+      window.addEventListener('resize', refresh);
+      const images = [...track.querySelectorAll('img, .cs-device-img')];
+      images.forEach((img) => img.addEventListener?.('load', refresh));
+      const t = window.setTimeout(refresh, 400);
 
       return () => {
         window.clearTimeout(t);
-        window.removeEventListener('load', onLoad);
+        window.removeEventListener('load', refresh);
+        window.removeEventListener('resize', refresh);
+        images.forEach((img) => img.removeEventListener?.('load', refresh));
         tween.scrollTrigger?.kill();
         tween.kill();
       };
     }, section);
 
     return () => ctx.revert();
-  }, [items.length]);
+  }, [items.length, snapFallback]);
+
+  /* Reduced-motion fallback: native horizontal snap */
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !snapFallback || items.length < 2) return undefined;
+
+    const syncIndex = () => {
+      const center = track.scrollLeft + track.clientWidth / 2;
+      let closest = 0;
+      let closestDistance = Infinity;
+      [...track.querySelectorAll('.cs-gallery-item')].forEach((child, i) => {
+        const mid = child.offsetLeft + child.offsetWidth / 2;
+        const distance = Math.abs(center - mid);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closest = i;
+        }
+      });
+      setIndex(closest);
+    };
+
+    syncIndex();
+    track.addEventListener('scroll', syncIndex, { passive: true });
+    window.addEventListener('resize', syncIndex);
+    return () => {
+      track.removeEventListener('scroll', syncIndex);
+      window.removeEventListener('resize', syncIndex);
+    };
+  }, [items.length, snapFallback]);
 
   if (!items.length) return null;
-
-  const mobile = typeof window !== 'undefined' && (window.innerWidth < 768 || prefersReducedMotion());
 
   return (
     <section
       id="section-final"
-      className={`cs-gallery${mobile ? ' is-snap' : ''}`}
+      className={`cs-gallery${snapFallback ? ' is-snap' : ''}`}
       ref={sectionRef}
       aria-label="Final screens"
     >
