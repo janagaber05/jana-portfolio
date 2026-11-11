@@ -57,8 +57,8 @@ export default function AboutSection() {
       gsap.set('.about-stat', { autoAlpha: 0, y: 18 });
       gsap.set('.about-actions', { autoAlpha: 0, y: 14 });
       gsap.set('.about-photo', { autoAlpha: 0, x: 80 });
-      gsap.set('.about-float-card', { autoAlpha: 0, y: 36, x: 16 });
-      gsap.set('.about-badge', { autoAlpha: 0, y: -10 });
+      gsap.set('.about-float-card', { autoAlpha: 0, y: 20 });
+      gsap.set('.about-badge', { autoAlpha: 0, y: -8 });
 
       const aboutTl = gsap.timeline({
         scrollTrigger: {
@@ -147,7 +147,6 @@ export default function AboutSection() {
           {
             autoAlpha: 1,
             y: 0,
-            x: 0,
             duration: 0.55,
             ease: 'power3.out',
           },
@@ -180,7 +179,7 @@ export default function AboutSection() {
 
   if (!about) return null;
 
-  const photoSrc = resolveMediaUrl(about.photo, heroImage);
+  const photoSrc = resolveMediaUrl(about.photo, heroImage) || heroImage;
 
   return (
     <section

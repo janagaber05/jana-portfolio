@@ -3,11 +3,12 @@
   grid-template-columns: 1fr 1fr;
   min-height: 100vh;
   overflow: hidden;
+  isolation: isolate;
   border-radius: 40px;
   opacity: 0;
   transform: scale(0.6);
   position: relative;
-  z-index: 3;
+  z-index: 5;
   margin: 0 clamp(1rem, 3vw, 2rem) clamp(2.5rem, 6vh, 4.5rem);
 }
 
@@ -189,13 +190,14 @@
   z-index: 3;
   padding: 0.55rem 1rem;
   border-radius: 999px;
-  background: rgba(255, 213, 251, 0.14);
-  color: #FFD5FB;
+  background: rgba(252, 244, 240, 0.92);
+  color: #6D0101;
   font-size: 0.68rem;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   backdrop-filter: blur(6px);
-  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
 .aboutPhotoWrap {
@@ -217,17 +219,18 @@
 
 .aboutFloatCard {
   position: absolute;
-  left: -1.25rem;
-  bottom: 1.75rem;
+  left: 0.85rem;
+  bottom: 1.25rem;
   z-index: 4;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.85rem 1.1rem;
+  max-width: calc(100% - 1.7rem);
+  box-sizing: border-box;
   background: #FCF4F0;
   border-radius: 0.75rem;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  transform: translate(16px, 36px);
 }
 
 .aboutFloatLabel {
@@ -324,8 +327,9 @@
   }
 
   .aboutFloatCard {
-    left: 0.35rem;
+    left: 0.5rem;
     bottom: 0.65rem;
+    max-width: calc(100% - 1rem);
     padding: 0.55rem 0.65rem;
   }
 
