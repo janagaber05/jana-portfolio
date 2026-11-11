@@ -1,6 +1,6 @@
 {
   "meta": {
-    "siteTitle": "Jana \u2014 Portfolio",
+    "siteTitle": "Jana — Portfolio",
     "copyrightYear": "2026"
   },
   "settings": {
@@ -17,7 +17,7 @@
     "bgLineOne": "JANA.",
     "bgLineTwo": "DESIGNER.",
     "stripLineOne": "UX/UI Designer & Developer since 2024",
-    "stripLineTwo": "DESIGN \u00b7 RESEARCH \u00b7 WIREFRAME \u00b7 PROTOTYPE \u00b7 DELIVER \u00b7 ITERATE \u00b7",
+    "stripLineTwo": "DESIGN · RESEARCH · WIREFRAME · PROTOTYPE · DELIVER · ITERATE ·",
     "stripRepeat": 10,
     "nextLabel": "Up Next",
     "nextValue": "Featured Work",
@@ -59,19 +59,20 @@
     "navSocials": [
       {
         "href": "https://instagram.com",
-        "label": "instagram"
+        "label": "instagram",
+        "todo": "TODO: replace with your Instagram handle"
       },
       {
-        "href": "https://linkedin.com",
+        "href": "https://www.linkedin.com/in/jana-gaber-542077374/",
         "label": "linkedin"
       }
     ],
-    "stripTop": "DESIGN \u00b7 RESEARCH \u00b7 WIREFRAME \u00b7 PROTOTYPE \u00b7 DELIVER \u00b7 ITERATE \u00b7",
-    "stripBottom": "UX \u00b7 UI \u00b7 BRAND \u00b7 FRONT-END \u00b7 MOTION"
+    "stripTop": "DESIGN · RESEARCH · WIREFRAME · PROTOTYPE · DELIVER · ITERATE ·",
+    "stripBottom": "UX · UI · BRAND · FRONT-END · MOTION"
   },
   "featuredWork": {
     "eyebrow": "Featured Work",
-    "countLabel": "01 \u2014 06",
+    "countLabel": "01 — 06",
     "homeLimit": 6,
     "homeProjectSlugs": [
       "e-commerce-redesign",
@@ -82,9 +83,9 @@
       "mobile-banking"
     ],
     "moreWorkLabel": "More work",
-    "moreWorkArrow": "\u2192",
+    "moreWorkArrow": "→",
     "moreWorkPageTitle": "More work",
-    "moreWorkPageIntro": "Every project \u2014 from product design to research and development.",
+    "moreWorkPageIntro": "Every project — from product design to research and development.",
     "cardCta": "View project",
     "projects": [
       {
@@ -159,7 +160,7 @@
         "role": "Designer & Developer",
         "client": "Personal",
         "summary": "A custom portfolio built with intentional motion, scroll choreography, and a modular case-study structure.",
-        "challenge": "Off-the-shelf templates felt generic and fought against the brand\u2019s editorial, high-contrast aesthetic.",
+        "challenge": "Off-the-shelf templates felt generic and fought against the brand’s editorial, high-contrast aesthetic.",
         "outcome": "A bespoke site with pinned sections, project pages, and a design language that stays consistent end to end.",
         "tools": [
           "React",
@@ -213,7 +214,7 @@
     "label": "About Jana",
     "headline": "I design for the people who",
     "headlineHighlight": "actually use it.",
-    "paragraph1": "I'm Jana \u2014 a UX/UI designer who cares about how things feel as much as how they look. Every screen, flow, and interaction starts with real people and the problems they need solved.",
+    "paragraph1": "I'm Jana — a UX/UI designer who cares about how things feel as much as how they look. Every screen, flow, and interaction starts with real people and the problems they need solved.",
     "paragraph2": "Based in Cairo, I bridge research, interface design, and prototyping to build digital experiences that are clear, intentional, and human at every touchpoint.",
     "stats": [
       {
@@ -229,12 +230,12 @@
         "label": "Based in"
       }
     ],
-    "ctaPrimary": "Download CV \u2192",
+    "ctaPrimary": "Download CV →",
     "ctaPrimaryHref": "#",
-    "ctaSecondary": "View my work \u2197",
+    "ctaSecondary": "View my work ↗",
     "ctaSecondaryHref": "#work",
     "watermark": "JG",
-    "badge": "\u2726 Available for work",
+    "badge": "✦ Available for work",
     "floatLabel": "Currently",
     "floatValue": "Open to work",
     "photo": ""
@@ -270,9 +271,9 @@
     }
   },
   "process": {
-    "eyebrow": "004 \u2022 PROCESS",
+    "eyebrow": "004 • PROCESS",
     "title": "How We Work",
-    "subtitle": "A proven process designed to transform complex workflows into scalable, user-centered products \u2014 efficiently and strategically.",
+    "subtitle": "A proven process designed to transform complex workflows into scalable, user-centered products — efficiently and strategically.",
     "steps": [
       {
         "num": "01",
@@ -308,31 +309,28 @@
   },
   "contact": {
     "formEnabled": false,
-    "marqueeText": "LET'S BUILD \u00b7 JANA \u00b7 DESIGN \u00b7 CAIRO \u00b7 AVAILABLE \u00b7 ",
+    "marqueeText": "LET'S BUILD · JANA · DESIGN · CAIRO · AVAILABLE · ",
     "marqueeRepeat": 12,
     "topLabel": "Get in touch",
     "availableBadge": "Available for work",
     "headlineLine1": "Let's build",
     "headlineLine2": "something",
     "headlineAccent": "worth using.",
-    "location": "Cairo, Egypt \u00b7 Remote friendly \u00b7 Open to relocation",
+    "location": "Cairo, Egypt · Remote friendly · Open to relocation",
     "email": "janagaber2910@gmail.com",
     "socials": [
       {
         "label": "LinkedIn",
-        "href": "https://linkedin.com"
+        "href": "https://www.linkedin.com/in/jana-gaber-542077374/"
       },
       {
         "label": "Behance",
-        "href": "https://behance.net"
-      },
-      {
-        "label": "Dribbble",
-        "href": "https://dribbble.com"
+        "href": "https://www.behance.net/jojogaber"
       },
       {
         "label": "Instagram",
-        "href": "https://instagram.com"
+        "href": "https://instagram.com",
+        "todo": "TODO: replace with your Instagram handle"
       }
     ],
     "closingLine": "Designed with intention.",
@@ -367,17 +365,17 @@
       "Branding",
       "Design Systems"
     ],
-    "copyright": "\u00a9 2026 Jana \u00b7 All rights reserved",
+    "copyright": "© 2026 Jana · All rights reserved",
     "footerLogo": "",
-    "stripTop": "LET'S TALK \u00b7 OPEN FOR WORK \u00b7 SAY HI \u00b7 CAIRO \u2192 ANYWHERE",
-    "stripBottom": "UX \u00b7 UI \u00b7 BRAND \u00b7 FRONT-END \u00b7 MOTION"
+    "stripTop": "LET'S TALK · OPEN FOR WORK · SAY HI · CAIRO → ANYWHERE",
+    "stripBottom": "UX · UI · BRAND · FRONT-END · MOTION"
   },
   "caseStudies": {
     "wellness-app": {
       "abbreviation": "WA",
       "facts": {
         "role": "UX / UI Designer",
-        "timeline": "6 weeks \u00b7 2025",
+        "timeline": "6 weeks · 2025",
         "tools": "Figma, Maze, FigJam",
         "type": "Mobile App"
       },
@@ -387,16 +385,16 @@
         "highlight": "problem",
         "problemLabel": "The problem",
         "problemTitle": "What was broken",
-        "problemText": "The existing wellness app pushed rigid schedules and noisy notifications. Users opened it once, felt overwhelmed, and never returned \u2014 daily habits never had room to form.",
+        "problemText": "The existing wellness app pushed rigid schedules and noisy notifications. Users opened it once, felt overwhelmed, and never returned — daily habits never had room to form.",
         "solutionLabel": "The solution",
         "solutionTitle": "What I designed",
-        "solutionText": "A calm, habit-first mobile experience with flexible daily goals, gentle reminders, and a progress view that rewards consistency over streaks \u2014 designed to feel supportive, not demanding."
+        "solutionText": "A calm, habit-first mobile experience with flexible daily goals, gentle reminders, and a progress view that rewards consistency over streaks — designed to feel supportive, not demanding."
       },
       "myRole": {
         "sectionNumber": "02",
         "title": "What I specifically did.",
         "highlight": "specifically",
-        "intro": "I led the end-to-end UX process on this project \u2014 from stakeholder interviews and competitive analysis through to high-fidelity UI and developer handoff.",
+        "intro": "I led the end-to-end UX process on this project — from stakeholder interviews and competitive analysis through to high-fidelity UI and developer handoff.",
         "pills": [
           "User research",
           "Competitive analysis",
@@ -417,7 +415,7 @@
           {
             "number": "01",
             "title": "Rigidity repels",
-            "text": "Users abandoned the app when missed days reset their progress. Streaks felt punishing rather than motivating \u2014 flexibility was non-negotiable."
+            "text": "Users abandoned the app when missed days reset their progress. Streaks felt punishing rather than motivating — flexibility was non-negotiable."
           },
           {
             "number": "02",
@@ -427,7 +425,7 @@
           {
             "number": "03",
             "title": "Progress must feel real",
-            "text": "Participants needed visible proof that small actions counted. Abstract metrics meant nothing \u2014 tangible weekly summaries drove retention."
+            "text": "Participants needed visible proof that small actions counted. Abstract metrics meant nothing — tangible weekly summaries drove retention."
           }
         ],
         "persona": {
@@ -436,12 +434,12 @@
           "goal": "Build sustainable wellness habits without guilt when life gets busy",
           "painPoint": "Apps that punish missed days and flood her with irrelevant alerts",
           "behaviour": "Checks in briefly each morning; abandons anything that takes more than 2 minutes",
-          "quote": "\"I want something that meets me where I am \u2014 not where it thinks I should be.\""
+          "quote": "\"I want something that meets me where I am — not where it thinks I should be.\""
         }
       },
       "quote": {
-        "text": "\"I want something that meets me where I am \u2014 not where it thinks I should be.\"",
-        "attribution": "Nour A. \u2014 User interview, February 2025"
+        "text": "\"I want something that meets me where I am — not where it thinks I should be.\"",
+        "attribution": "Nour A. — User interview, February 2025"
       },
       "designProcess": {
         "sectionNumber": "04",
@@ -488,7 +486,7 @@
         "metrics": [
           {
             "value": "89%",
-            "label": "Task completion rate \u2014 up from 58% in baseline testing"
+            "label": "Task completion rate — up from 58% in baseline testing"
           },
           {
             "value": "4.7",
@@ -525,7 +523,7 @@
       },
       "strips": {
         "top": "Figma, Maze, FigJam",
-        "bottom": "UX \u00b7 UI \u00b7 RESEARCH \u00b7 PROTOTYPE \u00b7 MOTION"
+        "bottom": "UX · UI · RESEARCH · PROTOTYPE · MOTION"
       }
     }
   }

@@ -67,8 +67,9 @@ export default function HeroSection() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [menuOpen, closeMenu]);
 
-  const heroImg = resolveMediaUrl(hero?.heroImage, heroImage);
-  const logoSrc = resolveMediaUrl(hero?.logo, logo);
+  // Prefer the bundled portrait when CMS leaves heroImage empty or broken.
+  const heroImg = resolveMediaUrl(hero?.heroImage, heroImage) || heroImage;
+  const logoSrc = resolveMediaUrl(hero?.logo, logo) || logo;
   const roles = useMemo(() => {
     const next = (hero?.roles?.length ? hero.roles : DEFAULT_ROLES)
       .map((role) => String(role || '').trim())
@@ -175,7 +176,19 @@ export default function HeroSection() {
       document.documentElement.classList.toggle('fx-nav-light', active);
     };
 
-    const darkTriggers = ['#contact'].map((selector) => {
+    const setNavScrolled = (active) => {
+      if (!nav) return;
+      nav.classList.toggle(styles.navScrolled, active);
+    };
+
+    const scrolledTrigger = ScrollTrigger.create({
+      trigger: heroEl,
+      start: 'bottom top+=72',
+      onEnter: () => setNavScrolled(true),
+      onLeaveBack: () => setNavScrolled(false),
+    });
+
+    const darkTriggers = ['#about', '#contact'].map((selector) => {
       const section = document.querySelector(selector);
       if (!section) return null;
       return ScrollTrigger.create({
@@ -207,6 +220,7 @@ export default function HeroSection() {
 
     return () => {
       motionInitRef.current = false;
+      scrolledTrigger.kill();
       darkTriggers.forEach((t) => t.kill());
       lightTriggers.forEach((t) => t.kill());
       document.documentElement.classList.remove('fx-nav-light');
@@ -259,7 +273,9 @@ export default function HeroSection() {
               {hero.navCta || 'get in touch'}
             </a>
             <div className={styles.navSocials}>
-              {(hero.navSocials || []).map((link) => (
+              {(hero.navSocials || [])
+                .filter((link) => !/dribbble/i.test(link?.label || '') && !/dribbble\.com/i.test(link?.href || ''))
+                .map((link) => (
                 <a key={link.href} href={safeHref(link.href)} target="_blank" rel="noopener noreferrer">
                   {link.label}
                 </a>
@@ -303,7 +319,9 @@ export default function HeroSection() {
             {hero.navCta || 'get in touch'}
           </a>
           <div className={styles.mobileMenuSocials}>
-            {(hero.navSocials || []).map((link) => (
+            {(hero.navSocials || [])
+              .filter((link) => !/dribbble/i.test(link?.label || '') && !/dribbble\.com/i.test(link?.href || ''))
+              .map((link) => (
               <a
                 key={link.href}
                 href={safeHref(link.href)}
@@ -319,6 +337,7 @@ export default function HeroSection() {
       </header>
 
       <section className={styles.hero} id="home" ref={heroRef} aria-label="Introduction">
+        <h1 className={styles.srOnly}>Jana Gaber — UX/UI Designer &amp; Front-End Developer</h1>
         <InkTrail />
         <div className={styles.roles} ref={rolesRef} aria-hidden="true">
           <span className={`${styles.role} ${styles.roleTL} fx-role-hover`} data-role data-role-pos="top">

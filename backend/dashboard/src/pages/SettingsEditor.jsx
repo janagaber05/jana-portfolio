@@ -163,6 +163,7 @@ export default function SettingsEditor() {
       </Card>
 
       <Card title="Social profiles">
+        {/* TODO: replace Instagram href with your handle */}
         <ListEditor
           items={settings.socials || draft.hero?.navSocials || []}
           onChange={(v) => setSettings('socials', v)}

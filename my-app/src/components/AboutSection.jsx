@@ -180,7 +180,7 @@ export default function AboutSection() {
 
   if (!about) return null;
 
-  const photoSrc = resolveMediaUrl(about.photo, heroImage);
+  const photoSrc = resolveMediaUrl(about.photo, heroImage) || heroImage;
 
   return (
     <section

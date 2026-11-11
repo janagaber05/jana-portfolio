@@ -349,6 +349,13 @@ html.fx-scroll-lock body {
 }
 
 /* Nav readable over light sections (#work, #process) — attribute selectors survive CSS Modules */
+html.fx-nav-light header nav {
+  background: rgba(252, 244, 240, 0.82) !important;
+  border-bottom-color: rgba(20, 18, 20, 0.08) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
 html.fx-nav-light header nav > a img,
 html.fx-nav-light header nav a[aria-label='Home'] img {
   filter: none !important;

@@ -41,7 +41,7 @@ export const defaultSite = {
     ],
     navSocials: [
       { href: 'https://instagram.com', label: 'instagram' },
-      { href: 'https://linkedin.com', label: 'linkedin' },
+      { href: 'https://www.linkedin.com/in/jana-gaber-542077374/', label: 'linkedin' },
     ],
   },
   featuredWork: {
@@ -242,9 +242,8 @@ export const defaultSite = {
     location: 'Cairo, Egypt · Remote friendly · Open to relocation',
     email: 'janagaber2910@gmail.com',
     socials: [
-      { label: 'LinkedIn', href: 'https://linkedin.com' },
-      { label: 'Behance', href: 'https://behance.net' },
-      { label: 'Dribbble', href: 'https://dribbble.com' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jana-gaber-542077374/' },
+      { label: 'Behance', href: 'https://www.behance.net/jojogaber' },
       { label: 'Instagram', href: 'https://instagram.com' },
     ],
     closingLine: 'Designed with intention.',

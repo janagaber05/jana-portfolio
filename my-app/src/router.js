@@ -245,8 +245,9 @@ function Hero() {
         <div className="nav__right">
           <a href="mailto:janagaber2910@gmail.com" className="nav__cta">get in touch</a>
           <div className="nav__socials">
+            {/* TODO: replace Instagram with your handle */}
             <a href="https://instagram.com" target="_blank" rel="noreferrer">instagram</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer">linkedin</a>
+            <a href="https://www.linkedin.com/in/jana-gaber-542077374/" target="_blank" rel="noreferrer">linkedin</a>
           </div>
         </div>
       </header>

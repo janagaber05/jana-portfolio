@@ -29,7 +29,12 @@
     "badgeName": "JANA",
     "badgeTitle": "UX/UI Designer",
     "badgeTagline": "Designing apps people love",
-    "roles": ["DESIGNER", "RESEARCHER", "PROTOTYPER", "CREATOR"],
+    "roles": [
+      "DESIGNER",
+      "RESEARCHER",
+      "PROTOTYPER",
+      "CREATOR"
+    ],
     "heroImage": "",
     "heroAnimated": "",
     "logo": "",
@@ -54,10 +59,11 @@
     "navSocials": [
       {
         "href": "https://instagram.com",
-        "label": "instagram"
+        "label": "instagram",
+        "todo": "TODO: replace with your Instagram handle"
       },
       {
-        "href": "https://linkedin.com",
+        "href": "https://www.linkedin.com/in/jana-gaber-542077374/",
         "label": "linkedin"
       }
     ]
@@ -306,19 +312,16 @@
     "socials": [
       {
         "label": "LinkedIn",
-        "href": "https://linkedin.com"
+        "href": "https://www.linkedin.com/in/jana-gaber-542077374/"
       },
       {
         "label": "Behance",
-        "href": "https://behance.net"
-      },
-      {
-        "label": "Dribbble",
-        "href": "https://dribbble.com"
+        "href": "https://www.behance.net/jojogaber"
       },
       {
         "label": "Instagram",
-        "href": "https://instagram.com"
+        "href": "https://instagram.com",
+        "todo": "TODO: replace with your Instagram handle"
       }
     ],
     "closingLine": "Designed with intention.",

@@ -86,7 +86,9 @@ export default function ContactSection() {
           <ContactForm contact={contact} />
 
           <nav className={styles.socialRow} aria-label="Social links">
-            {contact.socials.map((link) => (
+            {(contact.socials || [])
+              .filter((link) => !/dribbble/i.test(link?.label || '') && !/dribbble\.com/i.test(link?.href || ''))
+              .map((link) => (
               <a
                 key={link.label}
                 href={safeHref(link.href)}
@@ -164,7 +166,18 @@ export default function ContactSection() {
 
           <div className={styles.footerBar}>
             <p className={styles.copyright}>{contact.copyright}</p>
-            <p className={styles.footerCredit}>Cairo, Egypt · Portfolio 2026</p>
+            <p className={styles.footerCredit}>
+              Cairo, Egypt · Portfolio 2026
+              <span className={styles.footerCreditSep} aria-hidden="true"> · </span>
+              <a
+                className={styles.modelCredit}
+                href="https://sketchfab.com/3d-models/money-gun-3e073233e3e5482ba2acf33c32de82b4"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Money gun 3D model by Malibu · CC BY-NC 4.0
+              </a>
+            </p>
           </div>
         </div>
       </footer>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './IdCardFaces.module.css';
 
 const DEFAULT_DOINGS = [
@@ -24,6 +25,27 @@ const DEFAULT_DOINGS = [
   },
 ];
 
+function PhotoArea({ imageUrl, monogram = 'JG' }) {
+  const [failed, setFailed] = useState(false);
+  const showPhoto = Boolean(imageUrl) && !failed;
+
+  return (
+    <div className={styles.photoWrap}>
+      {showPhoto ? (
+        <img
+          className={styles.photo}
+          src={imageUrl}
+          alt=""
+          draggable={false}
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span className={styles.photoFallback} aria-hidden="true">{monogram}</span>
+      )}
+    </div>
+  );
+}
+
 export function IdCardFront({
   imageUrl,
   name = 'JANA',
@@ -32,14 +54,18 @@ export function IdCardFront({
   availableLabel = 'Available for hire',
   barcodeLabel = '10 2024',
 }) {
+  const monogram = String(name || 'JG')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'JG';
+
   return (
     <div className={styles.face}>
       <div className={styles.content}>
-        <div className={styles.photoWrap}>
-          {imageUrl ? (
-            <img className={styles.photo} src={imageUrl} alt="" draggable={false} />
-          ) : null}
-        </div>
+        <PhotoArea imageUrl={imageUrl} monogram={monogram === 'J' ? 'JG' : monogram} />
 
         <div className={styles.frontBody}>
           <div className={styles.nameRow}>
