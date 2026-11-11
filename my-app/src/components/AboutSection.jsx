@@ -28,42 +28,29 @@ export default function AboutSection() {
     if (!section || !about) return undefined;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        section,
-        {
-          scale: 0.6,
-          opacity: 0,
-          borderRadius: '40px',
-        },
-        {
-          scale: 1,
-          opacity: 1,
-          borderRadius: '40px',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'top 78%',
-            scrub: 0.5,
-          },
-        },
-      );
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       gsap.set('.about-label', { autoAlpha: 0, y: 12 });
-      gsap.set('.about-headline', { autoAlpha: 0, y: 40 });
+      gsap.set('.about-headline', { autoAlpha: 0, y: 28 });
       gsap.set('.about-divider', { scaleX: 0, transformOrigin: 'left center' });
       gsap.set('.about-para-1', { autoAlpha: 0, y: 14 });
       gsap.set('.about-para-2', { autoAlpha: 0, y: 14 });
-      gsap.set('.about-stat', { autoAlpha: 0, y: 18 });
-      gsap.set('.about-actions', { autoAlpha: 0, y: 14 });
-      gsap.set('.about-photo', { autoAlpha: 0, x: 80 });
-      gsap.set('.about-float-card', { autoAlpha: 0, y: 36, x: 16 });
-      gsap.set('.about-badge', { autoAlpha: 0, y: -10 });
+      gsap.set('.about-stat', { autoAlpha: 0, y: 16 });
+      gsap.set('.about-actions', { autoAlpha: 0, y: 12 });
+      gsap.set('.about-photo', { autoAlpha: 0, y: 24 });
+      gsap.set('.about-float-card', { autoAlpha: 0, y: 18 });
+      gsap.set('.about-badge', { autoAlpha: 0, y: -8 });
+
+      if (reduceMotion) {
+        gsap.set(section.querySelectorAll('.about-label, .about-headline, .about-para-1, .about-para-2, .about-stat, .about-actions, .about-photo, .about-float-card, .about-badge'), { autoAlpha: 1, x: 0, y: 0 });
+        gsap.set(section.querySelectorAll('.about-divider'), { scaleX: 1 });
+        return;
+      }
 
       const aboutTl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
-          start: 'top 72%',
+          start: 'top 78%',
           toggleActions: 'play none none none',
         },
       });
@@ -75,101 +62,67 @@ export default function AboutSection() {
           duration: 0.4,
           ease: 'power2.out',
         })
-        .to(
-          '.about-headline',
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.9,
-            ease: 'power4.out',
-          },
-          '+=0.2',
-        )
-        .addLabel('headlineStart', '<')
-        .to(
-          '.about-photo',
-          {
-            autoAlpha: 1,
-            x: 0,
-            duration: 1,
-            ease: 'power3.out',
-          },
-          'headlineStart',
-        )
-        .to(
-          '.about-divider',
-          {
-            scaleX: 1,
-            duration: 0.45,
-            ease: 'power2.inOut',
-          },
-          'headlineStart+=0.9',
-        )
-        .to(
-          '.about-para-1',
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.45,
-            ease: 'power2.out',
-          },
-          '+=0.12',
-        )
-        .to(
-          '.about-para-2',
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.45,
-            ease: 'power2.out',
-          },
-          '+=0.14',
-        )
-        .to('.about-stat', {
+        .to('.about-headline', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+        }, '-=0.1')
+        .addLabel('in')
+        .to('.about-photo', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+        }, 'in')
+        .to('.about-badge', {
           autoAlpha: 1,
           y: 0,
           duration: 0.4,
-          ease: 'power3.out',
-          stagger: 0.12,
-        })
-        .to(
-          '.about-actions',
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.45,
-            ease: 'power2.out',
-          },
-          '+=0.08',
-        )
-        .to(
-          '.about-float-card',
-          {
-            autoAlpha: 1,
-            y: 0,
-            x: 0,
-            duration: 0.55,
-            ease: 'power3.out',
-          },
-          'headlineStart+=1.1',
-        )
-        .to(
-          '.about-badge',
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.4,
-            ease: 'power3.out',
-          },
-          '+=0.12',
-        );
+          ease: 'power2.out',
+        }, 'in+=0.15')
+        .to('.about-divider', {
+          scaleX: 1,
+          duration: 0.4,
+          ease: 'power2.inOut',
+        }, 'in+=0.2')
+        .to('.about-para-1', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+        }, 'in+=0.25')
+        .to('.about-para-2', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+        }, 'in+=0.38')
+        .to('.about-stat', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.35,
+          ease: 'power2.out',
+          stagger: 0.08,
+        }, 'in+=0.5')
+        .to('.about-actions', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+        }, 'in+=0.65')
+        .to('.about-float-card', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.45,
+          ease: 'power2.out',
+        }, 'in+=0.45');
     }, section);
 
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
       const rect = section.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.85) {
-        gsap.set(section, { scale: 1, opacity: 1, borderRadius: '40px' });
+      if (rect.top < window.innerHeight * 0.8) {
         gsap.set(section.querySelectorAll('.about-label, .about-headline, .about-para-1, .about-para-2, .about-stat, .about-actions, .about-photo, .about-float-card, .about-badge'), { autoAlpha: 1, x: 0, y: 0 });
         gsap.set(section.querySelectorAll('.about-divider'), { scaleX: 1 });
       }
@@ -187,7 +140,6 @@ export default function AboutSection() {
       id="about"
       ref={aboutRef}
       className={styles.about}
-      style={{ transformOrigin: 'center center', willChange: 'transform' }}
     >
       <div className={styles.aboutLeft}>
         <div className={styles.aboutLeftInner}>
