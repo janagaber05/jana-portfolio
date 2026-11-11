@@ -1,39 +1,31 @@
 .about {
-  --about-ink: #141214;
-  --about-panel: #1a1a1a;
-  --about-burgundy: #6d0101;
-  --about-cream: #fcf4f0;
-  --about-pink: #ffd5fb;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: min(100vh, 56rem);
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
   overflow: hidden;
-  isolation: isolate;
-  border-radius: 2rem;
+  border-radius: 40px;
+  opacity: 0;
+  transform: scale(0.6);
   position: relative;
   z-index: 3;
   margin: 0 clamp(1rem, 3vw, 2rem) clamp(2.5rem, 6vh, 4.5rem);
-  background: var(--about-panel);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
 }
 
 .aboutLeft {
-  background: var(--about-panel);
-  color: var(--about-cream);
+  background: #1A1A1A;
+  color: #FCF4F0;
   display: flex;
   align-items: stretch;
-  min-width: 0;
 }
 
 .aboutLeftInner {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: clamp(1.25rem, 2.5vh, 2rem);
+  justify-content: space-between;
+  gap: 2rem;
   width: 100%;
-  min-height: 100%;
-  padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.75rem, 4.5vw, 3.75rem);
-  box-sizing: border-box;
+  min-height: 100vh;
+  padding: clamp(3rem, 7vh, 5rem) clamp(2rem, 5vw, 4.5rem);
 }
 
 .aboutLabel {
@@ -46,18 +38,16 @@
 
 .aboutHeadline {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  font-size: clamp(2.2rem, 4.2vw, 3.6rem);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.12;
   letter-spacing: -0.01em;
-  max-width: 18ch;
+  max-width: 14ch;
   margin: 0;
-  text-wrap: pretty;
-  overflow-wrap: break-word;
 }
 
 .aboutHighlight {
-  color: var(--about-pink);
+  color: #FFD5FB;
 }
 
 .aboutLabel,
@@ -76,76 +66,73 @@
 .aboutDivider {
   width: 40px;
   height: 2px;
-  background: var(--about-burgundy);
-  margin: 0;
+  background: #6D0101;
+  margin-top: 0.25rem;
   transform: scaleX(0);
   transform-origin: left center;
-  flex-shrink: 0;
 }
 
 .aboutBody {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  max-width: 42ch;
+  gap: 1rem;
+  max-width: 44ch;
 }
 
 .aboutParagraph {
   margin: 0;
-  font-size: clamp(0.92rem, 1.2vw, 1.02rem);
-  line-height: 1.7;
-  color: rgba(252, 244, 240, 0.68);
+  font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+  line-height: 1.75;
+  color: rgba(252, 244, 240, 0.6);
 }
 
 .aboutStats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.25rem;
-  max-width: 26rem;
-  padding-top: 0.35rem;
+  gap: 1.5rem;
+  max-width: 28rem;
 }
 
 .aboutStat {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  min-width: 0;
+  gap: 0.35rem;
 }
 
 .aboutStatValue {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
   line-height: 1;
   letter-spacing: 0.04em;
-  color: var(--about-pink);
+  color: #FFD5FB;
 }
 
 .aboutStatLabel {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(252, 244, 240, 0.55);
-  line-height: 1.35;
+  color: rgba(252, 244, 240, 0.6);
 }
 
 .aboutActions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem 1.5rem;
-  padding-top: 0.35rem;
+  gap: 1.25rem 1.75rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
 }
 
 .aboutCtaPrimary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 1.5rem;
+  padding: 0.9rem 1.65rem;
   border-radius: 999px;
-  background: var(--about-burgundy);
-  color: var(--about-cream);
+  background: #6D0101;
+  color: #FCF4F0;
   text-decoration: none;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   transition: transform 0.2s, background 0.2s;
@@ -159,97 +146,92 @@
 .aboutCtaGhost {
   color: rgba(252, 244, 240, 0.75);
   text-decoration: none;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   letter-spacing: 0.08em;
   border-bottom: 1px solid rgba(252, 244, 240, 0.25);
   transition: color 0.2s, border-color 0.2s;
 }
 
 .aboutCtaGhost:hover {
-  color: var(--about-pink);
+  color: #FFD5FB;
   border-bottom-color: rgba(255, 213, 251, 0.55);
 }
 
 .aboutRight {
   position: relative;
-  background: var(--about-burgundy);
-  min-height: 100%;
+  background: #6D0101;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: clamp(2rem, 5vh, 3.5rem) clamp(1.25rem, 3vw, 2.5rem);
-  box-sizing: border-box;
 }
 
 .aboutWatermark {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(10rem, 28vw, 22rem);
+  font-size: clamp(14rem, 34vw, 28rem);
   line-height: 0.85;
   letter-spacing: -0.04em;
-  color: rgba(252, 244, 240, 0.06);
+  color: rgba(252, 244, 240, 0.04);
   pointer-events: none;
   user-select: none;
-  overflow: hidden;
 }
 
 .aboutBadge {
   position: absolute;
-  top: clamp(1.25rem, 3vh, 2rem);
-  right: clamp(1.25rem, 3vw, 2rem);
+  top: clamp(1.5rem, 4vh, 2.5rem);
+  right: clamp(1.5rem, 4vw, 2.5rem);
   z-index: 3;
   padding: 0.55rem 1rem;
   border-radius: 999px;
-  background: rgba(252, 244, 240, 0.95);
-  color: var(--about-burgundy);
-  font-size: 0.62rem;
-  font-weight: 600;
+  background: rgba(255, 213, 251, 0.14);
+  color: #FFD5FB;
+  font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
   transform: translateY(-10px);
 }
 
 .aboutPhotoWrap {
   position: relative;
   z-index: 2;
-  width: min(78%, 22rem);
-  margin: 0;
+  width: 75%;
+  max-width: 26rem;
 }
 
 .aboutPhoto {
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  object-position: center 12%;
+  object-position: center top;
   display: block;
-  border-radius: 1.15rem;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
-  background: rgba(0, 0, 0, 0.15);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
 }
 
 .aboutFloatCard {
   position: absolute;
-  left: clamp(0.65rem, 2vw, 1rem);
-  bottom: 1.35rem;
+  left: -1.25rem;
+  bottom: 1.75rem;
   z-index: 4;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 0.8rem 1rem;
-  max-width: calc(100% - 1.5rem);
-  box-sizing: border-box;
-  background: var(--about-cream);
+  padding: 0.85rem 1.1rem;
+  background: #FCF4F0;
   border-radius: 0.75rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  transform: translate(16px, 36px);
 }
 
 .aboutFloatLabel {
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(26, 26, 26, 0.45);
@@ -257,115 +239,134 @@
 
 .aboutFloatValue {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   letter-spacing: 0.04em;
-  color: #1a1a1a;
+  color: #1A1A1A;
   font-weight: 400;
 }
 
 @media (max-width: 900px) {
+  /* Keep desktop side-by-side composition on phone */
   .about {
-    grid-template-columns: 1fr;
-    margin-inline: 0.75rem;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    margin-inline: 0.65rem;
     margin-bottom: 2.5rem;
-    border-radius: 1.35rem;
+    border-radius: 1.5rem;
     min-height: auto;
   }
 
   .aboutLeftInner {
+    min-height: auto;
     gap: 1.15rem;
-    padding: 1.75rem 1.25rem 1.5rem;
+    padding: 1.35rem 1rem 1.5rem;
     justify-content: flex-start;
   }
 
   .aboutHeadline {
-    max-width: 18ch;
-    font-size: clamp(1.7rem, 7vw, 2.35rem);
+    max-width: none;
+    font-size: clamp(1.35rem, 5.2vw, 1.85rem);
   }
 
   .aboutBody {
-    gap: 0.75rem;
+    gap: 0.65rem;
     max-width: none;
   }
 
   .aboutParagraph {
-    font-size: 0.9rem;
-    line-height: 1.65;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .aboutStats {
     max-width: none;
-    gap: 1rem;
+    gap: 0.65rem;
   }
 
   .aboutStatValue {
-    font-size: clamp(1.45rem, 6vw, 1.85rem);
+    font-size: clamp(1.2rem, 4.5vw, 1.55rem);
   }
 
   .aboutStatLabel {
-    font-size: 0.58rem;
+    font-size: 0.55rem;
     letter-spacing: 0.1em;
   }
 
   .aboutActions {
-    gap: 0.75rem 1rem;
+    flex-wrap: nowrap;
+    gap: 0.55rem 0.75rem;
+    padding-top: 0.15rem;
+    margin-top: 0.35rem;
   }
 
   .aboutCtaPrimary {
-    padding: 0.75rem 1.15rem;
-    font-size: 0.72rem;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   .aboutCtaGhost {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    white-space: nowrap;
   }
 
   .aboutRight {
-    min-height: 22rem;
-    padding: 1.5rem 1.25rem 1.75rem;
+    min-height: 100%;
+    padding: 1rem 0.75rem 1.25rem;
   }
 
   .aboutPhotoWrap {
-    width: min(78%, 16rem);
+    width: min(92%, 14rem);
   }
 
   .aboutFloatCard {
-    left: 0.65rem;
-    right: auto;
-    bottom: 0.85rem;
-    max-width: calc(100% - 1.25rem);
-    padding: 0.65rem 0.8rem;
+    left: 0.35rem;
+    bottom: 0.65rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .aboutFloatLabel {
+    font-size: 0.5rem;
+  }
+
+  .aboutFloatValue {
+    font-size: 0.85rem;
   }
 
   .aboutBadge {
-    top: 1rem;
-    right: 1rem;
+    top: 0.75rem;
+    right: 0.65rem;
     font-size: 0.55rem;
-    padding: 0.4rem 0.7rem;
-  }
-
-  .aboutWatermark {
-    font-size: clamp(8rem, 40vw, 14rem);
+    padding: 0.35rem 0.55rem;
   }
 }
 
 @media (max-width: 420px) {
   .about {
-    margin-inline: 0.55rem;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    margin-inline: 0.45rem;
     border-radius: 1.15rem;
   }
 
   .aboutLeftInner {
-    padding: 1.35rem 1rem 1.25rem;
-    gap: 1rem;
+    padding: 1.1rem 0.75rem 1.25rem;
+    gap: 0.85rem;
+  }
+
+  .aboutParagraph {
+    -webkit-line-clamp: 4;
   }
 
   .aboutCtaPrimary {
-    padding: 0.65rem 0.95rem;
-    font-size: 0.68rem;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.62rem;
   }
 
   .aboutCtaGhost {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
   }
 }
