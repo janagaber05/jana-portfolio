@@ -1,0 +1,16 @@
+Copyright (c) 2026 Jana Gaber. All rights reserved.
+
+This repository contains the source code, design, content, images and other
+assets of Jana Gaber's personal portfolio website.
+
+The code is published publicly for portfolio review only. No license is
+granted to copy, modify, distribute, sublicense or use any part of this
+repository, in whole or in part, for any purpose without prior written
+permission from the copyright holder.
+
+Third-party components keep their own licenses, including:
+- npm dependencies, under their respective open-source licenses.
+- "Money Gun" 3D model by Malibu (Sketchfab), licensed under CC BY-NC 4.0:
+  https://sketchfab.com/3d-models/money-gun-3e073233e3e5482ba2acf33c32de82b4
+
+For permission requests, contact: janagaber2910@gmail.com
