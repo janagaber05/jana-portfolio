@@ -34,11 +34,11 @@ function sanitizePath(path) {
 async function updatePresence(path) {
   if (!supabase) return;
 
-  await supabase.from('analytics_presence').upsert({
-    session_id: getSessionId(),
-    visitor_id: getVisitorId(),
-    path: sanitizePath(path),
-    last_seen: new Date().toISOString(),
+  // RPC (not upsert): anon has no SELECT on analytics_presence, which upsert needs.
+  await supabase.rpc('track_presence', {
+    p_session_id: getSessionId(),
+    p_visitor_id: getVisitorId(),
+    p_path: sanitizePath(path),
   });
 }
 
